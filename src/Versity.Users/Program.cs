@@ -1,8 +1,14 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Versity.Users.Configurations;
 using Versity.Users.Core.Application;
+using Versity.Users.Core.Application.Abstractions;
 using Versity.Users.Core.Domain.Models;
 using Versity.Users.Persistence;
+using Versity.Users.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,9 +27,48 @@ builder.Services.AddIdentity<VersityUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<VersityUsersDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddTransient<IAuthTokenGeneratorService, JwtTokenGeneratorService>();
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters()
+    {
+        ValidateActor = true,
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        RequireExpirationTime = true,
+        ValidateIssuerSigningKey = true,
+        // TODO: move this from config to env variables
+        ValidIssuer = builder.Configuration.GetSection("Jwt:Issuer").Value,
+        ValidAudience = builder.Configuration.GetSection("Jwt:Audience").Value,
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration.GetSection("Jwt:Key").Value))
+    };
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
+    {
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+});
+
+builder.Services.AddCors(options =>
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyHeader();
+        policy.AllowAnyMethod();
+        policy.AllowAnyOrigin();
+    }));
 
 var app = builder.Build();
 
@@ -33,11 +78,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
-
 app.AddGlobalErrorHandler();
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseCors("AllowAll");
+app.MapControllers();
 
 using var scope = app.Services.CreateScope();
 var serviceProvider = scope.ServiceProvider;

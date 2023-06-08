@@ -1,6 +1,6 @@
 ﻿using Versity.Users.Core.Domain.Models;
 
-namespace Versity.Users.Core.Domain.Abstractions;
+namespace Versity.Users.Core.Application.Abstractions;
 
 public interface IVersityUsersRepository
 {

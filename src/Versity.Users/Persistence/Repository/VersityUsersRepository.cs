@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Versity.Users.Core.Domain.Abstractions;
+using Versity.Users.Core.Application.Abstractions;
 using Versity.Users.Core.Domain.Models;
 
 namespace Versity.Users.Persistence.Repository;

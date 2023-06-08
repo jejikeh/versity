@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Versity.Users.Abstractions;
+using Versity.Users.Core.Application.Abstractions;
 using Versity.Users.Core.Application.RequestHandlers.Auth.Commands.LoginVersityUser;
 using Versity.Users.Core.Application.RequestHandlers.Commands.RegisterVersityUser;
 using Versity.Users.Dtos;
@@ -10,8 +11,11 @@ namespace Versity.Users.Controllers;
 [Route("api/[controller]/[action]")]
 public sealed class AuthController : ApiController
 {
-    public AuthController(ISender sender) : base(sender)
+    private readonly IAuthTokenGeneratorService _tokenGeneratorService;
+    
+    public AuthController(ISender sender, IAuthTokenGeneratorService tokenGeneratorService) : base(sender)
     {
+        _tokenGeneratorService = tokenGeneratorService;
     }
 
     [HttpPost]
@@ -29,7 +33,7 @@ public sealed class AuthController : ApiController
     {
         var command = new LoginVersityUserCommand(userDto.Email, userDto.Password);
 
-        var result = await Sender.Send(command, cancellationToken);
-        return result ? Accepted() : BadRequest();
+        var (user, result) = await Sender.Send(command, cancellationToken);
+        return result ? Ok(_tokenGeneratorService.GenerateToken(user)) : BadRequest();
     }
 }
