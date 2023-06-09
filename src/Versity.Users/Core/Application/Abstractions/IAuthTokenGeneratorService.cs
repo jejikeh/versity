@@ -4,5 +4,5 @@ namespace Application.Abstractions;
 
 public interface IAuthTokenGeneratorService
 {
-    string GenerateToken(string userId, string userEmail, params string[] roles);
+    public string GenerateToken(string userId, string userEmail, params string[] roles);
 }
