@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using System.Text;
 using Application.Abstractions;
-using Domain.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;

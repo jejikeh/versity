@@ -1,4 +1,4 @@
-﻿namespace Versity.Users.Dtos;
+﻿namespace Application.Dtos;
 
 public record ViewVersityUserDto(
     string FirstName, 

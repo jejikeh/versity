@@ -102,7 +102,7 @@ try
             await roleManager.CreateAsync(new IdentityRole(role));
     }
 }
-catch (Exception ex)
+catch (Exception _)
 {
     // TODO
 }

@@ -1,13 +1,12 @@
 ﻿using System.Security.Claims;
+using Application.Dtos;
 using Application.RequestHandlers.Auth.Commands.GetAdminRole;
 using Application.RequestHandlers.Auth.Commands.LoginVersityUser;
+using Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Abstractions;
-using Presentation.Dtos;
-using Versity.Users.Core.Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
-using Versity.Users.Dtos;
 
 namespace Presentation.Controllers;
 

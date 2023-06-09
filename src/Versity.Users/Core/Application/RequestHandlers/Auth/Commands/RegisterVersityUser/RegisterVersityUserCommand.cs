@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Identity;
 
-namespace Versity.Users.Core.Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
+namespace Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
 
 public record RegisterVersityUserCommand(
     string FirstName, 

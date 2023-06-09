@@ -1,4 +1,4 @@
-﻿namespace Versity.Users.Exceptions;
+﻿namespace Application.Exceptions;
 
 public class BadRequestException : Exception
 {

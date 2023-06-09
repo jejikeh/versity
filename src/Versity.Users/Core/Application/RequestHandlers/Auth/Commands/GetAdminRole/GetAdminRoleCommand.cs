@@ -1,5 +1,4 @@
-﻿using Domain.Models;
-using MediatR;
+﻿using MediatR;
 
 namespace Application.RequestHandlers.Auth.Commands.GetAdminRole;
 

@@ -1,6 +1,4 @@
-﻿using Domain.Models;
-
-namespace Application.Abstractions;
+﻿namespace Application.Abstractions;
 
 public interface IAuthTokenGeneratorService
 {
