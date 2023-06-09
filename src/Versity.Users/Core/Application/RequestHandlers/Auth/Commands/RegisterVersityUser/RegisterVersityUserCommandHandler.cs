@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Versity.Users.Core.Domain.Models;
 
-namespace Versity.Users.Core.Application.RequestHandlers.Commands.RegisterVersityUser;
+namespace Versity.Users.Core.Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
 
 public class RegisterVersityUserCommandHandler : IRequestHandler<RegisterVersityUserCommand, IdentityResult>
 {
@@ -26,6 +26,7 @@ public class RegisterVersityUserCommandHandler : IRequestHandler<RegisterVersity
         };
 
         var result = await _userManager.CreateAsync(versityUser, request.Password);
+        await _userManager.AddToRoleAsync(versityUser, "Member");
         return result;
     }
 }

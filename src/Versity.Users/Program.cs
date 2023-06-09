@@ -5,10 +5,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Versity.Users.Configurations;
 using Versity.Users.Core.Application;
-using Versity.Users.Core.Application.Abstractions;
 using Versity.Users.Core.Domain.Models;
+using Versity.Users.Infrastructure.Services;
+using Versity.Users.Infrastructure.Services.Interfaces;
 using Versity.Users.Persistence;
-using Versity.Users.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,16 +16,17 @@ builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddApplication();
 
 builder.Services.AddIdentity<VersityUser, IdentityRole>(options =>
-{
-    options.Password.RequiredLength = 8;
-    options.Password.RequireUppercase = true;
-    options.Password.RequireLowercase = true;
-    options.User.RequireUniqueEmail = true;
-    options.User.AllowedUserNameCharacters =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
-})
+    {
+        options.Password.RequiredLength = 8;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireLowercase = true;
+        options.User.RequireUniqueEmail = true;
+        options.User.AllowedUserNameCharacters =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
+    })
     .AddEntityFrameworkStores<VersityUsersDbContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders()
+    .AddRoles<IdentityRole>();
 
 builder.Services.AddTransient<IAuthTokenGeneratorService, JwtTokenGeneratorService>();
 
@@ -89,6 +90,14 @@ using var scope = app.Services.CreateScope();
 var serviceProvider = scope.ServiceProvider;
 try
 {
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var roles = new[] { "Admin", "Member" };
+    foreach (var role in roles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole(role));
+    }
+    
     var versityUsersDbContext = serviceProvider.GetRequiredService<VersityUsersDbContext>();
     versityUsersDbContext.Database.EnsureCreated();
 }

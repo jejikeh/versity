@@ -2,11 +2,11 @@
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using Versity.Users.Core.Application.Abstractions;
 using Versity.Users.Core.Domain.Models;
+using Versity.Users.Infrastructure.Services.Interfaces;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
-namespace Versity.Users.Services;
+namespace Versity.Users.Infrastructure.Services;
 
 public class JwtTokenGeneratorService : IAuthTokenGeneratorService
 {
@@ -17,14 +17,15 @@ public class JwtTokenGeneratorService : IAuthTokenGeneratorService
         _config = config;
     }
 
-    public string GenerateToken(VersityUser user)
+    public string GenerateToken(VersityUser user, params string[] roles)
     {
         var claims = new List<Claim>()
         {
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
             new Claim(JwtRegisteredClaimNames.Email, user.NormalizedEmail),
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id)
         };
-        
+        claims.AddRange(roles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
+
         var securityToken = new JwtSecurityToken(
             claims: claims,
             expires: DateTime.Now.AddMinutes(60),

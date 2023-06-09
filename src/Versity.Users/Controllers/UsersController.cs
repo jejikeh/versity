@@ -12,7 +12,7 @@ public sealed class UsersController : ApiController
     {
     }
 
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetSomething()
     {
