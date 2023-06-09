@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Versity.Users.Abstractions;
+namespace Presentation.Abstractions;
 
 [ApiController]
 public abstract class ApiController : ControllerBase

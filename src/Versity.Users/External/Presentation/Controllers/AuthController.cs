@@ -1,33 +1,27 @@
 ﻿using System.Security.Claims;
+using Application.RequestHandlers.Auth.Commands.GetAdminRole;
+using Application.RequestHandlers.Auth.Commands.LoginVersityUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Versity.Users.Abstractions;
-using Versity.Users.Core.Application.RequestHandlers.Auth.Commands.GetAdminRole;
-using Versity.Users.Core.Application.RequestHandlers.Auth.Commands.LoginVersityUser;
+using Presentation.Abstractions;
+using Presentation.Dtos;
 using Versity.Users.Core.Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
 using Versity.Users.Dtos;
-using Versity.Users.Infrastructure.Services.Interfaces;
 
-namespace Versity.Users.Controllers;
+namespace Presentation.Controllers;
 
 [Route("api/[controller]/[action]")]
 public sealed class AuthController : ApiController
 {
-    private readonly IAuthTokenGeneratorService _tokenGeneratorService;
-    
-    public AuthController(ISender sender, IAuthTokenGeneratorService tokenGeneratorService) : base(sender)
+    public AuthController(ISender sender) : base(sender)
     {
-        _tokenGeneratorService = tokenGeneratorService;
     }
 
     [HttpPost]
     public async Task<IActionResult> Register(RegisterVersityUserDto userDto, CancellationToken cancellationToken)
     {
-        var command = new RegisterVersityUserCommand(
-            userDto.FirstName, userDto.LastName, userDto.Email, userDto.Phone, userDto.Password);
-
+        var command = new RegisterVersityUserCommand(userDto.FirstName, userDto.LastName, userDto.Email, userDto.Phone, userDto.Password);
         var result = await Sender.Send(command, cancellationToken);
         return result.Succeeded ? Ok() : BadRequest(result.Errors);
     }
@@ -36,9 +30,8 @@ public sealed class AuthController : ApiController
     public async Task<IActionResult> Login(LoginVersityUserDto userDto, CancellationToken cancellationToken)
     {
         var command = new LoginVersityUserCommand(userDto.Email, userDto.Password);
-
-        var (user, result) = await Sender.Send(command, cancellationToken);
-        return result ? Ok(_tokenGeneratorService.GenerateToken(user, "Member")) : BadRequest();
+        var token = await Sender.Send(command, cancellationToken);
+        return Ok(new { Token = token });
     }
     
     [Authorize]
@@ -47,10 +40,10 @@ public sealed class AuthController : ApiController
     {
         var userId = HttpContext.User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
         if (userId == string.Empty)
-            return StatusCode(StatusCodes.Status500InternalServerError);
+            throw new Exception("Something went wrong... Empty claims");
         
         var command = new GetAdminRoleCommand(userId);
-        var user  = await Sender.Send(command, cancellationToken);
-        return Ok(_tokenGeneratorService.GenerateToken(user, "Admin", "Member"));
+        var token  = await Sender.Send(command, cancellationToken);
+        return Ok(new { Token = token });
     }
 }

@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Versity.Users.Core.Application.Abstractions;
-using Versity.Users.Core.Domain.Models;
+﻿using Application.Abstractions;
+using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace Versity.Users.Persistence.Repository;
+namespace Infrastructure.Persistence.Repositories;
 
 public class VersityUsersRepository : IVersityUsersRepository
 {

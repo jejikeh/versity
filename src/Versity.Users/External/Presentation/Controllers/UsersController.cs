@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Versity.Users.Abstractions;
+using Presentation.Abstractions;
 
-namespace Versity.Users.Controllers;
+namespace Presentation.Controllers;
 
 [Route("api/[controller]/")]
 public sealed class UsersController : ApiController
@@ -16,6 +16,6 @@ public sealed class UsersController : ApiController
     [HttpGet]
     public async Task<IActionResult> GetSomething()
     {
-        return Ok("Hello world!");
+        return Ok("Hello world, Admin!");
     }
 }

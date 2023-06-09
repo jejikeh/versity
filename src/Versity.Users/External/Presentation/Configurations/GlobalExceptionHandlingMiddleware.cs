@@ -1,10 +1,11 @@
 ﻿using System.Net;
 using System.Text.Json;
-using Versity.Users.Core.Application.Exceptions;
+using Application.Exceptions;
 using Versity.Users.Exceptions;
 
-namespace Versity.Users.Configurations;
+namespace Presentation.Configurations;
 
+// TODO: Replace that
 public class GlobalExceptionHandlingMiddleware
 {
     private readonly RequestDelegate _next;

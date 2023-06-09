@@ -1,6 +1,6 @@
-﻿using MediatR;
-using Versity.Users.Core.Domain.Models;
+﻿using Domain.Models;
+using MediatR;
 
-namespace Versity.Users.Core.Application.RequestHandlers.Auth.Commands.LoginVersityUser;
+namespace Application.RequestHandlers.Auth.Commands.LoginVersityUser;
 
-public record LoginVersityUserCommand(string Email, string Password) : IRequest<(VersityUser, bool)>;
+public record LoginVersityUserCommand(string Email, string Password) : IRequest<string>;

@@ -1,4 +1,4 @@
-﻿namespace Versity.Users.Core.Application.Exceptions;
+﻿namespace Application.Exceptions;
 
 public class NotFoundException<T> : Exception
 {

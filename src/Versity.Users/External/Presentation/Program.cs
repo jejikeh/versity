@@ -1,14 +1,15 @@
 using System.Text;
+using Application;
+using Application.Abstractions;
+using Domain.Models;
+using Infrastructure;
+using Infrastructure.Persistence;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Versity.Users.Configurations;
-using Versity.Users.Core.Application;
-using Versity.Users.Core.Domain.Models;
-using Versity.Users.Infrastructure.Services;
-using Versity.Users.Infrastructure.Services.Interfaces;
-using Versity.Users.Persistence;
+using Presentation.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,6 +91,9 @@ using var scope = app.Services.CreateScope();
 var serviceProvider = scope.ServiceProvider;
 try
 {
+    var versityUsersDbContext = serviceProvider.GetRequiredService<VersityUsersDbContext>();
+    versityUsersDbContext.Database.EnsureCreated();
+    
     var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var roles = new[] { "Admin", "Member" };
     foreach (var role in roles)
@@ -97,9 +101,6 @@ try
         if (!await roleManager.RoleExistsAsync(role))
             await roleManager.CreateAsync(new IdentityRole(role));
     }
-    
-    var versityUsersDbContext = serviceProvider.GetRequiredService<VersityUsersDbContext>();
-    versityUsersDbContext.Database.EnsureCreated();
 }
 catch (Exception ex)
 {

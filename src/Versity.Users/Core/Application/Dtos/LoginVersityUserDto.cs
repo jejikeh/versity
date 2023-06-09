@@ -1,3 +1,3 @@
-﻿namespace Versity.Users.Dtos;
+﻿namespace Presentation.Dtos;
 
 public record LoginVersityUserDto(string Email, string Password);

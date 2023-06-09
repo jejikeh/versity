@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Versity.Users.Core.Application;
+namespace Application;
 
 public static class ApplicationInjection
 {

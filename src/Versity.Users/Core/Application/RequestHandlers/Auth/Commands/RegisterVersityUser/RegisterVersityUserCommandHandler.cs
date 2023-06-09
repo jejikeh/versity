@@ -1,8 +1,9 @@
-﻿using MediatR;
+﻿using Domain.Models;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Versity.Users.Core.Domain.Models;
+using Versity.Users.Core.Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
 
-namespace Versity.Users.Core.Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
+namespace Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
 
 public class RegisterVersityUserCommandHandler : IRequestHandler<RegisterVersityUserCommand, IdentityResult>
 {

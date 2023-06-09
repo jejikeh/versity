@@ -1,12 +1,13 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Application.Abstractions;
+using Domain.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Versity.Users.Core.Domain.Models;
-using Versity.Users.Infrastructure.Services.Interfaces;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
-namespace Versity.Users.Infrastructure.Services;
+namespace Infrastructure.Services;
 
 public class JwtTokenGeneratorService : IAuthTokenGeneratorService
 {
@@ -17,12 +18,12 @@ public class JwtTokenGeneratorService : IAuthTokenGeneratorService
         _config = config;
     }
 
-    public string GenerateToken(VersityUser user, params string[] roles)
+    public string GenerateToken(string userId, string userEmail, params string[] roles)
     {
         var claims = new List<Claim>()
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.NormalizedEmail),
+            new Claim(JwtRegisteredClaimNames.Sub, userId),
+            new Claim(JwtRegisteredClaimNames.Email, userEmail)
         };
         claims.AddRange(roles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
 

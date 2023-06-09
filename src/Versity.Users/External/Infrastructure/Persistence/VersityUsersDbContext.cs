@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Domain.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Versity.Users.Core.Domain.Models;
 
-namespace Versity.Users.Persistence;
+namespace Infrastructure.Persistence;
 
 public class VersityUsersDbContext : IdentityDbContext
 {

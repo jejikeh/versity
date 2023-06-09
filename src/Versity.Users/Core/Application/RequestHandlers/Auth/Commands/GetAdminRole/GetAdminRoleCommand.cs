@@ -1,6 +1,6 @@
-﻿using MediatR;
-using Versity.Users.Core.Domain.Models;
+﻿using Domain.Models;
+using MediatR;
 
-namespace Versity.Users.Core.Application.RequestHandlers.Auth.Commands.GetAdminRole;
+namespace Application.RequestHandlers.Auth.Commands.GetAdminRole;
 
-public record GetAdminRoleCommand(string UserId) : IRequest<VersityUser>;
+public record GetAdminRoleCommand(string UserId) : IRequest<string>;

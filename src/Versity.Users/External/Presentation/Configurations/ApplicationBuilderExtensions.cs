@@ -1,4 +1,4 @@
-﻿namespace Versity.Users.Configurations;
+﻿namespace Presentation.Configurations;
 
 public static class ApplicationBuilderExtensions
 {
