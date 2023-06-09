@@ -26,7 +26,7 @@ public class RegisterVersityUserCommandHandler : IRequestHandler<RegisterVersity
         };
 
         var result = await _userManager.CreateAsync(versityUser, request.Password);
-        await _userManager.AddToRoleAsync(versityUser, "Member");
+        await _userManager.AddToRoleAsync(versityUser, VersityRole.Member.ToString());
         return result;
     }
 }

@@ -4,11 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence;
 
-public class VersityUsersDbContext : IdentityDbContext
+public class VersityUsersDbContext : IdentityDbContext<VersityUser>
 {
-    public DbSet<VersityUser?> VersityUsers { get; set; }
-
-    public VersityUsersDbContext(DbContextOptions<VersityUsersDbContext> options) : base(options)
+    public VersityUsersDbContext(DbContextOptions options) : base(options)
     {
         
     }

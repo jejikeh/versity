@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using Application.Abstractions;
+using Application.Abstractions.Repositories;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +23,7 @@ public static class InfrastructureInjection
         });
 
         serviceCollection.AddScoped<IVersityUsersRepository, VersityUsersRepository>();
+        serviceCollection.AddScoped<IVersityRolesRepository, VersityRoleRepository>();
         
         return serviceCollection;
     }

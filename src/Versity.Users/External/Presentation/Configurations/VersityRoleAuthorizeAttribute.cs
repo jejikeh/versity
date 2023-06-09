@@ -5,7 +5,8 @@ namespace Presentation.Configurations;
 
 public class VersityRoleAuthorizeAttribute : AuthorizeAttribute
 {
-    public VersityRoleAuthorizeAttribute(VersityRoles role) : base(policy: role.ToString())
+    public VersityRoleAuthorizeAttribute(VersityRole role)
     {
+        Roles = role.ToString();
     }
 }

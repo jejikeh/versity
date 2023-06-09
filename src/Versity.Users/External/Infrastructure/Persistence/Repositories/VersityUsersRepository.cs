@@ -1,45 +1,51 @@
 ﻿using Application.Abstractions;
+using Application.Abstractions.Repositories;
 using Domain.Models;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Persistence.Repositories;
 
 public class VersityUsersRepository : IVersityUsersRepository
 {
-    private readonly VersityUsersDbContext _context;
+    private readonly UserManager<VersityUser> _context;
 
-    public VersityUsersRepository(VersityUsersDbContext context)
+    public VersityUsersRepository(UserManager<VersityUser> context)
     {
         _context = context;
     }
 
-    public async Task<IEnumerable<VersityUser?>> GetAllUsersAsync(CancellationToken cancellationToken)
+    public IQueryable<VersityUser?> GetAllUsersAsync()
     {
-        return await _context.VersityUsers.ToListAsync(cancellationToken);
+        return _context.Users;
     }
 
-    public async Task<VersityUser?> GetUserAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<VersityUser?> GetUserAsync(string id)
     {
-        return await _context.VersityUsers.SingleOrDefaultAsync(x => x.Id == id.ToString(), cancellationToken);
+        return await _context.FindByIdAsync(id);
     }
 
-    public async Task CreateUserAsync(VersityUser user, CancellationToken cancellationToken)
+    public async Task<IList<string>> GetUserRolesAsync(VersityUser user)
     {
-        await _context.AddAsync(user, cancellationToken);
+        return await _context.GetRolesAsync(user);
     }
 
-    public void UpdateUserAsync(VersityUser user)
+    public async Task<IdentityResult> CreateUserAsync(VersityUser user)
     {
-        _context.Update(user);
+        return await _context.CreateAsync(user);
     }
 
-    public void DeleteUserAsync(VersityUser user)
+    public async Task<IdentityResult> UpdateUserAsync(VersityUser user)
     {
-        _context.Remove(user);
+        return await _context.UpdateAsync(user);
     }
 
-    public async Task SaveAsync(CancellationToken cancellationToken)
+    public async Task<IdentityResult>  DeleteUserAsync(VersityUser user)
     {
-        await _context.SaveChangesAsync(cancellationToken);
+        return await _context.DeleteAsync(user);
+    }
+
+    public async Task<IdentityResult> SetUserRoleAsync(VersityUser user, VersityRole role)
+    {
+        return await _context.AddToRoleAsync(user, role.ToString());
     }
 }

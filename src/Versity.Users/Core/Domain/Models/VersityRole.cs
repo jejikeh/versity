@@ -1,6 +1,6 @@
 ﻿namespace Domain.Models;
 
-public enum VersityRoles
+public enum VersityRole
 {
     Member,
     Admin

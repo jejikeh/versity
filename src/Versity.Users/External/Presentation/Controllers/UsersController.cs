@@ -13,7 +13,7 @@ public sealed class UsersController : ApiController
     {
     }
 
-    [VersityRoleAuthorize(VersityRoles.Admin)]
+    [VersityRoleAuthorize(VersityRole.Admin)]
     [HttpGet]
     public async Task<IActionResult> GetSomething()
     {
