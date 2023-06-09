@@ -2,5 +2,5 @@
 
 public interface IAuthTokenGeneratorService
 {
-    public string GenerateToken(string userId, string userEmail, params string[] roles);
+    public string GenerateToken(string userId, string userEmail, IEnumerable<string> roles);
 }

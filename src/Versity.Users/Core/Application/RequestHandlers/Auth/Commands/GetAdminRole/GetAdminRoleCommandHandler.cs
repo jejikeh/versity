@@ -1,5 +1,5 @@
 ﻿using Application.Abstractions;
-using Application.Exceptions;
+using Application.Exceptions.AuthExceptions;
 using Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -10,8 +10,7 @@ public class GetAdminRoleCommandHandler : IRequestHandler<GetAdminRoleCommand, s
 {
     private readonly UserManager<VersityUser> _userManager;
     private readonly IAuthTokenGeneratorService _tokenGeneratorService;
-
-
+    
     public GetAdminRoleCommandHandler(UserManager<VersityUser> userManager, IAuthTokenGeneratorService tokenGeneratorService)
     {
         _userManager = userManager;
@@ -22,10 +21,10 @@ public class GetAdminRoleCommandHandler : IRequestHandler<GetAdminRoleCommand, s
     {
         var versityUser = await _userManager.FindByIdAsync(request.UserId);
         if (versityUser is null)
-            throw new NotFoundException<VersityUser>(nameof(request.UserId));
+            throw new IncorrectEmailOrPasswordException();
 
         await _userManager.AddToRoleAsync(versityUser, "Admin");
         var userRoles = await _userManager.GetRolesAsync(versityUser);
-        return _tokenGeneratorService.GenerateToken(versityUser.Id, versityUser.NormalizedEmail, userRoles.ToArray());
+        return _tokenGeneratorService.GenerateToken(versityUser.Id, versityUser.NormalizedEmail, userRoles);
     }
 }

@@ -17,7 +17,7 @@ public class JwtTokenGeneratorService : IAuthTokenGeneratorService
         _config = config;
     }
 
-    public string GenerateToken(string userId, string userEmail, params string[] roles)
+    public string GenerateToken(string userId, string userEmail, IEnumerable<string> roles)
     {
         var claims = new List<Claim>()
         {

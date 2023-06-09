@@ -1,5 +1,5 @@
 ﻿using Application.Abstractions;
-using Application.Exceptions;
+using Application.Exceptions.AuthExceptions;
 using Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -21,12 +21,12 @@ public class LoginVersityUserCommandHandler : IRequestHandler<LoginVersityUserCo
     {
         var versityUser = await _userManager.FindByEmailAsync(request.Email);
         if (versityUser is null)
-            throw new NotFoundException<VersityUser>(nameof(request.Email));
+            throw new IncorrectEmailOrPasswordException();
 
         if (!await _userManager.CheckPasswordAsync(versityUser, request.Password))
-            throw new Exception("Invalid username or password!");
+            throw new IncorrectEmailOrPasswordException();
 
         var userRoles = await _userManager.GetRolesAsync(versityUser);
-        return _tokenGeneratorService.GenerateToken(versityUser.Id, versityUser.NormalizedEmail, userRoles.ToArray());
+        return _tokenGeneratorService.GenerateToken(versityUser.Id, versityUser.NormalizedEmail, userRoles);
     }
 }
