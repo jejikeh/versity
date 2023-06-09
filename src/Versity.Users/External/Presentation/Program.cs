@@ -1,7 +1,7 @@
 using Domain.Models;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
-using Presentation.Configurations;
+using Presentation.Extensions;
 
 var builder = WebApplication
     .CreateBuilder(args)

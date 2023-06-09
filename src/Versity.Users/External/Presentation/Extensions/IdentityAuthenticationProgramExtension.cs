@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Presentation.Configurations;
+namespace Presentation.Extensions;
 
-public static class IdentityAuthenticationInjection
+public static class IdentityAuthenticationProgramExtension
 {
     public static IServiceCollection AddIdentityJwtAuthentication(
         this IServiceCollection serviceCollection,

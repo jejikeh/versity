@@ -2,7 +2,7 @@
 using Infrastructure;
 using Microsoft.OpenApi.Models;
 
-namespace Presentation.Configurations;
+namespace Presentation.Extensions;
 
 public static class ProgramExtensions
 {

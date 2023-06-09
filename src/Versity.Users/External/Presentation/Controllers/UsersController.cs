@@ -1,8 +1,7 @@
-﻿using Domain.Models;
-using MediatR;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Abstractions;
-using Presentation.Configurations;
 
 namespace Presentation.Controllers;
 
@@ -13,7 +12,7 @@ public sealed class UsersController : ApiController
     {
     }
 
-    [VersityRoleAuthorize(VersityRole.Admin)]
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetSomething()
     {
