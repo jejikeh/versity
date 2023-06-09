@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Presentation.Configurations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,6 +52,7 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -78,9 +78,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    // app.UseExceptionHandler("/error-development");
 }
+app.UseExceptionHandler("/error");
+    
 
-app.AddGlobalErrorHandler();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -95,7 +97,7 @@ try
     versityUsersDbContext.Database.EnsureCreated();
     
     var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var roles = new[] { "Admin", "Member" };
+    var roles = Enum.GetNames(typeof(VersityRoles));
     foreach (var role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))

@@ -1,8 +1,11 @@
-﻿namespace Application.Exceptions;
+﻿using Microsoft.AspNetCore.Http;
 
-public class BadRequestException : Exception
+namespace Application.Exceptions;
+
+public class BadRequestException : HttpResponseException
 {
-    public BadRequestException(string msg) : base(msg)
+    public BadRequestException(object? value = null) : 
+        base(StatusCodes.Status400BadRequest, value)
     {
     }
 }

@@ -1,8 +1,13 @@
-﻿namespace Application.Exceptions.AuthExceptions;
+﻿using Microsoft.AspNetCore.Http;
 
-public class InvalidEmailOrPasswordException : HttpResponseException
+namespace Application.Exceptions.AuthExceptions;
+
+public class IncorrectEmailOrPasswordException : HttpResponseException
 {
-    public InvalidEmailOrPasswordException() : base(statusCode, "")
+    public IncorrectEmailOrPasswordException() : 
+        base(
+            StatusCodes.Status401Unauthorized, 
+            "Email or password is incorrect! Please check your credentials and try again.")
     {
     }
 }
