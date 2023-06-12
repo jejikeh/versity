@@ -64,6 +64,7 @@ public static class InfrastructureInjection
             
             // TODO: get password from env vars?
             await userManager.CreateUserAsync(adminUser, configuration.GetSection("Jwt:Issuer").Value);
+            // TODO: add admin user to Admin Role. For now adding to role throw exception.
             await serviceProvider.GetRequiredService<VersityUsersDbContext>().SaveChangesAsync();
         }
 
