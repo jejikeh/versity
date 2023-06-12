@@ -1,5 +1,5 @@
 ﻿using MediatR;
 
-namespace Application.RequestHandlers.Auth.Commands.GetAdminRole;
+namespace Application.RequestHandlers.Auth.Commands.GiveAdminRoleToUser;
 
-public record GetAdminRoleCommand(string UserId) : IRequest<string>;
+public record GiveAdminRoleToUserCommand(string UserId) : IRequest<string>;
