@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Application.RequestHandlers.Auth.Commands.GetAdminRole;
 
-public class GetAdminRoleCommandHandler : IRequestHandler<GetAdminRoleCommand, string>
+public class GetAdminRoleCommandHandler : IRequestHandler<GiveAdminRoleToUserCommand, string>
 {
     private readonly IVersityUsersRepository _versityUsersRepository;
     private readonly IAuthTokenGeneratorService _tokenGeneratorService;
@@ -17,11 +17,11 @@ public class GetAdminRoleCommandHandler : IRequestHandler<GetAdminRoleCommand, s
         _tokenGeneratorService = tokenGeneratorService;
     }
 
-    public async Task<string> Handle(GetAdminRoleCommand request, CancellationToken cancellationToken)
+    public async Task<string> Handle(GiveAdminRoleToUserCommand request, CancellationToken cancellationToken)
     {
         var versityUser = await _versityUsersRepository.GetUserAsync(request.UserId);
         if (versityUser is null)
-            throw new IncorrectEmailOrPasswordException();
+            throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
 
         await _versityUsersRepository.SetUserRoleAsync(versityUser, VersityRole.Admin);
         var userRoles = await _versityUsersRepository.GetUserRolesAsync(versityUser);

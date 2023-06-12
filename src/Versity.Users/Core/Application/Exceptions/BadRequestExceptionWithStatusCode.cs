@@ -2,7 +2,7 @@
 
 namespace Application.Exceptions;
 
-public class BadRequestException : HttpResponseException
+public class BadRequestException : CustomException
 {
     public BadRequestException(object? value = null) : 
         base(StatusCodes.Status400BadRequest, value)

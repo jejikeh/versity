@@ -2,7 +2,7 @@
 
 namespace Application.Exceptions.AuthExceptions;
 
-public class IncorrectEmailOrPasswordException : HttpResponseException
+public class IncorrectEmailOrPasswordException : CustomException
 {
     public IncorrectEmailOrPasswordException() : 
         base(
