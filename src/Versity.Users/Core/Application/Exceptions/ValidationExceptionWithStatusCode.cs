@@ -2,9 +2,9 @@
 
 namespace Application.Exceptions;
 
-public class HttpValidationExceptionWithStatusCode : ExceptionWithStatusCode
+public class ValidationExceptionWithStatusCode : ExceptionWithStatusCode
 {
-    public HttpValidationExceptionWithStatusCode(object? value = null) : 
+    public ValidationExceptionWithStatusCode(object? value = null) : 
         base(
             StatusCodes.Status403Forbidden, 
             value)

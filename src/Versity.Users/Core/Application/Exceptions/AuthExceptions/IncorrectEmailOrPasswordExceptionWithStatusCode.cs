@@ -2,9 +2,9 @@
 
 namespace Application.Exceptions.AuthExceptions;
 
-public class IncorrectEmailOrPasswordException : CustomException
+public class IncorrectEmailOrPasswordExceptionWithStatusCode : ExceptionWithStatusCode
 {
-    public IncorrectEmailOrPasswordException() : 
+    public IncorrectEmailOrPasswordExceptionWithStatusCode() : 
         base(
             StatusCodes.Status401Unauthorized, 
             "Email or password is incorrect! Please check your credentials and try again.")

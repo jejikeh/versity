@@ -2,9 +2,9 @@
 
 namespace Application.Exceptions;
 
-public class BadRequestException : CustomException
+public class BadRequestExceptionWithStatusCode : ExceptionWithStatusCode
 {
-    public BadRequestException(object? value = null) : 
+    public BadRequestExceptionWithStatusCode(object? value = null) : 
         base(StatusCodes.Status400BadRequest, value)
     {
     }

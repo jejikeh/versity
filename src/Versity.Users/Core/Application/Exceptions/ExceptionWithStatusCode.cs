@@ -1,11 +1,11 @@
 ﻿namespace Application.Exceptions;
 
-public class CustomException : Exception
+public class ExceptionWithStatusCode : Exception
 {
     public int StatusCode { get; }
     public object? Value { get; }
 
-    public CustomException(int statusCode, object? value = null)
+    public ExceptionWithStatusCode(int statusCode, object? value = null)
     {
         StatusCode = statusCode;
         Value = value;
