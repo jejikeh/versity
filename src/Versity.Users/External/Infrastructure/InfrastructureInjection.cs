@@ -49,25 +49,4 @@ public static class InfrastructureInjection
         
         return serviceProvider;
     }
-    
-    public static async Task<IServiceProvider> CreateAdminUser(this IServiceProvider serviceProvider, IConfiguration configuration)
-    {
-        var userManager = serviceProvider.GetRequiredService<IVersityUsersRepository>();
-        if (await userManager.GetUserByIdAsync("admin") == null)
-        {
-            var adminUser = new VersityUser
-            {
-                Id = Guid.NewGuid().ToString(),
-                UserName = "admin",
-                Email = "admin@admin.com"
-            };
-            
-            // TODO: get password from env vars?
-            await userManager.CreateUserAsync(adminUser, configuration.GetSection("Jwt:Issuer").Value);
-            // TODO: add admin user to Admin Role. For now adding to role throw exception.
-            await serviceProvider.GetRequiredService<VersityUsersDbContext>().SaveChangesAsync();
-        }
-
-        return serviceProvider;
-    }
 }
