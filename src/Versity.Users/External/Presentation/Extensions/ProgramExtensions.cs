@@ -39,9 +39,10 @@ public static class ProgramExtensions
     {
         if (app.Environment.IsDevelopment())
         {
+            // Or use your own middleware?
+            app.UseExceptionHandler("/error-development");
             app.UseSwagger();
             app.UseSwaggerUI();
-            app.UseExceptionHandler("/error-development");
         }
         else
         {

@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 using Application.Dtos;
-using Application.RequestHandlers.Auth.Commands.GetAdminRole;
+using Application.RequestHandlers.Auth.Commands.GiveAdminRoleToUser;
 using Application.RequestHandlers.Auth.Commands.LoginVersityUser;
 using Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
 using MediatR;
@@ -41,7 +41,7 @@ public sealed class AuthController : ApiController
         if (userId == string.Empty)
             throw new Exception("Something went wrong... Empty claims");
         
-        var command = new GetAdminRoleCommand(userId);
+        var command = new GiveAdminRoleToUserCommand(userId);
         var token  = await Sender.Send(command, cancellationToken);
         return Ok(new { Token = token });
     }

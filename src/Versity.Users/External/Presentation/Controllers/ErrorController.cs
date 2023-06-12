@@ -12,7 +12,7 @@ public sealed class ErrorController : ControllerBase
     {
         var exception = HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
 
-        if (exception is HttpResponseException httpResponseException)
+        if (exception is ExceptionWithStatusCode httpResponseException)
             return Problem(
                 title: httpResponseException.Value?.ToString(), 
                 statusCode: httpResponseException.StatusCode);
@@ -31,7 +31,7 @@ public sealed class ErrorController : ControllerBase
         var title = exceptionHandlerFeature.Error.Message;
         var statusCode = StatusCodes.Status500InternalServerError;
 
-        if (exceptionHandlerFeature.Error is HttpResponseException httpResponseException)
+        if (exceptionHandlerFeature.Error is ExceptionWithStatusCode httpResponseException)
         {
             title = httpResponseException.Value?.ToString();
             statusCode = httpResponseException.StatusCode;
