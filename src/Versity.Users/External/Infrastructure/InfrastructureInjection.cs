@@ -1,7 +1,9 @@
 ﻿using System.Reflection;
 using Application.Abstractions.Repositories;
+using Domain.Models;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,5 +28,45 @@ public static class InfrastructureInjection
         serviceCollection.AddScoped<IVersityRolesRepository, VersityRoleRepository>();
         
         return serviceCollection;
+    }
+
+    public static async Task<IServiceProvider> EnsureRolesExists(this IServiceProvider serviceProvider)
+    {
+        var roleManager = serviceProvider.GetRequiredService<IVersityRolesRepository>();
+        var roles = Enum.GetNames(typeof(VersityRole));
+        var anyRoleWasAdded = false;
+        foreach (var role in roles)
+        {
+            if (await roleManager.RoleExistsAsync(role)) 
+                continue;
+            
+            await roleManager.CreateRoleAsync(role);
+            anyRoleWasAdded = true;
+        }
+        
+        if (anyRoleWasAdded)
+            await serviceProvider.GetRequiredService<VersityUsersDbContext>().SaveChangesAsync();
+        
+        return serviceProvider;
+    }
+    
+    public static async Task<IServiceProvider> CreateAdminUser(this IServiceProvider serviceProvider, IConfiguration configuration)
+    {
+        var userManager = serviceProvider.GetRequiredService<IVersityUsersRepository>();
+        if (await userManager.GetUserByIdAsync("admin") == null)
+        {
+            var adminUser = new VersityUser
+            {
+                Id = Guid.NewGuid().ToString(),
+                UserName = "admin",
+                Email = "admin@admin.com"
+            };
+            
+            // TODO: get password from env vars?
+            await userManager.CreateUserAsync(adminUser, configuration.GetSection("Jwt:Issuer").Value);
+            await serviceProvider.GetRequiredService<VersityUsersDbContext>().SaveChangesAsync();
+        }
+
+        return serviceProvider;
     }
 }
