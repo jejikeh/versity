@@ -1,5 +1,4 @@
-﻿using Application.Abstractions;
-using Application.Abstractions.Repositories;
+﻿using Application.Abstractions.Repositories;
 using Domain.Models;
 using Microsoft.AspNetCore.Identity;
 
@@ -14,7 +13,7 @@ public class VersityUsersRepository : IVersityUsersRepository
         _userManager = userManager;
     }
 
-    public IQueryable<VersityUser?> GetAllUsersAsync()
+    public IQueryable<VersityUser?> GetAllUsers()
     {
         return _userManager.Users;
     }
@@ -62,5 +61,15 @@ public class VersityUsersRepository : IVersityUsersRepository
     public async Task<IEnumerable<string>> GetRolesAsync(VersityUser user)
     {
         return await _userManager.GetRolesAsync(user);
+    }
+
+    public async Task<IdentityResult> ResetPasswordAsync(VersityUser user, string token, string newPassword)
+    {
+        return await _userManager.ResetPasswordAsync(user, token, newPassword);
+    }
+
+    public async Task<string> GeneratePasswordResetTokenAsync(VersityUser user)
+    {
+        return await _userManager.GeneratePasswordResetTokenAsync(user);
     }
 }

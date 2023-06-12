@@ -1,3 +1,7 @@
-﻿namespace Application.RequestHandlers.Users.Queries.GetVersityUserById;
+﻿using Application.Dtos;
+using MediatR;
+using Microsoft.AspNetCore.Identity;
 
-public record GetVersityUserByIdCommand(string id);
+namespace Application.RequestHandlers.Users.Queries.GetVersityUserById;
+
+public record GetVersityUserByIdCommand(string Id) : IRequest<ViewVersityUserDto>;

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Application.RequestHandlers.Auth.Commands.GiveAdminRoleToUser;
+namespace Application.RequestHandlers.Users.Commands.GiveAdminRoleToUser;
 
 public class GiveAdminToleToUserCommandValidator : AbstractValidator<GiveAdminRoleToUserCommand>
 {

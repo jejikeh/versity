@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
 using Application.Dtos;
-using Application.RequestHandlers.Auth.Commands.GiveAdminRoleToUser;
 using Application.RequestHandlers.Auth.Commands.LoginVersityUser;
 using Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
+using Application.RequestHandlers.Users.Commands.GiveAdminRoleToUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

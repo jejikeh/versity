@@ -1,10 +1,10 @@
 ﻿using Application.Abstractions;
 using Application.Abstractions.Repositories;
-using Application.Exceptions.AuthExceptions;
+using Application.Exceptions;
 using Domain.Models;
 using MediatR;
 
-namespace Application.RequestHandlers.Auth.Commands.GiveAdminRoleToUser;
+namespace Application.RequestHandlers.Users.Commands.GiveAdminRoleToUser;
 
 public class GiveAdminRoleToUserCommandHandler : IRequestHandler<GiveAdminRoleToUserCommand, string>
 {
