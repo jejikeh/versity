@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Abstractions.Repositories;
 using Application.Exceptions.AuthExceptions;
 using Domain.Models;
 using MediatR;
@@ -8,25 +9,25 @@ namespace Application.RequestHandlers.Auth.Commands.LoginVersityUser;
 
 public class LoginVersityUserCommandHandler : IRequestHandler<LoginVersityUserCommand, string>
 {
-    private readonly UserManager<VersityUser> _userManager;
+    private readonly IVersityUsersRepository _versityUsersRepository;
     private readonly IAuthTokenGeneratorService _tokenGeneratorService;
     
-    public LoginVersityUserCommandHandler(UserManager<VersityUser> userManager, IAuthTokenGeneratorService tokenGeneratorService)
+    public LoginVersityUserCommandHandler(IAuthTokenGeneratorService tokenGeneratorService, IVersityUsersRepository versityUsersRepository)
     {
-        _userManager = userManager;
         _tokenGeneratorService = tokenGeneratorService;
+        _versityUsersRepository = versityUsersRepository;
     }
 
     public async Task<string> Handle(LoginVersityUserCommand request, CancellationToken cancellationToken)
     {
-        var versityUser = await _userManager.FindByEmailAsync(request.Email);
+        var versityUser = await _versityUsersRepository.GetUserByEmailAsync(request.Email);
         if (versityUser is null)
-            throw new IncorrectEmailOrPasswordException();
+            throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
 
-        if (!await _userManager.CheckPasswordAsync(versityUser, request.Password))
-            throw new IncorrectEmailOrPasswordException();
+        if (!await _versityUsersRepository.CheckPasswordAsync(versityUser, request.Password))
+            throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
 
-        var userRoles = await _userManager.GetRolesAsync(versityUser);
+        var userRoles = await _versityUsersRepository.GetRolesAsync(versityUser);
         return _tokenGeneratorService.GenerateToken(versityUser.Id, versityUser.NormalizedEmail, userRoles);
     }
 }

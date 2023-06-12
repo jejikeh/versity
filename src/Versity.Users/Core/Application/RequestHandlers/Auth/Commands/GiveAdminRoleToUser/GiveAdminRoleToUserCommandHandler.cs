@@ -4,14 +4,14 @@ using Application.Exceptions.AuthExceptions;
 using Domain.Models;
 using MediatR;
 
-namespace Application.RequestHandlers.Auth.Commands.GetAdminRole;
+namespace Application.RequestHandlers.Auth.Commands.GiveAdminRoleToUser;
 
-public class GetAdminRoleCommandHandler : IRequestHandler<GiveAdminRoleToUserCommand, string>
+public class GiveAdminRoleToUserCommandHandler : IRequestHandler<GiveAdminRoleToUserCommand, string>
 {
     private readonly IVersityUsersRepository _versityUsersRepository;
     private readonly IAuthTokenGeneratorService _tokenGeneratorService;
     
-    public GetAdminRoleCommandHandler(IVersityUsersRepository versityUsersRepository, IAuthTokenGeneratorService tokenGeneratorService)
+    public GiveAdminRoleToUserCommandHandler(IVersityUsersRepository versityUsersRepository, IAuthTokenGeneratorService tokenGeneratorService)
     {
         _versityUsersRepository = versityUsersRepository;
         _tokenGeneratorService = tokenGeneratorService;
@@ -19,7 +19,7 @@ public class GetAdminRoleCommandHandler : IRequestHandler<GiveAdminRoleToUserCom
 
     public async Task<string> Handle(GiveAdminRoleToUserCommand request, CancellationToken cancellationToken)
     {
-        var versityUser = await _versityUsersRepository.GetUserAsync(request.UserId);
+        var versityUser = await _versityUsersRepository.GetUserByIdAsync(request.UserId);
         if (versityUser is null)
             throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
 
