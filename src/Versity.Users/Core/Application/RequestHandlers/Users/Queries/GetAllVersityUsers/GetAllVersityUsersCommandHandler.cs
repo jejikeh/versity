@@ -16,7 +16,13 @@ public class GetAllVersityUsersCommandHandler
 
     public async Task<IEnumerable<ViewVersityUserDto>> Handle(GetAllVersityUsersCommand request, CancellationToken cancellationToken)
     {
-        var users = _versityUsersRepository.GetAllUsers().ToList();
+        var users = _versityUsersRepository
+            .GetAllUsers()
+            .OrderBy(x => x.UserName)
+            .Skip(10 * (request.Page - 1))
+            .Take(10)
+            .ToList();
+        
         var viewDtos = new List<ViewVersityUserDto>();
         foreach (var user in users)
             viewDtos.Add(ViewVersityUserDto.MapFromModel(user, await _versityUsersRepository.GetRolesAsync(user)));
