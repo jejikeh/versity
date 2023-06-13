@@ -3,7 +3,4 @@ using MediatR;
 
 namespace Application.RequestHandlers.Users.Queries.GetAllVersityUsers;
 
-public class GetAllVersityUsersCommand : IRequest<IEnumerable<ViewVersityUserDto>>
-{
-    
-}
+public record GetAllVersityUsersCommand(int Page) : IRequest<IEnumerable<ViewVersityUserDto>>;
