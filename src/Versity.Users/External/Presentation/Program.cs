@@ -6,9 +6,6 @@ var builder = WebApplication
     .CreateBuilder(args)
     .ConfigureBuilder();
 
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-
 var app = builder
     .Build()
     .ConfigureApplication();

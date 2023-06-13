@@ -10,6 +10,7 @@ public static class ApplicationInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection serviceCollection)
     {
+        serviceCollection.AddScoped(typeof(IPipelineBehavior<,>), typeof(LoggingPipelineBehavior<,>));
         serviceCollection.AddScoped(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
         serviceCollection.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         

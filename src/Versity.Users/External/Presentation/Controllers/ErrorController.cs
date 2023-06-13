@@ -6,6 +6,13 @@ namespace Presentation.Controllers;
 
 public sealed class ErrorController : ControllerBase
 {
+    private readonly ILogger<ErrorController> _logger;
+
+    public ErrorController(ILogger<ErrorController> logger)
+    {
+        _logger = logger;
+    }
+
     [ApiExplorerSettings(IgnoreApi = true)]
     [Route("/error")]
     public IActionResult HandleError()
@@ -13,9 +20,17 @@ public sealed class ErrorController : ControllerBase
         var exception = HttpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
 
         if (exception is ExceptionWithStatusCode httpResponseException)
+        {
+            _logger.LogError("Request failure, {@Error}", httpResponseException.Message);
+            
             return Problem(
-                title: httpResponseException.Value?.ToString(), 
+                title: httpResponseException.Value?.ToString(),
                 statusCode: httpResponseException.StatusCode);
+        }
+        else
+        {
+            _logger.LogError("Request failure, {@Error}", exception.Message);
+        }
 
         return Problem(title: "Ops 🤨! Something went wrong...");
     }
@@ -36,6 +51,8 @@ public sealed class ErrorController : ControllerBase
             title = httpResponseException.Value?.ToString();
             statusCode = httpResponseException.StatusCode;
         }
+        
+        _logger.LogError("Request failure, {@Error}, debug_trace {@Trace}", title, exceptionHandlerFeature.Error.StackTrace);
 
         return Problem(
             detail: exceptionHandlerFeature.Error.StackTrace,
