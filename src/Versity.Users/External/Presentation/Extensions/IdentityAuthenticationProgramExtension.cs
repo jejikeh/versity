@@ -43,7 +43,6 @@ public static class IdentityAuthenticationProgramExtension
                 ValidateAudience = true,
                 RequireExpirationTime = true,
                 ValidateIssuerSigningKey = true,
-                // TODO: move this from config to env variables
                 ValidIssuer = configuration.GetSection("Jwt:Issuer").Value,
                 ValidAudience = configuration.GetSection("Jwt:Audience").Value,
                 IssuerSigningKey = new SymmetricSecurityKey(

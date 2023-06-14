@@ -20,8 +20,6 @@ public class LoggingPipelineBehavior<TRequest, TResponse>
             typeof(TRequest).Name,
             DateTime.UtcNow);
 
-        // TODO?: If use Error and Result instead of throwing Exception in RequestHandlers,
-        // then you can put all the logs in here
         var result = await next();
         
         _logger.LogInformation(

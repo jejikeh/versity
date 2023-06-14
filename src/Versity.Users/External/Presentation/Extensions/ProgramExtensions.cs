@@ -39,7 +39,6 @@ public static class ProgramExtensions
             policy.AllowAnyOrigin();
         }));
         
-        // builder.Services.AddSerilog();
         builder.Host.UseSerilog(((context, configuration) =>
         {
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
