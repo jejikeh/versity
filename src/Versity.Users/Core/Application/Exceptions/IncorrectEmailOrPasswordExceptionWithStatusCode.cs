@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Application.Exceptions.AuthExceptions;
+namespace Application.Exceptions;
 
 public class IncorrectEmailOrPasswordExceptionWithStatusCode : ExceptionWithStatusCode
 {

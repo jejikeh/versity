@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions;
 using Application.Abstractions.Repositories;
-using Application.Exceptions.AuthExceptions;
+using Application.Exceptions;
 using Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
