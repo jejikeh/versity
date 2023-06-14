@@ -45,19 +45,18 @@ services:
     depends_on:
       - versity-users-db
     ports:
-      - 4001:80
+      - 4000:80
+      - 4001:443
     build:
       context: .
       dockerfile: Dockerfile
     environment:
       - ConnectionString=Host=versity-users-db;Port=5432;Username=versity_dev;Password=versity_dev;Database=versity_users_dev;
-    #   - ASPNETCORE_URLS=https://+;http://+
-    #   - ASPNETCORE_HTTPS_PORT=4001
-    #   - ASPNETCORE_Kestrel__Certificates__Default__Password=versity
-    #   - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-    # volumes:
-    #   - $APPDATA\Roaming\microsoft\UserSecrets\:/root/.microsoft/usersecrets:ro
-    #   - $USERPROFILE\.aspnet\https:/root/.aspnet/https/:ro
+      - ASPNETCORE_URLS=https://+;http://+  
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=versity
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    volumes:
+     - ~/.aspnet/https:/https:ro
     networks:
       - dev
 
