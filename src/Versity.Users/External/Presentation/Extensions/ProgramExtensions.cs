@@ -1,6 +1,9 @@
 ﻿using System.Reflection;
 using Application;
 using Infrastructure;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
+using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Exceptions;
@@ -59,6 +62,17 @@ public static class ProgramExtensions
                 .ReadFrom.Configuration(context.Configuration);
         }));
 
+        builder.Services.AddDataProtection().UseCryptographicAlgorithms(new AuthenticatedEncryptorConfiguration
+        {
+            EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
+            ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
+        });
+
+        builder.Services.Configure<IISServerOptions>(options =>
+        {
+            options.AutomaticAuthentication = false;
+        });
+
         return builder;
     }
 
@@ -66,6 +80,7 @@ public static class ProgramExtensions
     {
         if (app.Environment.IsDevelopment())
         {
+            Console.WriteLine("Is development mode");
             // Or use your own middleware?
             app.UseExceptionHandler("/error-development");
             app.UseSwagger();
