@@ -23,10 +23,11 @@ public class GetAllVersityUsersCommandHandler
             .Take(10)
             .ToList();
         
-        var viewDtos = new List<ViewVersityUserDto>();
-        foreach (var user in users)
-            viewDtos.Add(ViewVersityUserDto.MapFromModel(user, await _versityUsersRepository.GetRolesAsync(user)));
-        
-        return viewDtos;
+        var viewVersityUserDtos = new List<ViewVersityUserDto>();
+        foreach (var user in users) 
+        {
+            viewVersityUserDtos.Add(ViewVersityUserDto.MapFromModel(user, await _versityUsersRepository.GetRolesAsync(user)));
+        }
+        return viewVersityUserDtos;
     }
 }

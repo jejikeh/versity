@@ -19,9 +19,10 @@ public class GetVersityUserByIdCommandHandler
     public async Task<ViewVersityUserDto> Handle(GetVersityUserByIdCommand request, CancellationToken cancellationToken)
     {
         var versityUser = await _versityUsersRepository.GetUserByIdAsync(request.Id);
-        if (versityUser == null)
+        if (versityUser is null)
+        {
             throw new NotFoundExceptionWithStatusCode("There is no user with this Id");
-
+        }
         return ViewVersityUserDto.MapFromModel(
             versityUser, 
             await _versityUsersRepository.GetRolesAsync(versityUser));

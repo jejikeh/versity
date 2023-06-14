@@ -21,12 +21,10 @@ public class LoginVersityUserCommandHandler : IRequestHandler<LoginVersityUserCo
     public async Task<string> Handle(LoginVersityUserCommand request, CancellationToken cancellationToken)
     {
         var versityUser = await _versityUsersRepository.GetUserByEmailAsync(request.Email);
-        if (versityUser is null)
+        if (versityUser is null || !await _versityUsersRepository.CheckPasswordAsync(versityUser, request.Password)) 
+        { 
             throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
-
-        if (!await _versityUsersRepository.CheckPasswordAsync(versityUser, request.Password))
-            throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
-
+        }
         var userRoles = await _versityUsersRepository.GetRolesAsync(versityUser);
         return _tokenGeneratorService.GenerateToken(versityUser.Id, versityUser.NormalizedEmail, userRoles);
     }

@@ -20,9 +20,10 @@ public class GiveAdminRoleToUserCommandHandler : IRequestHandler<GiveAdminRoleTo
     public async Task<string> Handle(GiveAdminRoleToUserCommand request, CancellationToken cancellationToken)
     {
         var versityUser = await _versityUsersRepository.GetUserByIdAsync(request.UserId);
-        if (versityUser is null)
+        if (versityUser is null) 
+        {
             throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
-
+        }
         await _versityUsersRepository.SetUserRoleAsync(versityUser, VersityRole.Admin);
         var userRoles = await _versityUsersRepository.GetUserRolesAsync(versityUser);
         return _tokenGeneratorService.GenerateToken(versityUser.Id, versityUser.NormalizedEmail, userRoles);

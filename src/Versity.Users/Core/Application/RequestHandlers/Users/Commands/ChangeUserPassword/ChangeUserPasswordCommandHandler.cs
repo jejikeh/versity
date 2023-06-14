@@ -17,13 +17,14 @@ public class ChangeUserPasswordCommandHandler : IRequestHandler<ChangeUserPasswo
     public async Task<IdentityResult> Handle(ChangeUserPasswordCommand request, CancellationToken cancellationToken)
     {
         var versityUser = await _versityUsersRepository.GetUserByIdAsync(request.Id);
-        if (versityUser == null)
+        if (versityUser is null) 
+        {
             throw new NotFoundExceptionWithStatusCode("There is no user with this Id");
-        
+        }
         if (!await _versityUsersRepository.CheckPasswordAsync(versityUser, request.OldPassword))
+        {
             throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
-        
-        // TODO: It would be great to send that token by email or another provider.
+        }
         var token = await _versityUsersRepository.GeneratePasswordResetTokenAsync(versityUser);
         return await _versityUsersRepository.ResetPasswordAsync(versityUser, token, request.NewPassword);
     }
