@@ -3,7 +3,6 @@ using Application.Abstractions.Repositories;
 using Domain.Models;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,11 +14,15 @@ public static class InfrastructureInjection
     public static IServiceCollection AddPersistence(this IServiceCollection serviceCollection,
         IConfiguration configuration)
     {
+        var connectionString = configuration.GetConnectionString("VersityUsersDb");
+        if (string.IsNullOrEmpty(connectionString)) 
+            connectionString = Environment.GetEnvironmentVariable("ConnectionString");
+            
         serviceCollection.AddDbContext<VersityUsersDbContext>(options =>
         {
             options.EnableDetailedErrors();
             options.UseNpgsql(
-                configuration.GetConnectionString("VersityUsersDb"), 
+                connectionString, 
                 builder => builder.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName));
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         });
