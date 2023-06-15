@@ -2,7 +2,6 @@
 using Application.Dtos;
 using Application.Exceptions;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 
 namespace Application.RequestHandlers.Users.Queries.GetVersityUserById;
 

@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using Application.Dtos;
+﻿using Application.Dtos;
 using Application.RequestHandlers.Users.Commands.ChangeUserPassword;
 using Application.RequestHandlers.Users.Queries.GetAllVersityUsers;
 using Application.RequestHandlers.Users.Queries.GetVersityUserById;
@@ -39,12 +38,7 @@ public sealed class UsersController : ApiController
     [HttpPut("me/password")]
     public async Task<IActionResult> ChangeUserPassword(ChangeUserPasswordDto changeUserPasswordDto,CancellationToken cancellationToken)
     {
-        var userId = HttpContext.User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-        if (userId == string.Empty)
-            throw new Exception("Something went wrong... Empty claims");
-
         var command = new ChangeUserPasswordCommand(
-            userId, 
             changeUserPasswordDto.OldPassword, 
             changeUserPasswordDto.NewPassword);
         var result = await Sender.Send(command, cancellationToken);
@@ -56,10 +50,9 @@ public sealed class UsersController : ApiController
     public async Task<IActionResult> ChangeUserPassword(string id, ChangeUserPasswordDto changeUserPasswordDto,CancellationToken cancellationToken)
     {
         var command = new ChangeUserPasswordCommand(
-            id, 
             changeUserPasswordDto.OldPassword, 
-            changeUserPasswordDto.NewPassword);
-        
+            changeUserPasswordDto.NewPassword,
+            id);
         var result = await Sender.Send(command, cancellationToken);
         return Ok(result);
     }

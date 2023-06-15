@@ -36,12 +36,8 @@ public sealed class AuthController : ApiController
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> GetAdminRole(CancellationToken cancellationToken)
-    {
-        var userId = HttpContext.User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-        if (userId == string.Empty)
-            throw new Exception("Something went wrong... Empty claims");
-        
-        var command = new GiveAdminRoleToUserCommand(userId);
+    {        
+        var command = new GiveAdminRoleToUserCommand();
         var token  = await Sender.Send(command, cancellationToken);
         return Ok(new { Token = token });
     }

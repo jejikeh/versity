@@ -1,6 +1,8 @@
-﻿using Application.Abstractions.Repositories;
+﻿using System.Security.Claims;
+using Application.Abstractions.Repositories;
 using Application.Exceptions;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.RequestHandlers.Users.Commands.ChangeUserPassword;
@@ -8,15 +10,27 @@ namespace Application.RequestHandlers.Users.Commands.ChangeUserPassword;
 public class ChangeUserPasswordCommandHandler : IRequestHandler<ChangeUserPasswordCommand, IdentityResult>
 {
     private readonly IVersityUsersRepository _versityUsersRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public ChangeUserPasswordCommandHandler(IVersityUsersRepository versityUsersRepository)
+    public ChangeUserPasswordCommandHandler(IVersityUsersRepository versityUsersRepository, IHttpContextAccessor httpContextAccessor)
     {
         _versityUsersRepository = versityUsersRepository;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<IdentityResult> Handle(ChangeUserPasswordCommand request, CancellationToken cancellationToken)
     {
-        var versityUser = await _versityUsersRepository.GetUserByIdAsync(request.Id);
+        var userId = request.Id;
+        if (string.IsNullOrEmpty(userId))
+        {
+            userId = _httpContextAccessor.HttpContext?.User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+            if (string.IsNullOrEmpty(userId)) 
+            { 
+                throw new InvalidOperationException("User claims was empty!");
+            }
+        }
+
+        var versityUser = await _versityUsersRepository.GetUserByIdAsync(userId);
         if (versityUser is null) 
         {
             throw new NotFoundExceptionWithStatusCode("There is no user with this Id");
