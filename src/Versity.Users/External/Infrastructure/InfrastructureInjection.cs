@@ -11,8 +11,7 @@ namespace Infrastructure;
 
 public static class InfrastructureInjection
 {
-    public static IServiceCollection AddPersistence(this IServiceCollection serviceCollection,
-        IConfiguration configuration)
+    public static IServiceCollection AddDbContext(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("VersityUsersDb");
         if (string.IsNullOrEmpty(connectionString))
@@ -24,17 +23,21 @@ public static class InfrastructureInjection
         {
             options.EnableDetailedErrors();
             options.UseNpgsql(
-                connectionString, 
+                connectionString,
                 builder => builder.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName));
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         });
 
-        serviceCollection.AddScoped<IVersityUsersRepository, VersityUsersRepository>();
-        serviceCollection.AddScoped<IVersityRolesRepository, VersityRoleRepository>();
-        
         return serviceCollection;
     }
-
+    
+    public static IServiceCollection AddRepositories(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddScoped<IVersityUsersRepository, VersityUsersRepository>();
+        serviceCollection.AddScoped<IVersityRolesRepository, VersityRoleRepository>();
+        return serviceCollection;
+    }
+    
     public static async Task<IServiceProvider> EnsureRolesExists(this IServiceProvider serviceProvider)
     {
         var roleManager = serviceProvider.GetRequiredService<IVersityRolesRepository>();

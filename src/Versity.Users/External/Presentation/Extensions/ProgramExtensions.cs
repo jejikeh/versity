@@ -15,12 +15,11 @@ public static class ProgramExtensions
 {
     public static WebApplicationBuilder ConfigureBuilder(this WebApplicationBuilder builder)
     {
-        builder.Services.AddPersistence(builder.Configuration);
+        builder.Services.AddDbContext(builder.Configuration);
+        builder.Services.AddRepositories();
         builder.Services.AddApplication();
         builder.Services.AddIdentityJwtAuthentication(builder.Configuration);
-     
         builder.Services.AddControllers();
-        
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
@@ -80,7 +79,6 @@ public static class ProgramExtensions
         if (app.Environment.IsDevelopment())
         {
             Console.WriteLine("Is development mode");
-            // Or use your own middleware?
             app.UseExceptionHandler("/error-development");
             app.UseSwagger();
             app.UseSwaggerUI();
