@@ -40,16 +40,18 @@ public static class InfrastructureInjection
         var anyRoleWasAdded = false;
         foreach (var role in roles)
         {
-            if (await roleManager.RoleExistsAsync(role)) 
+            if (await roleManager.RoleExistsAsync(role))
+            {
                 continue;
-            
+            }
             await roleManager.CreateRoleAsync(role);
             anyRoleWasAdded = true;
         }
-        
+
         if (anyRoleWasAdded)
+        {
             await serviceProvider.GetRequiredService<VersityUsersDbContext>().SaveChangesAsync();
-        
+        }
         return serviceProvider;
     }
 }
