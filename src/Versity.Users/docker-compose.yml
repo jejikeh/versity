@@ -52,9 +52,16 @@ services:
       dockerfile: Dockerfile
     environment:
       - ConnectionString=Host=versity-users-db;Port=5432;Username=versity_dev;Password=versity_dev;Database=versity_users_dev;
+      - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
       - ASPNETCORE_URLS=https://+;http://+  
       - ASPNETCORE_Kestrel__Certificates__Default__Password=versity
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - JWT__Key=06AA645D-B70D-446F-90D7-192A5C1CAA6A
+      - JWT__Issuer=https://versity.users:4001
+      - JWT__Audience=https://versity.users:4001
+      - TEST=Hello
+      - TEST_KEY=HelloKEY
+      - TEST__KEY=HelloKEYTWO
     volumes:
      - ~/.aspnet/https:/https:ro
     networks:

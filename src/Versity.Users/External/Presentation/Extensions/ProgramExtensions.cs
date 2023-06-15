@@ -78,7 +78,6 @@ public static class ProgramExtensions
     {
         if (app.Environment.IsDevelopment())
         {
-            Console.WriteLine("Is development mode");
             app.UseExceptionHandler("/error-development");
             app.UseSwagger();
             app.UseSwaggerUI();

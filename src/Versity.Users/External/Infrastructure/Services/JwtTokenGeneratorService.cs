@@ -29,10 +29,10 @@ public class JwtTokenGeneratorService : IAuthTokenGeneratorService
         var securityToken = new JwtSecurityToken(
             claims: claims,
             expires: DateTime.Now.AddMinutes(60),
-            issuer: _config.GetSection("Jwt:Issuer").Value,
-            audience: _config.GetSection("Jwt:Audience").Value,
+            issuer: Environment.GetEnvironmentVariable("JWT__Issuer") ?? _config.GetSection("Jwt:Issuer").Value,
+            audience: Environment.GetEnvironmentVariable("JWT__Audience"),
             signingCredentials: new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("Jwt:Key").Value)), 
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT__Key") ?? _config.GetSection("Jwt:Key").Value)), 
                 SecurityAlgorithms.HmacSha512Signature));
         
         return new JwtSecurityTokenHandler().WriteToken(securityToken);
