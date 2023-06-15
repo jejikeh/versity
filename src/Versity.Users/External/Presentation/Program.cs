@@ -12,14 +12,11 @@ var app = builder
 
 using var scope = app.Services.CreateScope();
 var serviceProvider = scope.ServiceProvider;
-
 try
 {
     var versityUsersDbContext = serviceProvider.GetRequiredService<VersityUsersDbContext>();
     versityUsersDbContext.Database.EnsureCreated();
-    
     await serviceProvider.EnsureRolesExists();
-
     app.Run();
 }
 catch (Exception ex)

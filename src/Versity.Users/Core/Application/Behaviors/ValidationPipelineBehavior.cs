@@ -22,10 +22,11 @@ public class ValidationPipelineBehavior<TRequest, TResponse>
             .SelectMany(result => result.Errors)
             .Where(failure => failure != null)
             .ToArray();
-
+        
         if (failures.Any())
+        {
             throw new ValidationExceptionWithStatusCode(new ValidationException(failures).Message);
-
+        }
         return await next();
     }
 }

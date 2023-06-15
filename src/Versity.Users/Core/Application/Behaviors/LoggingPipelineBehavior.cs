@@ -21,12 +21,11 @@ public class LoggingPipelineBehavior<TRequest, TResponse>
             DateTime.UtcNow);
 
         var result = await next();
-        
         _logger.LogInformation(
             "Completed request {@RequestName}, {@DateTimeUtc}",
             typeof(TRequest).Name,
             DateTime.UtcNow);
-
+        
         return result;
     }
 }
