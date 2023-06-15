@@ -15,9 +15,11 @@ public static class InfrastructureInjection
         IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("VersityUsersDb");
-        if (string.IsNullOrEmpty(connectionString)) 
+        if (string.IsNullOrEmpty(connectionString))
+        {
             connectionString = Environment.GetEnvironmentVariable("ConnectionString");
-            
+        }
+
         serviceCollection.AddDbContext<VersityUsersDbContext>(options =>
         {
             options.EnableDetailedErrors();
