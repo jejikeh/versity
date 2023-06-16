@@ -18,7 +18,8 @@ public static class ProgramExtensions
         builder.Services.AddDbContext(builder.Configuration);
         builder.Services.AddRepositories();
         builder.Services.AddApplication();
-        builder.Services.AddIdentityJwtAuthentication(builder.Configuration);
+        builder.Services.AddVersityIdentity();
+        builder.Services.AddJwtAuthentication(builder.Configuration);
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>

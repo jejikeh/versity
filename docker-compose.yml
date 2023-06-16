@@ -45,25 +45,48 @@ services:
     depends_on:
       - versity-users-db
     ports:
-      - 4000:80
-      - 4001:443
+      - 80
+      - 443
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: src/Versity.Users/Dockerfile
     environment:
       - ConnectionString=Host=versity-users-db;Port=5432;Username=versity_dev;Password=versity_dev;Database=versity_users_dev;
       - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
       - ASPNETCORE_URLS=https://+;http://+  
       - ASPNETCORE_Kestrel__Certificates__Default__Password=versity
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/root/.aspnet/https/aspnetapp.pfx
       - JWT__Key=06AA645D-B70D-446F-90D7-192A5C1CAA6A
       - JWT__Issuer=https://versity.users:4001
       - JWT__Audience=https://versity.users:4001
-      - TEST=Hello
-      - TEST_KEY=HelloKEY
-      - TEST__KEY=HelloKEYTWO
     volumes:
-     - ~/.aspnet/https:/https:ro
+      - ~/.aspnet/https:/root/.aspnet/https:ro
+      - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro
+    networks:
+      - dev
+  
+  versity-apigateway-service:
+    image: jejikeh/versity.apigateway:latest
+    container_name: versity-apigateway-service
+    depends_on:
+      - versity-users-service
+    ports:
+      - 8000:80
+      - 8001:443
+    build:
+      context: .
+      dockerfile: src/Versity.ApiGateway/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
+      - ASPNETCORE_URLS=https://+;http://+
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=versity
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/root/.aspnet/https/aspnetapp.pfx
+      - JWT__Key=06AA645D-B70D-446F-90D7-192A5C1CAA6A
+      - JWT__Issuer=https://versity.users:4001
+      - JWT__Audience=https://versity.users:4001
+    volumes:
+      - ~/.aspnet/https:/root/.aspnet/https:ro
+      - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro
     networks:
       - dev
 

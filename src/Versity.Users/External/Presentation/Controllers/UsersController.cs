@@ -26,7 +26,7 @@ public sealed class UsersController : ApiController
     }
     
     [Authorize(Roles = "Admin")]
-    [HttpGet("{page:int}")]
+    [HttpGet("page/{page:int}")]
     public async Task<IActionResult> GetAllUsers(int page, CancellationToken cancellationToken)
     {
         var command = new GetAllVersityUsersCommand(page);

@@ -1,0 +1,118 @@
+﻿{
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/api/auth/register",
+      "UpstreamHttpMethod": ["Post"],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "versity-users-service",
+          "Port": 443
+        }
+      ],
+      "DownstreamPathTemplate": "/api/auth/register",
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "UpstreamPathTemplate": "/api/auth/login",
+      "UpstreamHttpMethod": ["Post"],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "versity-users-service",
+          "Port": 443
+        }
+      ],
+      "DownstreamPathTemplate": "/api/auth/login",
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "UpstreamPathTemplate": "/api/auth/getadminrole",
+      "UpstreamHttpMethod": ["Post"],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "versity-users-service",
+          "Port": 443
+        }
+      ],
+      "DownstreamPathTemplate": "/api/auth/getadminrole",
+      "DangerousAcceptAnyServerCertificateValidator": true,
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/{id}",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "versity-users-service",
+          "Port": 443
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users/{id}",
+      "DangerousAcceptAnyServerCertificateValidator": true,
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/page/{page}",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "versity-users-service",
+          "Port": 443
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users/page/{page}",
+      "DangerousAcceptAnyServerCertificateValidator": true,
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/me/password/",
+      "UpstreamHttpMethod": ["Put"],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "versity-users-service",
+          "Port": 443
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users/me/password/",
+      "DangerousAcceptAnyServerCertificateValidator": true,
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/{id}/password",
+      "UpstreamHttpMethod": ["Put"],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "versity-users-service",
+          "Port": 443
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users/{id}/password/",
+      "DangerousAcceptAnyServerCertificateValidator": true,
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:8001"
+  }
+}

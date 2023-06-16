@@ -1,33 +1,13 @@
 ﻿using System.Text;
-using Application.Abstractions;
-using Domain.Models;
-using Infrastructure.Persistence;
-using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Versity.ApiGateway.Services;
+using Versity.ApiGateway.Services.Abstractions;
 
-namespace Presentation.Extensions;
+namespace Versity.ApiGateway.Extensions;
 
 public static class IdentityAuthenticationProgramExtension
 {
-    public static IServiceCollection AddVersityIdentity(this IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddIdentity<VersityUser, IdentityRole>(options =>
-        {
-            options.Password.RequiredLength = 8;
-            options.Password.RequireUppercase = true;
-            options.Password.RequireLowercase = true;
-            options.User.RequireUniqueEmail = true;
-            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
-        })
-        .AddEntityFrameworkStores<VersityUsersDbContext>()
-        .AddDefaultTokenProviders()
-        .AddRoles<IdentityRole>();
-
-        return serviceCollection;
-    }
-
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
         serviceCollection.AddTransient<IAuthTokenGeneratorService, JwtTokenGeneratorService>();
