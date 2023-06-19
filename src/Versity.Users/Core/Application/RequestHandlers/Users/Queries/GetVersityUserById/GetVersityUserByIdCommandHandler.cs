@@ -22,6 +22,7 @@ public class GetVersityUserByIdCommandHandler
         {
             throw new NotFoundExceptionWithStatusCode("There is no user with this Id");
         }
+        
         return ViewVersityUserDto.MapFromModel(
             versityUser, 
             await _versityUsersRepository.GetRolesAsync(versityUser));
