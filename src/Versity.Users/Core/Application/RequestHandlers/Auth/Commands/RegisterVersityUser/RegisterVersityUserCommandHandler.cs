@@ -32,6 +32,7 @@ public class RegisterVersityUserCommandHandler : IRequestHandler<RegisterVersity
         };
         var result = await _versityUsersRepository.CreateUserAsync(versityUser, request.Password);
         await _versityUsersRepository.SetUserRoleAsync(versityUser, VersityRole.Member);
+        
         return result;
     }
 }

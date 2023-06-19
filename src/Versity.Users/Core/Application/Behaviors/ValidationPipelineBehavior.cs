@@ -27,6 +27,7 @@ public class ValidationPipelineBehavior<TRequest, TResponse>
         {
             throw new ValidationExceptionWithStatusCode(new ValidationException(failures).Message);
         }
+        
         return await next();
     }
 }

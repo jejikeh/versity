@@ -40,6 +40,7 @@ public class ChangeUserPasswordCommandHandler : IRequestHandler<ChangeUserPasswo
             throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
         }
         var token = await _versityUsersRepository.GeneratePasswordResetTokenAsync(versityUser);
+        
         return await _versityUsersRepository.ResetPasswordAsync(versityUser, token, request.NewPassword);
     }
 }

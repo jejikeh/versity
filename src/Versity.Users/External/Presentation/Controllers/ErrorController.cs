@@ -26,6 +26,7 @@ public sealed class ErrorController : ControllerBase
                 statusCode: httpResponseException.StatusCode);
         }
         _logger.LogError("Request failure, {@Error}", exception.Message);
+        
         return Problem(title: "Ops 🤨! Something went wrong...");
     }
     
@@ -46,6 +47,7 @@ public sealed class ErrorController : ControllerBase
             statusCode = httpResponseException.StatusCode;
         }
         _logger.LogError("Request failure, {@Error}, debug_trace {@Trace}", title, exceptionHandlerFeature.Error.StackTrace);
+        
         return Problem(
             detail: exceptionHandlerFeature.Error.StackTrace,
             title: title,

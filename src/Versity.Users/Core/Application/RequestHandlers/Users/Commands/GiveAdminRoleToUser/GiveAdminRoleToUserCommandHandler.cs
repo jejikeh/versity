@@ -41,6 +41,7 @@ public class GiveAdminRoleToUserCommandHandler : IRequestHandler<GiveAdminRoleTo
         }
         await _versityUsersRepository.SetUserRoleAsync(versityUser, VersityRole.Admin);
         var userRoles = await _versityUsersRepository.GetUserRolesAsync(versityUser);
+        
         return _tokenGeneratorService.GenerateToken(versityUser.Id, versityUser.NormalizedEmail, userRoles);
     }
 }
