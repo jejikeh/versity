@@ -28,6 +28,7 @@ public class GetAllVersityUsersCommandHandler
         {
             viewVersityUserDtos.Add(ViewVersityUserDto.MapFromModel(user, await _versityUsersRepository.GetRolesAsync(user)));
         }
+        
         return viewVersityUserDtos;
     }
 }
