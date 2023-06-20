@@ -39,7 +39,7 @@ public static class ProgramExtensions
             policy.AllowAnyOrigin();
         }));
         
-        builder.Host.UseSerilog(((context, configuration) =>
+        builder.Host.UseSerilog((context, configuration) =>
         {
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
@@ -59,7 +59,7 @@ public static class ProgramExtensions
                 .WriteTo.Elasticsearch(ConfigureElasticSink(configurationRoot, environment))
                 .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName)
                 .ReadFrom.Configuration(context.Configuration);
-        }));
+        });
 
         builder.Services.AddDataProtection().UseCryptographicAlgorithms(new AuthenticatedEncryptorConfiguration
         {
