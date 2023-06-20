@@ -38,6 +38,19 @@ services:
       - postgres-data:/data/db
     networks:
       - dev
+  
+  versity-products-db:
+    image: debezium/postgres:13-alpine
+    environment:
+      - POSTGRES_DATABASE=versity_products_dev
+      - POSTGRES_USER=versity_dev
+      - POSTGRES_PASSWORD=versity_dev
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/data/db
+    networks:
+      - dev
 
   versity-users-service:
     image: jejikeh/versity.users:latest
@@ -64,12 +77,39 @@ services:
       - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro
     networks:
       - dev
+        
+  versity-products-service:
+    image: jejikeh/versity.products:latest
+    container_name: versity-products-service
+    depends_on:
+      - versity-products-db
+    ports:
+      - 80
+      - 443
+    build:
+      context: .
+      dockerfile: src/Versity.Products/Dockerfile
+    environment:
+      - ConnectionString=Host=versity-products-db;Port=5432;Username=versity_dev;Password=versity_dev;Database=versity_products_dev;
+      - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
+      - ASPNETCORE_URLS=https://+;http://+
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=versity
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/root/.aspnet/https/aspnetapp.pfx
+      - JWT__Key=06AA645D-B70D-446F-90D7-192A5C1CAA6A
+      - JWT__Issuer=https://versity.products:4001
+      - JWT__Audience=https://versity.products:4001
+    volumes:
+      - ~/.aspnet/https:/root/.aspnet/https:ro
+      - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro
+    networks:
+      - dev
   
   versity-apigateway-service:
     image: jejikeh/versity.apigateway:latest
     container_name: versity-apigateway-service
     depends_on:
       - versity-users-service
+      - versity-products-service
     ports:
       - 8000:80
       - 8001:443

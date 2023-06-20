@@ -6,6 +6,12 @@ build-users:
 push-users:
 	docker push $(DOCKER_REGISTRY)/versity.users
 
+build-products:
+	docker build -t $(DOCKER_REGISTRY)/versity.products ./src/Versity.Products/
+
+push-products:
+	docker push $(DOCKER_REGISTRY)/versity.products
+
 build-apigateway:
 	docker build -t $(DOCKER_REGISTRY)/versity.apigateway ./src/Versity.ApiGateway/
 
