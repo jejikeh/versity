@@ -62,6 +62,11 @@ public class VersityUsersRepository : IVersityUsersRepository
     {
         return await _userManager.GetRolesAsync(user);
     }
+    
+    public async Task<IdentityResult> ConfirmUserEmail(VersityUser user, string code)
+    {
+        return await _userManager.ConfirmEmailAsync(user, code);
+    }
 
     public async Task<IdentityResult> ResetPasswordAsync(VersityUser user, string token, string newPassword)
     {
