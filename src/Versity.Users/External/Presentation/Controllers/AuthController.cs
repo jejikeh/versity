@@ -1,11 +1,15 @@
 ﻿using System.Security.Claims;
+using System.Text;
 using Application.Dtos;
+using Application.RequestHandlers.Auth.Commands.ConfirmEmail;
 using Application.RequestHandlers.Auth.Commands.LoginVersityUser;
 using Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
+using Application.RequestHandlers.Auth.Commands.ResendEmailVerificationToken;
 using Application.RequestHandlers.Users.Commands.GiveAdminRoleToUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Presentation.Abstractions;
 
 namespace Presentation.Controllers;
@@ -40,5 +44,21 @@ public sealed class AuthController : ApiController
         var command = new GiveAdminRoleToUserCommand();
         var token  = await Sender.Send(command, cancellationToken);
         return Ok(new { Token = token });
+    }
+
+    [HttpGet("{userId}/{code}")]
+    public async Task<IActionResult> ConfirmEmail(string userId, string code, CancellationToken cancellationToken)
+    {
+        var command = new ConfirmEmailCommand(userId, Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code)));
+        var token  = await Sender.Send(command, cancellationToken);
+        return Ok(token.Succeeded ? "Thank you for confirming your mail." : "Your Email is not confirmed");
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> ResendEmailVerificationToken(LoginVersityUserDto userDto, CancellationToken cancellationToken)
+    {
+        var command = new ResendEmailVerificationTokenCommand(userDto.Email, userDto.Password);
+        var token = await Sender.Send(command, cancellationToken);
+        return Ok(token.Succeeded ? "Email verification token was send" : "Email verification token didnt send");
     }
 }
