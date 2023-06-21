@@ -25,8 +25,12 @@ public class LoginVersityUserCommandHandler : IRequestHandler<LoginVersityUserCo
         { 
             throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
         }
+        if (!versityUser.EmailConfirmed)
+        {
+            throw new EmailNotConfirmedExceptionWithStatusCode();
+        }
         var userRoles = await _versityUsersRepository.GetRolesAsync(versityUser);
         
-        return _tokenGeneratorService.GenerateToken(versityUser.Id, versityUser.NormalizedEmail, userRoles);
+        return _tokenGeneratorService.GenerateToken(versityUser.Id, versityUser.Email, userRoles);
     }
 }

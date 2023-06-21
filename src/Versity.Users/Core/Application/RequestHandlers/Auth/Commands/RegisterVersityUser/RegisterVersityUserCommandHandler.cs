@@ -1,4 +1,7 @@
-﻿using Application.Abstractions.Repositories;
+﻿using Application.Abstractions;
+using Application.Abstractions.Repositories;
+using Application.Common;
+using Application.Exceptions;
 using Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -8,10 +11,12 @@ namespace Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
 public class RegisterVersityUserCommandHandler : IRequestHandler<RegisterVersityUserCommand, IdentityResult>
 {
     private readonly IVersityUsersRepository _versityUsersRepository;
+    private readonly IEmailConfirmMessageService _emailConfirmMessageService;
 
-    public RegisterVersityUserCommandHandler(IVersityUsersRepository versityUsersRepository)
+    public RegisterVersityUserCommandHandler(IVersityUsersRepository versityUsersRepository, IEmailConfirmMessageService emailConfirmMessageService)
     {
         _versityUsersRepository = versityUsersRepository;
+        _emailConfirmMessageService = emailConfirmMessageService;
     }
 
     public async Task<IdentityResult> Handle(RegisterVersityUserCommand request, CancellationToken cancellationToken)
@@ -21,6 +26,7 @@ public class RegisterVersityUserCommandHandler : IRequestHandler<RegisterVersity
         {
             userId = Guid.NewGuid().ToString();
         }
+
         var versityUser = new VersityUser
         {
             Id = userId,
@@ -31,7 +37,9 @@ public class RegisterVersityUserCommandHandler : IRequestHandler<RegisterVersity
             UserName = $"{request.FirstName} {request.LastName}",
         };
         var result = await _versityUsersRepository.CreateUserAsync(versityUser, request.Password);
-        await _versityUsersRepository.SetUserRoleAsync(versityUser, VersityRole.Member);
+        IdentityResultHelpers.AggregateIdentityErrorsAndThrow(result);
+        IdentityResultHelpers.AggregateIdentityErrorsAndThrow(await _versityUsersRepository.SetUserRoleAsync(versityUser, VersityRole.Member));
+        await _emailConfirmMessageService.GenerateEmailConfirmMessageAsync(versityUser);
         
         return result;
     }

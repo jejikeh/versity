@@ -1,17 +1,17 @@
-﻿using FluentValidation;
+﻿using Application.RequestHandlers.Auth.Commands.ConfirmEmail;
+using FluentValidation;
 
-namespace Application.RequestHandlers.Auth.Commands.ConfirmEmail;
+namespace Application.RequestHandlers.Auth.Commands.ResendEmailVerificationToken;
 
-public class ConfirmEmailCommandValidation : AbstractValidator<ConfirmEmailCommand>  
+public class ResendEmailVerificationTokenCommandValidator : AbstractValidator<ResendEmailVerificationTokenCommand>  
 {
-    public ConfirmEmailCommandValidation()
+    public ResendEmailVerificationTokenCommandValidator()
     {
-        RuleFor(request => request.UserId)
-            .NotEmpty().WithMessage("User Id is required.")
-            .Matches(@"[({]?[a-fA-F0-9]{8}[-]?([a-fA-F0-9]{4}[-]?){3}[a-fA-F0-9]{12}[})]?")
-            .WithMessage("The Guid ID is incorrect! Double-check your Guid ID.");
+        RuleFor(user => user.Email)
+            .NotEmpty().WithMessage("Email is required.")
+            .EmailAddress().WithMessage("Please enter the correct email.");
 
-        RuleFor(request => request.Token)
-            .NotEmpty().WithMessage("Token from Email is required.");
+        RuleFor(user => user.Password)
+            .NotEmpty().WithMessage("Password cannot be empty");
     }
 }

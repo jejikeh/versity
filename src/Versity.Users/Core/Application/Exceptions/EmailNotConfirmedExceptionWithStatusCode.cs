@@ -2,12 +2,12 @@
 
 namespace Application.Exceptions;
 
-public class IncorrectEmailOrPasswordExceptionWithStatusCode : ExceptionWithStatusCode
+public class EmailNotConfirmedExceptionWithStatusCode : ExceptionWithStatusCode
 {
-    public IncorrectEmailOrPasswordExceptionWithStatusCode() : 
+    public EmailNotConfirmedExceptionWithStatusCode() : 
         base(
             StatusCodes.Status401Unauthorized, 
-            "Email or password is incorrect! Please check your credentials and try again.")
+            "Email is not confirmed! Please confirm your Email.")
     {
     }
 }

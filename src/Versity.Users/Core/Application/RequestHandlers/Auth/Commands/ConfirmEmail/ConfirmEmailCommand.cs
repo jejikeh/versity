@@ -1,6 +1,6 @@
-﻿namespace Application.RequestHandlers.Auth.Commands.ConfirmEmail;
+﻿using MediatR;
+using Microsoft.AspNetCore.Identity;
 
-public class ConfirmEmailCommand
-{
-    
-}
+namespace Application.RequestHandlers.Auth.Commands.ConfirmEmail;
+
+public record ConfirmEmailCommand(string UserId, string Token) : IRequest<IdentityResult>;

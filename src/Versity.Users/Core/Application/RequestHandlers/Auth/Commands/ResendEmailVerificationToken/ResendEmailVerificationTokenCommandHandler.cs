@@ -1,4 +1,5 @@
-﻿using Application.Abstractions.Repositories;
+﻿using Application.Abstractions;
+using Application.Abstractions.Repositories;
 using Application.Exceptions;
 using Application.RequestHandlers.Auth.Commands.ConfirmEmail;
 using MediatR;
@@ -9,10 +10,13 @@ namespace Application.RequestHandlers.Auth.Commands.ResendEmailVerificationToken
 public class ResendEmailVerificationTokenCommandHandler : IRequestHandler<ResendEmailVerificationTokenCommand, IdentityResult>
 {
     private readonly IVersityUsersRepository _versityUsersRepository;
+    private readonly IEmailConfirmMessageService _emailConfirmMessageService;
 
-    public ResendEmailVerificationTokenCommandHandler(IVersityUsersRepository versityUsersRepository)
+
+    public ResendEmailVerificationTokenCommandHandler(IVersityUsersRepository versityUsersRepository, IEmailConfirmMessageService emailConfirmMessageService)
     {
         _versityUsersRepository = versityUsersRepository;
+        _emailConfirmMessageService = emailConfirmMessageService;
     }
 
     public async Task<IdentityResult> Handle(ResendEmailVerificationTokenCommand request, CancellationToken cancellationToken)
@@ -22,12 +26,12 @@ public class ResendEmailVerificationTokenCommandHandler : IRequestHandler<Resend
         { 
             throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
         }
-        if (!versityUser.EmailConfirmed)
+        if (versityUser.EmailConfirmed)
         {
-            throw new EmailNotConfirmedExceptionWithStatusCode();
+            throw new IdentityExceptionWithStatusCode("The Email already confirmed");
         }
-        var userRoles = await _versityUsersRepository.GetRolesAsync(versityUser);
+        await _emailConfirmMessageService.GenerateEmailConfirmMessageAsync(versityUser);
         
-        return _tokenGeneratorService.GenerateToken(versityUser.Id, versityUser.Email, userRoles);
+        return IdentityResult.Success;
     }
 }

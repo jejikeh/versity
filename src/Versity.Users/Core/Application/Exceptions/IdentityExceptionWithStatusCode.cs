@@ -1,6 +1,10 @@
-﻿namespace Application.Exceptions;
+﻿using Microsoft.AspNetCore.Http;
 
-public class IdentityExceptionWithStatusCode
+namespace Application.Exceptions;
+
+public class IdentityExceptionWithStatusCode : ExceptionWithStatusCode
 {
-    
+    public IdentityExceptionWithStatusCode(string value) : base(StatusCodes.Status401Unauthorized, value)
+    {
+    }
 }
