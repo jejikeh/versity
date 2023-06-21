@@ -1,23 +1,26 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Xml.Schema;
+﻿
+using System.Text;
 using Application.Abstractions;
 using Application.Exceptions;
 using Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using RestSharp;
-using RestSharp.Authenticators;
+using MimeKit;
+using MailKit.Net.Smtp;
+using MailKit;
+using Microsoft.AspNetCore.WebUtilities;
+using MimeKit;
 
 namespace Infrastructure.Services;
 
-public class EmailConfirmMessageMailgunService : IEmailConfirmMessageService
+public class EmailConfirmMessageGmailService : IEmailConfirmMessageService
 {
     private readonly UserManager<VersityUser> _userManager;
     private readonly IConfiguration _config;
-    private readonly ILogger<EmailConfirmMessageMailgunService> _logger;
+    private readonly ILogger<EmailConfirmMessageGmailService> _logger;
 
-    public EmailConfirmMessageMailgunService(UserManager<VersityUser> userManager, IConfiguration config, ILogger<EmailConfirmMessageMailgunService> logger)
+    public EmailConfirmMessageGmailService(UserManager<VersityUser> userManager, IConfiguration config, ILogger<EmailConfirmMessageGmailService> logger)
     {
         _userManager = userManager;
         _config = config;
@@ -26,36 +29,52 @@ public class EmailConfirmMessageMailgunService : IEmailConfirmMessageService
 
     public async Task GenerateEmailConfirmMessageAsync(VersityUser user)
     {
-        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        var confirmUrl = $"https://localhost:8001/api/auth/confirmemail/{user.Id}/{code}";
-        var emailBody = $"Please confirm your email address <a href={System.Text.Encodings.Web.HtmlEncoder.Default.Encode(confirmUrl)}>Confirm</a>";
-        var result = SendEmail(emailBody, user.Email);
-
-        if (!result.IsSuccessful)
-        {
-            _logger.LogError($"Error occured while sending API Request to Mailgun service:\n Error Message: {result.ErrorMessage}");
-            throw new BadRequestExceptionWithStatusCode(result.ErrorMessage!);
-        }
+        var token = await GenerateConfirmationToken(user);
+        var confirmUrl = $"https://localhost:8001/api/auth/confirmemail/{user.Id}/{token}";
+        var emailBody = $"<h1>Привет {user.FirstName}! Ты мое солнышко :3</h1></br>" +
+                        $"Please confirm your email address <a href={System.Text.Encodings.Web.HtmlEncoder.Default.Encode(confirmUrl)}>Confirm</a>";
+        var message = CrateEmailMessage(emailBody, user.Email);
+        SendEmailMessage(message);
     }
 
-    private RestResponse SendEmail(string body, string email)
+    private async Task<string> GenerateConfirmationToken(VersityUser user)
     {
-        var options = new RestClientOptions("https://api.mailgun.net/v3")
-        {
-            Authenticator = new HttpBasicAuthenticator("api",
-                Environment.GetEnvironmentVariable("Mailgun__Private__ApiKey") ??
-                _config.GetSection("Mailgun:PrivateApiKey").Value)
-        };
-        var client = new RestClient(options);
-        var request = new RestRequest();
-        request.AddParameter("domain", "sandbox584dcdad9f9c441c8068dd796b88f7c8.mailgun.org", ParameterType.UrlSegment);
-        request.Resource = "{domain}/messages";
-        request.AddParameter("from", "Versity Identity Server Sandbox <mailgun@sandbox584dcdad9f9c441c8068dd796b88f7c8.mailgun.org>");
-        request.AddParameter("to", email);
-        request.AddParameter("subject", "Email Verification ");
-        request.AddParameter("text", body);
-        request.Method = Method.Post;
-        
-        return client.Execute(request);
+        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var tokenGeneratedBytes = Encoding.UTF8.GetBytes(code);
+        var codeEncoded = WebEncoders.Base64UrlEncode(tokenGeneratedBytes);
+        return codeEncoded;
     }
+
+    private MimeMessage CrateEmailMessage(string body, string email)
+    {
+        var message = new MimeMessage();
+        message.From.Add(new MailboxAddress(
+            "Versity Identity Server", 
+            Environment.GetEnvironmentVariable("EMAIL__From") ?? _config.GetSection("EmailConfiguration:From").Value));
+        message.To.Add(MailboxAddress.Parse(email));
+        message.Subject = "Confirm Email";
+        message.Body = new TextPart("html")
+        {
+            Text = body
+        };
+
+        return message;
+    }
+
+    private void SendEmailMessage(MimeMessage message)
+    {
+        using var client = new SmtpClient();
+        client.Connect(
+            Environment.GetEnvironmentVariable("EMAIL__SmtpServer") ?? _config.GetSection("EmailConfiguration:SmtpServer").Value, 
+            int.Parse(Environment.GetEnvironmentVariable("EMAIL__Port") ?? _config.GetSection("EmailConfiguration:Port").Value!), 
+            true);
+
+        client.AuthenticationMechanisms.Remove("XOAUTH2");
+        client.Authenticate(
+            Environment.GetEnvironmentVariable("EMAIL__Username") ?? _config.GetSection("EmailConfiguration:Username").Value, 
+            Environment.GetEnvironmentVariable("EMAIL__Password") ?? _config.GetSection("EmailConfiguration:Password").Value);
+
+        client.Send(message);
+        client.Disconnect(true);
+    } 
 }
