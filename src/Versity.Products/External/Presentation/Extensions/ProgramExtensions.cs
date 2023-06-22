@@ -26,12 +26,13 @@ public static class ProgramExtensions
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
+            options.UseDateOnlyTimeOnlyStringConverters();
             options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
             {
                 In = ParameterLocation.Header,
                 Name = "Authorization",
                 Type = SecuritySchemeType.ApiKey
-            });
+            }); 
         });
 
         builder.Services.AddCors(options => options.AddPolicy("AllowAll", policy =>

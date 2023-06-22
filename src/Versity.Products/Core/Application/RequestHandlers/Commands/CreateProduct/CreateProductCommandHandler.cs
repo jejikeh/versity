@@ -30,6 +30,7 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             Release = request.Release
         };
         var result = await _products.CreateProductAsync(product, cancellationToken);
+        await _products.SaveChangesAsync(cancellationToken);
         
         return result;
     }

@@ -3,7 +3,7 @@ using Domain.Models;
 
 namespace Application.Dtos;
 
-public record CreateProductDto(
+public record UpdateProductDto(
     string Title,
     string Description,
     string Author,

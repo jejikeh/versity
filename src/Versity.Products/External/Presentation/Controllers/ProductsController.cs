@@ -1,4 +1,5 @@
-﻿using Application.RequestHandlers.Commands.CreateProduct;
+﻿using Application.Dtos;
+using Application.RequestHandlers.Commands.CreateProduct;
 using Application.RequestHandlers.Commands.UpdateProduct;
 using Application.RequestHandlers.Queries.GetAllProducts;
 using Application.RequestHandlers.Queries.GetProductById;
@@ -38,9 +39,10 @@ public sealed class ProductsController : ApiController
         return result.IsFailed ? Problem(result.Errors.ToList()[0].Message) : Ok(result.Value);
     }
     
-    [HttpPut]
-    public async Task<IActionResult> UpdateProduct(UpdateProductCommand updateProductCommand, CancellationToken cancellationToken)
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] UpdateProductDto updateProductDto, CancellationToken cancellationToken)
     {
+        var updateProductCommand = new UpdateProductCommand(id, updateProductDto.Title, updateProductDto.Description, updateProductDto.Author, updateProductDto.Release);
         var result = await Sender.Send(updateProductCommand, cancellationToken);
         return result.IsFailed ? Problem(result.Errors.ToList()[0].Message) : Ok(result.Value);
     }
