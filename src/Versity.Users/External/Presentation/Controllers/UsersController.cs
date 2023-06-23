@@ -17,16 +17,16 @@ public sealed class UsersController : ApiController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetUserById(string id, CancellationToken cancellationToken)
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetUserById(Guid id, CancellationToken cancellationToken)
     {
-        var command = new GetVersityUserByIdCommand(id);
+        var command = new GetVersityUserByIdCommand(id.ToString());
         var result = await Sender.Send(command, cancellationToken);
         return Ok(result);
     }
     
     [Authorize(Roles = "Admin")]
-    [HttpGet("page/{page:int}")]
+    [HttpGet("{page:int}")]
     public async Task<IActionResult> GetAllUsers(int page, CancellationToken cancellationToken)
     {
         var command = new GetAllVersityUsersCommand(page);

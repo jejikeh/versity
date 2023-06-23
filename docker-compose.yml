@@ -57,8 +57,8 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Password=versity
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/root/.aspnet/https/aspnetapp.pfx
       - JWT__Key=06AA645D-B70D-446F-90D7-192A5C1CAA6A
-      - JWT__Issuer=https://versity.products:4001
-      - JWT__Audience=https://versity.products:4001
+      - JWT__Issuer=https://versity.users:4001
+      - JWT__Audience=https://versity.users:4001
     volumes:
       - ~/.aspnet/https:/root/.aspnet/https:ro
       - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro

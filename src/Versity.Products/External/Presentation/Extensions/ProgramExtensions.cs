@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 using System.Text;
 using Application;
 using Infrastructure;
@@ -6,6 +7,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -85,6 +88,7 @@ public static class ProgramExtensions
             app.UseExceptionHandler("/error-development");
             app.UseSwagger();
             app.UseSwaggerUI();
+            IdentityModelEventSource.ShowPII = true;
         }
         else
         {
@@ -113,7 +117,7 @@ public static class ProgramExtensions
             {
                 ValidateActor = true,
                 ValidateIssuer = true,
-                ValidateAudience = true,
+                ValidateAudience = false,
                 RequireExpirationTime = true,
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = Environment.GetEnvironmentVariable("JWT__Issuer") ?? configuration.GetSection("Jwt:Issuer").Value,

@@ -40,7 +40,7 @@ public class GiveAdminRoleToUserCommandHandler : IRequestHandler<GiveAdminRoleTo
             throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
         }
         await _versityUsersRepository.SetUserRoleAsync(versityUser, VersityRole.Admin);
-        var userRoles = await _versityUsersRepository.GetUserRolesAsync(versityUser);
+        var userRoles = await _versityUsersRepository.GetRolesAsync(versityUser);
         
         return _tokenGeneratorService.GenerateToken(versityUser.Id, versityUser.NormalizedEmail, userRoles);
     }
