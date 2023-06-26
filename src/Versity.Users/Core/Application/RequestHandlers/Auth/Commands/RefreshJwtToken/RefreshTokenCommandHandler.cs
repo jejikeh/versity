@@ -1,56 +1,53 @@
 ﻿using Application.Abstractions;
 using Application.Abstractions.Repositories;
-using Application.Common;
 using Application.Dtos;
 using Application.Exceptions;
-using Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.Net.Http.Headers;
+using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
-namespace Application.RequestHandlers.Auth.Commands.RefreshRefreshToken;
+namespace Application.RequestHandlers.Auth.Commands.RefreshJwtToken;
 
 public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, AuthTokens>
 {
     private readonly IVersityUsersRepository _versityUsersRepository;
     private readonly IVersityRefreshTokensRepository _refreshTokensRepository;
-    private readonly IAuthTokenGeneratorService _tokenGeneratorService;
+    private readonly IAuthTokenGeneratorService _authTokenGeneratorService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IRefreshTokenGeneratorService _refreshTokenGeneratorService;
 
-    public RefreshTokenCommandHandler(IVersityRefreshTokensRepository refreshTokensRepository, IVersityUsersRepository versityUsersRepository, IAuthTokenGeneratorService tokenGeneratorService)
+    public RefreshTokenCommandHandler(IVersityRefreshTokensRepository refreshTokensRepository, IVersityUsersRepository versityUsersRepository, IAuthTokenGeneratorService authTokenGeneratorService, IHttpContextAccessor httpContextAccessor, IRefreshTokenGeneratorService refreshTokenGeneratorService)
     {
         _refreshTokensRepository = refreshTokensRepository;
         _versityUsersRepository = versityUsersRepository;
-        _tokenGeneratorService = tokenGeneratorService;
+        _authTokenGeneratorService = authTokenGeneratorService;
+        _httpContextAccessor = httpContextAccessor;
+        _refreshTokenGeneratorService = refreshTokenGeneratorService;
     }
 
     public async Task<AuthTokens> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        var oldRefreshToken = await ValidateRefreshToken(request, cancellationToken);
-        var versityUser = await _versityUsersRepository.GetUserByIdAsync(request.UserId);
+        var oldJwtToken = _httpContextAccessor.HttpContext?.Request.Headers[HeaderNames.Authorization].ToString();
+        if (oldJwtToken is null)
+        {
+            throw new IdentityExceptionWithStatusCode("The Authorization token was not provided!");
+        }
+        var decryptedJwtToken = _authTokenGeneratorService.DecryptToken(oldJwtToken);
+        
+        var userIdClaim = decryptedJwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub);
+        if (userIdClaim is null || string.IsNullOrEmpty(userIdClaim.Value)) 
+        { 
+            throw new IdentityExceptionWithStatusCode("The Authorization token was corrupted!");
+        }
+        var oldRefreshToken = await _refreshTokenGeneratorService.ValidateTokenAsync(userIdClaim.Value, request.RefreshToken, cancellationToken);
+        var versityUser = await _versityUsersRepository.GetUserByIdAsync(userIdClaim.Value);
         var userRoles = await _versityUsersRepository.GetRolesAsync(versityUser);
-        var userToken = _tokenGeneratorService.GenerateToken(versityUser.Id, versityUser.Email, userRoles);
-        var refreshToken = Utils.GenerateRefreshTokenForUserById(versityUser.Id);
-        await _refreshTokensRepository.AddAsync(refreshToken, cancellationToken);
-        await _refreshTokensRepository.SaveChangesAsync(cancellationToken);
+        var userToken = _authTokenGeneratorService.GenerateToken(versityUser.Id, versityUser.Email, userRoles);
         oldRefreshToken.IsUsed = true;
         _refreshTokensRepository.Update(oldRefreshToken);
+        await _refreshTokensRepository.SaveChangesAsync(cancellationToken);
 
-        return new AuthTokens(userToken, refreshToken.Token);
-    }
-
-    private async Task<RefreshToken> ValidateRefreshToken(RefreshTokenCommand request, CancellationToken cancellationToken)
-    {
-        var tokens = await _refreshTokensRepository.GetAllUserTokensByUserIdAsync(request.UserId, cancellationToken);
-        var refreshToken = tokens.FirstOrDefault(x => x.Token == request.RefreshToken);
-        if (refreshToken is null)
-        {
-            throw new IdentityExceptionWithStatusCode("The refresh token was not generated.");
-        }
-        if (!refreshToken.IsRevoked && refreshToken.ExpiryTime > DateTime.UtcNow)
-        {
-            throw new IdentityExceptionWithStatusCode("The refresh token was expired or revoked. Please login again");
-        }
-
-        return refreshToken;
+        return new AuthTokens(userToken, request.RefreshToken);
     }
 }

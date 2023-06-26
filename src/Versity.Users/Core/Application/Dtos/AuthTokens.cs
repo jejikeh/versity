@@ -1,6 +1,3 @@
 ﻿namespace Application.Dtos;
 
-public class AuthTokens
-{
-    
-}
+public record AuthTokens(string Token, string RefreshToken);

@@ -1,6 +1,9 @@
-﻿namespace Application.RequestHandlers.Auth.Queries;
+﻿using Domain.Models;
+using MediatR;
 
-public class GetAllRefreshTokens
+namespace Application.RequestHandlers.Auth.Queries;
+
+public record GetAllRefreshTokensCommand : IRequest<IEnumerable<RefreshToken>>
 {
     
 }
