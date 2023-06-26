@@ -33,6 +33,7 @@ public static class IdentityAuthenticationProgramExtension
     {
         serviceCollection.AddTransient<IAuthTokenGeneratorService, JwtTokenGeneratorService>();
         serviceCollection.AddTransient<IEmailConfirmMessageService, EmailConfirmMessageGmailService>();
+        serviceCollection.AddTransient<IRefreshTokenGeneratorService, RefreshTokenGeneratorService>();
         
         serviceCollection.AddAuthentication(options =>
         {
