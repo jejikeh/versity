@@ -18,13 +18,11 @@ public class EmailConfirmMessageGmailService : IEmailConfirmMessageService
 {
     private readonly UserManager<VersityUser> _userManager;
     private readonly IConfiguration _config;
-    private readonly ILogger<EmailConfirmMessageGmailService> _logger;
 
-    public EmailConfirmMessageGmailService(UserManager<VersityUser> userManager, IConfiguration config, ILogger<EmailConfirmMessageGmailService> logger)
+    public EmailConfirmMessageGmailService(UserManager<VersityUser> userManager, IConfiguration config)
     {
         _userManager = userManager;
         _config = config;
-        _logger = logger;
     }
 
     public async Task GenerateEmailConfirmMessageAsync(VersityUser user)

@@ -1,6 +1,9 @@
-﻿namespace Application.Abstractions;
+﻿using Domain.Models;
 
-public interface IAuthTokenGeneratorService
+namespace Application.Abstractions;
+
+public interface IRefreshTokenGeneratorService
 {
-    public string GenerateToken(string userId, string userEmail, IEnumerable<string> roles);
+    public RefreshToken GenerateToken(string userId);
+    public Task<RefreshToken> ValidateTokenAsync(string userId, string token, CancellationToken cancellationToken);
 }

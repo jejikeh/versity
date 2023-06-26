@@ -1,4 +1,5 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System.Globalization;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Application.Abstractions;
@@ -15,13 +16,15 @@ public class JwtTokenGeneratorService : IAuthTokenGeneratorService
         var claims = new List<Claim>()
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId),
-            new Claim(JwtRegisteredClaimNames.Email, userEmail)
+            new Claim(JwtRegisteredClaimNames.Email, userEmail),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture))
         };
         claims.AddRange(roles.Select(userRole => new Claim("role", userRole)));
 
         var securityToken = new JwtSecurityToken(
             claims: claims,
-            expires: DateTime.Now.AddMinutes(60),
+            expires: DateTime.UtcNow.AddMinutes(1),
             issuer: Environment.GetEnvironmentVariable("JWT__Issuer"),
             audience: Environment.GetEnvironmentVariable("JWT__Audience"),
             signingCredentials: new SigningCredentials(
@@ -29,5 +32,17 @@ public class JwtTokenGeneratorService : IAuthTokenGeneratorService
                 SecurityAlgorithms.HmacSha512Signature));
         
         return new JwtSecurityTokenHandler().WriteToken(securityToken);
+    }
+
+    public JwtSecurityToken DecryptToken(string encryptedToken)
+    {
+        if (encryptedToken.StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase))
+        {
+            encryptedToken = encryptedToken[7..];
+        }
+        var handler = new JwtSecurityTokenHandler();
+        var decryptedJwtToken = handler.ReadJwtToken(encryptedToken);
+        
+        return decryptedJwtToken;
     }
 }
