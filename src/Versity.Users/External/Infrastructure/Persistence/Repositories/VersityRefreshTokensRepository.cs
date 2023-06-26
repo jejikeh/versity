@@ -28,9 +28,9 @@ public class VersityRefreshTokensRepository : IVersityRefreshTokensRepository
         return _usersDbContext.RefreshTokens.Update(token).Entity;
     }
 
-    public async Task<IEnumerable<RefreshToken>> GetAllUserTokensByUserIdAsync(string userId, CancellationToken cancellationToken)
+    public async Task<RefreshToken> FindUserTokenAsync(string userId, string token, CancellationToken cancellationToken)
     {
-        return await _usersDbContext.RefreshTokens.Where(x => x.UserId == userId).ToListAsync(cancellationToken);
+        return await _usersDbContext.RefreshTokens.SingleAsync(x => x.UserId == userId && x.Token == token, cancellationToken);
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken)

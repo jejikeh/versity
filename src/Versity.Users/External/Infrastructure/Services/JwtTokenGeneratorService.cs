@@ -3,14 +3,24 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Application.Abstractions;
+using Application.Exceptions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace Infrastructure.Services;
 
 public class JwtTokenGeneratorService : IAuthTokenGeneratorService
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public JwtTokenGeneratorService(IHttpContextAccessor httpContextAccessor)
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
+
     public string GenerateToken(string userId, string userEmail, IEnumerable<string> roles)
     {
         var claims = new List<Claim>()
@@ -34,7 +44,30 @@ public class JwtTokenGeneratorService : IAuthTokenGeneratorService
         return new JwtSecurityTokenHandler().WriteToken(securityToken);
     }
 
-    public JwtSecurityToken DecryptToken(string encryptedToken)
+    public JwtSecurityToken DecryptJwtTokenFromHeader()
+    {
+        var oldJwtToken = _httpContextAccessor.HttpContext?.Request.Headers[HeaderNames.Authorization].ToString();
+        if (oldJwtToken is null)
+        {
+            throw new IdentityExceptionWithStatusCode("The Authorization token was not provided!");
+        }
+        var decryptedJwtToken = DecryptToken(oldJwtToken);
+        
+        return decryptedJwtToken;
+    }
+    
+    public Claim GetUserIdClaimFromJwtToken(JwtSecurityToken decryptedJwtToken)
+    {
+        var userIdClaim = decryptedJwtToken.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub);
+        if (userIdClaim is null || string.IsNullOrEmpty(userIdClaim.Value))
+        {
+            throw new IdentityExceptionWithStatusCode("The Authorization token was corrupted!");
+        }
+
+        return userIdClaim;
+    }
+    
+    private JwtSecurityToken DecryptToken(string encryptedToken)
     {
         if (encryptedToken.StartsWith("bearer", StringComparison.InvariantCultureIgnoreCase))
         {

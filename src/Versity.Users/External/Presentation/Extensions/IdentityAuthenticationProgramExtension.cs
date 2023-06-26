@@ -31,9 +31,9 @@ public static class IdentityAuthenticationProgramExtension
 
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
-        serviceCollection.AddTransient<IAuthTokenGeneratorService, JwtTokenGeneratorService>();
         serviceCollection.AddTransient<IEmailConfirmMessageService, EmailConfirmMessageGmailService>();
-        serviceCollection.AddTransient<IRefreshTokenGeneratorService, RefreshTokenGeneratorService>();
+        serviceCollection.AddScoped<IAuthTokenGeneratorService, JwtTokenGeneratorService>();
+        serviceCollection.AddScoped<IRefreshTokenGeneratorService, RefreshTokenGeneratorService>();
         
         serviceCollection.AddAuthentication(options =>
         {

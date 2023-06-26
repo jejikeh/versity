@@ -4,6 +4,7 @@ using Application.Dtos;
 using Application.Exceptions;
 using Domain.Models;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 
 namespace Application.RequestHandlers.Auth.Commands.LoginVersityUser;
 
@@ -13,6 +14,7 @@ public class LoginVersityUserCommandHandler : IRequestHandler<LoginVersityUserCo
     private readonly IVersityRefreshTokensRepository _refreshTokensRepository;
     private readonly IAuthTokenGeneratorService _authTokenGeneratorService;
     private readonly IRefreshTokenGeneratorService _refreshTokenGeneratorService;
+
 
     public LoginVersityUserCommandHandler(IAuthTokenGeneratorService authTokenGeneratorService, IVersityUsersRepository versityUsersRepository, IVersityRefreshTokensRepository refreshTokensRepository, IRefreshTokenGeneratorService refreshTokenGeneratorService)
     {
@@ -30,7 +32,7 @@ public class LoginVersityUserCommandHandler : IRequestHandler<LoginVersityUserCo
         var refreshToken = _refreshTokenGeneratorService.GenerateToken(versityUser.Id);
         await _refreshTokensRepository.AddAsync(refreshToken, cancellationToken);
         await _refreshTokensRepository.SaveChangesAsync(cancellationToken);
-        
+
         return new AuthTokens(userToken, refreshToken.Token);
     }
 

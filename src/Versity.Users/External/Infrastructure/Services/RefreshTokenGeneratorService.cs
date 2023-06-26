@@ -31,8 +31,7 @@ public class RefreshTokenGeneratorService : IRefreshTokenGeneratorService
 
     public async Task<RefreshToken> ValidateTokenAsync(string userId, string token, CancellationToken cancellationToken)
     {
-        var tokens = await _refreshTokensRepository.GetAllUserTokensByUserIdAsync(userId, cancellationToken);
-        var refreshToken = tokens.FirstOrDefault(x => x.Token == token);
+        var refreshToken = await _refreshTokensRepository.FindUserTokenAsync(userId, token, cancellationToken);
         if (refreshToken is null)
         {
             throw new IdentityExceptionWithStatusCode("The refresh token was not generated.");

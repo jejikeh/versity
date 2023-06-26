@@ -1,8 +1,6 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Versity.ApiGateway.Services;
-using Versity.ApiGateway.Services.Abstractions;
 
 namespace Versity.ApiGateway.Extensions;
 
@@ -10,8 +8,6 @@ public static class IdentityAuthenticationProgramExtension
 {
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
-        serviceCollection.AddTransient<IAuthTokenGeneratorService, JwtTokenGeneratorService>();
-
         serviceCollection.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
