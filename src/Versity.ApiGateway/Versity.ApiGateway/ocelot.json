@@ -14,6 +14,36 @@
       "DangerousAcceptAnyServerCertificateValidator": true
     },
     {
+      "UpstreamPathTemplate": "/api/auth/refreshtoken/{refreshToken}",
+      "UpstreamHttpMethod": ["Post"],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "versity-users-service",
+          "Port": 443
+        }
+      ],
+      "DownstreamPathTemplate": "/api/auth/refreshtoken/{refreshToken}",
+      "DangerousAcceptAnyServerCertificateValidator": true
+    },
+    {
+      "UpstreamPathTemplate": "/api/auth/GetAllRefreshTokens",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "versity-users-service",
+          "Port": 443
+        }
+      ],
+      "DownstreamPathTemplate": "/api/auth/GetAllRefreshTokens",
+      "DangerousAcceptAnyServerCertificateValidator": true,
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
       "UpstreamPathTemplate": "/api/auth/login",
       "UpstreamHttpMethod": ["Post"],
       "DownstreamScheme": "https",

@@ -24,7 +24,7 @@ public class ConfirmEmailCommandHandler : IRequestHandler<ConfirmEmailCommand, I
             throw new NotFoundExceptionWithStatusCode("There is no user with this Id");
         }
         var result = await _versityUsersRepository.ConfirmUserEmail(versityUser, request.Token);
-        IdentityResultHelpers.AggregateIdentityErrorsAndThrow(result);
+        Utils.AggregateIdentityErrorsAndThrow(result);
 
         return result;
     }

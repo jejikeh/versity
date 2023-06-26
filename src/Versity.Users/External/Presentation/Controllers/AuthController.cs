@@ -1,10 +1,11 @@
-﻿using System.Security.Claims;
-using System.Text;
+﻿using System.Text;
 using Application.Dtos;
 using Application.RequestHandlers.Auth.Commands.ConfirmEmail;
 using Application.RequestHandlers.Auth.Commands.LoginVersityUser;
+using Application.RequestHandlers.Auth.Commands.RefreshJwtToken;
 using Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
 using Application.RequestHandlers.Auth.Commands.ResendEmailVerificationToken;
+using Application.RequestHandlers.Auth.Queries;
 using Application.RequestHandlers.Users.Commands.GiveAdminRoleToUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -26,7 +27,7 @@ public sealed class AuthController : ApiController
     {
         var command = new RegisterVersityUserCommand(userDto.FirstName, userDto.LastName, userDto.Email, userDto.Phone, userDto.Password);
         var result = await Sender.Send(command, cancellationToken);
-        return result.Succeeded ? Ok() : BadRequest(result.Errors);
+        return result.Succeeded ? Ok("The confirmation message was send to your email!") : BadRequest(result.Errors);
     }
     
     [HttpPost]
@@ -60,5 +61,22 @@ public sealed class AuthController : ApiController
         var command = new ResendEmailVerificationTokenCommand(userDto.Email, userDto.Password);
         var token = await Sender.Send(command, cancellationToken);
         return Ok(token.Succeeded ? "Email verification token was send" : "Email verification token didnt send");
+    }
+    
+    [HttpPost("{refreshToken}")]
+    public async Task<IActionResult> RefreshToken(string refreshToken, CancellationToken cancellationToken)
+    {
+        var command = new RefreshTokenCommand(refreshToken);
+        var token = await Sender.Send(command, cancellationToken);
+        return Ok(token);
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> GetAllRefreshTokens(CancellationToken cancellationToken)
+    {
+        var command = new GetAllRefreshTokensCommand();
+        var token = await Sender.Send(command, cancellationToken);
+        return Ok(token);
     }
 }

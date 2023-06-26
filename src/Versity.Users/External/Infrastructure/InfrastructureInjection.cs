@@ -35,6 +35,7 @@ public static class InfrastructureInjection
     {
         serviceCollection.AddScoped<IVersityUsersRepository, VersityUsersRepository>();
         serviceCollection.AddScoped<IVersityRolesRepository, VersityRoleRepository>();
+        serviceCollection.AddScoped<IVersityRefreshTokensRepository, VersityRefreshTokensRepository>();
         return serviceCollection;
     }
     
@@ -52,11 +53,11 @@ public static class InfrastructureInjection
             await roleManager.CreateRoleAsync(role);
             anyRoleWasAdded = true;
         }
-
         if (anyRoleWasAdded)
         {
             await serviceProvider.GetRequiredService<VersityUsersDbContext>().SaveChangesAsync();
         }
+        
         return serviceProvider;
     }
 }

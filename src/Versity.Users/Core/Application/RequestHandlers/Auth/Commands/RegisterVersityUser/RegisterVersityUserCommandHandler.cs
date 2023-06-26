@@ -37,8 +37,8 @@ public class RegisterVersityUserCommandHandler : IRequestHandler<RegisterVersity
             UserName = $"{request.FirstName} {request.LastName}",
         };
         var result = await _versityUsersRepository.CreateUserAsync(versityUser, request.Password);
-        IdentityResultHelpers.AggregateIdentityErrorsAndThrow(result);
-        IdentityResultHelpers.AggregateIdentityErrorsAndThrow(await _versityUsersRepository.SetUserRoleAsync(versityUser, VersityRole.Member));
+        Utils.AggregateIdentityErrorsAndThrow(result);
+        Utils.AggregateIdentityErrorsAndThrow(await _versityUsersRepository.SetUserRoleAsync(versityUser, VersityRole.Member));
         await _emailConfirmMessageService.GenerateEmailConfirmMessageAsync(versityUser);
         
         return result;

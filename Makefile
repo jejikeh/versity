@@ -20,3 +20,6 @@ push-apigateway:
 
 up:
 	docker-compose up
+
+.PHONY: all
+all: build-users push-users build-products push-products build-apigateway push-apigateway up
