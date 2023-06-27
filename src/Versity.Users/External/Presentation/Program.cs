@@ -4,7 +4,8 @@ using Presentation.Extensions;
 
 var builder = WebApplication
     .CreateBuilder(args)
-    .ConfigureBuilder();
+    .ConfigureBuilder()
+    .AddElasticAndSerilog();
 
 var app = builder
     .Build()

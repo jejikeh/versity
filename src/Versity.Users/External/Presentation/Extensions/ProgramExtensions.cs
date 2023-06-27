@@ -1,13 +1,10 @@
-﻿using System.Reflection;
-using Application;
+﻿using Application;
 using Infrastructure;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using Serilog.Exceptions;
-using Serilog.Sinks.Elasticsearch;
 
 namespace Presentation.Extensions;
 
@@ -15,13 +12,15 @@ public static class ProgramExtensions
 {
     public static WebApplicationBuilder ConfigureBuilder(this WebApplicationBuilder builder)
     {
-        builder.Services.AddDbContext(builder.Configuration);
-        builder.Services.AddRepositories();
-        builder.Services.AddApplication();
-        builder.Services.AddVersityIdentity();
-        builder.Services.AddJwtAuthentication(builder.Configuration);
-        builder.Services.AddControllers();
-        builder.Services.AddEndpointsApiExplorer();
+        builder.Services
+            .AddDbContext(builder.Configuration)
+            .AddRepositories()
+            .AddApplication()
+            .AddVersityIdentity()
+            .AddJwtAuthentication(builder.Configuration)
+            .AddEndpointsApiExplorer()
+            .AddControllers();
+        
         builder.Services.AddSwaggerGen(options =>
         {
             options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
@@ -39,28 +38,6 @@ public static class ProgramExtensions
             policy.AllowAnyOrigin();
         }));
         
-        builder.Host.UseSerilog((context, configuration) =>
-        {
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-            if (string.IsNullOrEmpty(environment))
-                throw new NullReferenceException("ASPNETCORE_ENVIRONMENT variable is empty!");
-
-            var configurationRoot = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{environment}.json", optional: true)
-                .Build();
-
-            configuration
-                .Enrich.FromLogContext()
-                .Enrich.WithMachineName()
-                .Enrich.WithExceptionDetails()
-                .WriteTo.Console()
-                .WriteTo.Elasticsearch(ConfigureElasticSink(configurationRoot, environment))
-                .Enrich.WithProperty("Environment", context.HostingEnvironment.EnvironmentName)
-                .ReadFrom.Configuration(context.Configuration);
-        });
-
         builder.Services.AddDataProtection().UseCryptographicAlgorithms(new AuthenticatedEncryptorConfiguration
         {
             EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
@@ -96,21 +73,5 @@ public static class ProgramExtensions
         app.MapControllers();
         
         return app;
-    }
-    
-    private static ElasticsearchSinkOptions ConfigureElasticSink(IConfigurationRoot configuration, string enviroment)
-    {
-        var connectionString = configuration["ElasticConfiguration:Uri"];
-
-        if (string.IsNullOrEmpty(connectionString))
-            throw new NullReferenceException("ElasticConfiguration:Uri configuration is empty");
-
-        var connectionUri = new Uri(connectionString);
-        return new ElasticsearchSinkOptions(connectionUri) {
-            AutoRegisterTemplate = true,
-            IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name?.ToLower().Replace('.', '-')}-{enviroment.ToString()}-{DateTime.UtcNow:yyyy-MM}",
-            NumberOfReplicas = 1,
-            NumberOfShards = 2,
-        };
     }
 }

@@ -4,8 +4,7 @@ using MediatR;
 
 namespace Application.RequestHandlers.Users.Queries.GetAllVersityUsers;
 
-public class GetAllVersityUsersCommandHandler 
-    : IRequestHandler<GetAllVersityUsersCommand, IEnumerable<ViewVersityUserDto>>
+public class GetAllVersityUsersCommandHandler : IRequestHandler<GetAllVersityUsersCommand, IEnumerable<ViewVersityUserDto>>
 {
     private readonly IVersityUsersRepository _versityUsersRepository;
 

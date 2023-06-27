@@ -1,16 +1,11 @@
-﻿
-using System.Text;
+﻿using System.Text;
 using Application.Abstractions;
-using Application.Exceptions;
 using Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using MimeKit;
 using MailKit.Net.Smtp;
-using MailKit;
 using Microsoft.AspNetCore.WebUtilities;
-using MimeKit;
 
 namespace Infrastructure.Services;
 
@@ -50,6 +45,7 @@ public class EmailConfirmMessageGmailService : IEmailConfirmMessageService
         message.From.Add(new MailboxAddress(
             "Versity Identity Server", 
             Environment.GetEnvironmentVariable("EMAIL__From") ?? _config.GetSection("EmailConfiguration:From").Value));
+        
         message.To.Add(MailboxAddress.Parse(email));
         message.Subject = "Confirm Email";
         message.Body = new TextPart("html")

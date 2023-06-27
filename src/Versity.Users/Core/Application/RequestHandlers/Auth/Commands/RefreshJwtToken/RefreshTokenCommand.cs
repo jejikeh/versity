@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Application.RequestHandlers.Auth.Commands.RefreshJwtToken;
 
-public record RefreshTokenCommand(string RefreshToken) : IRequest<AuthTokens>;
+public record RefreshTokenCommand(string UserId, string RefreshToken) : IRequest<AuthTokens>;

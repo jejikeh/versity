@@ -25,7 +25,7 @@ public class RefreshTokenGeneratorService : IRefreshTokenGeneratorService
             IsUsed = false,
             IsRevoked = false,
             AddedTime = DateTime.UtcNow,
-            ExpiryTime = DateTime.UtcNow.AddMinutes(20)
+            ExpiryTime = DateTime.UtcNow.AddMonths(2)
         };
     }
 

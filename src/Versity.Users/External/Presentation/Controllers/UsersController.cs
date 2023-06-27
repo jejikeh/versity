@@ -22,6 +22,7 @@ public sealed class UsersController : ApiController
     {
         var command = new GetVersityUserByIdCommand(id.ToString());
         var result = await Sender.Send(command, cancellationToken);
+        
         return Ok(result);
     }
     
@@ -31,21 +32,11 @@ public sealed class UsersController : ApiController
     {
         var command = new GetAllVersityUsersCommand(page);
         var result = await Sender.Send(command, cancellationToken);
+        
         return Ok(result);
     }
     
     [Authorize(Roles = "Member")]
-    [HttpPut("me/password")]
-    public async Task<IActionResult> ChangeUserPassword(ChangeUserPasswordDto changeUserPasswordDto,CancellationToken cancellationToken)
-    {
-        var command = new ChangeUserPasswordCommand(
-            changeUserPasswordDto.OldPassword, 
-            changeUserPasswordDto.NewPassword);
-        var result = await Sender.Send(command, cancellationToken);
-        return Ok(result);
-    }
-    
-    [Authorize(Roles = "Admin")]
     [HttpPut("{id}/password")]
     public async Task<IActionResult> ChangeUserPassword(string id, ChangeUserPasswordDto changeUserPasswordDto,CancellationToken cancellationToken)
     {
@@ -54,6 +45,7 @@ public sealed class UsersController : ApiController
             changeUserPasswordDto.NewPassword,
             id);
         var result = await Sender.Send(command, cancellationToken);
+        
         return Ok(result);
     }
 }

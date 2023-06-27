@@ -2,4 +2,4 @@
 
 namespace Application.RequestHandlers.Users.Commands.GiveAdminRoleToUser;
 
-public record GiveAdminRoleToUserCommand(string UserId = "") : IRequest<string>;
+public record GiveAdminRoleToUserCommand(string UserId) : IRequest<string>;

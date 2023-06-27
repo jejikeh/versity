@@ -15,7 +15,6 @@ public class GetAllRefreshTokensCommandHandler : IRequestHandler<GetAllRefreshTo
 
     public async Task<IEnumerable<RefreshToken>> Handle(GetAllRefreshTokensCommand request, CancellationToken cancellationToken)
     {
-        var tokens = await _tokensRepository.GetAllAsync(cancellationToken);
-        return tokens;
+        return await _tokensRepository.GetAllAsync(cancellationToken);;
     }
 }

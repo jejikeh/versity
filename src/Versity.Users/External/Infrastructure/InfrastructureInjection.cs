@@ -18,7 +18,6 @@ public static class InfrastructureInjection
         {
             connectionString = Environment.GetEnvironmentVariable("ConnectionString");
         }
-
         serviceCollection.AddDbContext<VersityUsersDbContext>(options =>
         {
             options.EnableDetailedErrors();
@@ -36,6 +35,7 @@ public static class InfrastructureInjection
         serviceCollection.AddScoped<IVersityUsersRepository, VersityUsersRepository>();
         serviceCollection.AddScoped<IVersityRolesRepository, VersityRoleRepository>();
         serviceCollection.AddScoped<IVersityRefreshTokensRepository, VersityRefreshTokensRepository>();
+        
         return serviceCollection;
     }
     

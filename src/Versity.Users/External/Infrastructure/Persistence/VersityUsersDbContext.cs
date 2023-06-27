@@ -1,4 +1,5 @@
 ﻿using Domain.Models;
+using Infrastructure.Persistence.Configuration;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,5 +12,11 @@ public class VersityUsersDbContext : IdentityDbContext<VersityUser>
     public VersityUsersDbContext(DbContextOptions options) : base(options)
     {
         
+    }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfiguration(new RefreshTokensConfiguration());
     }
 }
