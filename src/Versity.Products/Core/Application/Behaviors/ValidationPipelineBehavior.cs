@@ -1,34 +1,33 @@
-﻿using FluentResults;
+﻿using Application.Exceptions;
 using FluentValidation;
 using MediatR;
 
 namespace Application.Behaviors;
 
-public class ValidationPipelineBehavior<TReq, TRes> : IPipelineBehavior<TReq, TRes> 
-    where TReq: IRequest<TRes>
-    where TRes : ResultBase, new()
+public class ValidationPipelineBehavior<TRequest, TResponse> 
+    : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse> 
 {
-    private readonly IEnumerable<IValidator<TReq>> _validators;
+    private readonly IEnumerable<IValidator<TRequest>> _validators;
 
-    public ValidationPipelineBehavior(IEnumerable<IValidator<TReq>> validators)
+    public ValidationPipelineBehavior(IEnumerable<IValidator<TRequest>> validators)
     {
         _validators = validators;
     }
 
-    public async Task<TRes> Handle(TReq request, RequestHandlerDelegate<TRes> next, CancellationToken cancellationToken)
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        var context = new ValidationContext<TReq>(request);
-        foreach (var validator in _validators)
+        var context = new ValidationContext<TRequest>(request);
+        var failures = _validators
+            .Select(validator => validator.Validate(context))
+            .SelectMany(result => result.Errors)
+            .Where(failure => failure != null)
+            .ToArray();
+        
+        if (failures.Any())
         {
-            var validationResult = await validator.ValidateAsync(context, cancellationToken);
-            if (!validationResult.IsValid)
-            {
-                var result = new TRes();
-                result.Reasons.AddRange(validationResult.ToResult().Reasons);
-                return result;
-            }
+            throw new ValidationExceptionWithStatusCode(new ValidationException(failures).Message);
         }
-
+        
         return await next();
     }
 }

@@ -1,11 +1,10 @@
 ﻿using Application.Abstractions.Repositories;
 using Domain.Models;
-using FluentResults;
 using MediatR;
 
 namespace Application.RequestHandlers.Queries.GetAllProducts;
 
-public class GetAllProductsRequestHandler : IRequestHandler<GetAllProductsQuery, Result<IEnumerable<Product>>>
+public class GetAllProductsRequestHandler : IRequestHandler<GetAllProductsQuery, IEnumerable<Product>>
 {
     private readonly IVersityProductsRepository _products;
 
@@ -14,7 +13,7 @@ public class GetAllProductsRequestHandler : IRequestHandler<GetAllProductsQuery,
         _products = products;
     }
 
-    public Task<Result<IEnumerable<Product>>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
+    public Task<IEnumerable<Product>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
     {
         var products = _products
             .GetAllProducts()
@@ -23,6 +22,6 @@ public class GetAllProductsRequestHandler : IRequestHandler<GetAllProductsQuery,
             .Take(10)
             .ToList();
 
-        return Task.Run(() => Result.Ok((IEnumerable<Product>)products), cancellationToken);
+        return Task.Run(() => (IEnumerable<Product>)products, cancellationToken);
     }
 }

@@ -1,7 +1,4 @@
-﻿using Application.Abstractions.Messaging;
-using Domain.Models;
-
-namespace Application.Dtos;
+﻿namespace Application.Dtos;
 
 public record UpdateProductDto(
     string Title,

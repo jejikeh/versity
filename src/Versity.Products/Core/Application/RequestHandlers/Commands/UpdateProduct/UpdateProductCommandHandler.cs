@@ -1,11 +1,12 @@
 ﻿using Application.Abstractions.Repositories;
+using Application.Exceptions;
 using Domain.Models;
 using FluentResults;
 using MediatR;
 
 namespace Application.RequestHandlers.Commands.UpdateProduct;
 
-public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, Result<Product>>
+public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, Product>
 {
     private readonly IVersityProductsRepository _products;
 
@@ -14,12 +15,12 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
         _products = products;
     }
 
-    public async Task<Result<Product>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
+    public async Task<Product> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
         var product = await _products.GetProductByIdAsync(request.Id, cancellationToken);
         if (product is null)
         {
-            return Result.Fail("There is no product with this Id");
+            throw new NotFoundExceptionWithStatusCode("There is no user with this Id");
         }
 
         product.Author = request.Author ?? product.Author;
@@ -30,6 +31,6 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
         var updatedProduct = _products.UpdateProduct(product);
         await _products.SaveChangesAsync(cancellationToken);
         
-        return Result.Ok(updatedProduct);
+        return updatedProduct;
     }
 }

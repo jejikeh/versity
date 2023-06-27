@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Application.RequestHandlers.Commands.CreateProduct;
 
-public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Result<Product>>
+public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Product>
 {
     private readonly IVersityProductsRepository _products;
 
@@ -14,7 +14,7 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
         _products = products;
     }
 
-    public async Task<Result<Product>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+    public async Task<Product> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
         var productId = Guid.NewGuid();
         while (await _products.GetProductByIdAsync(productId, cancellationToken) is not null)

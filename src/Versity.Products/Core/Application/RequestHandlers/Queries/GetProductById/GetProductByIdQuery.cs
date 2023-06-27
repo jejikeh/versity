@@ -1,6 +1,6 @@
-﻿using Application.Abstractions.Messaging;
-using Domain.Models;
+﻿using Domain.Models;
+using MediatR;
 
 namespace Application.RequestHandlers.Queries.GetProductById;
 
-public record GetProductByIdQuery(Guid Id) : IQuery<Product>;
+public record GetProductByIdQuery(Guid Id) : IRequest<Product>;

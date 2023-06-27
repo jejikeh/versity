@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using Application.Dtos;
+﻿using Application.Dtos;
 using Application.RequestHandlers.Commands.CreateProduct;
 using Application.RequestHandlers.Commands.UpdateProduct;
 using Application.RequestHandlers.Queries.GetAllProducts;
@@ -14,11 +13,8 @@ namespace Presentation.Controllers;
 [Route("api/[controller]/")]
 public sealed class ProductsController : ApiController
 {
-    private ILogger<ProductsController> _logger; 
-    
-    public ProductsController(ISender sender, ILogger<ProductsController> logger) : base(sender)
+    public ProductsController(ISender sender) : base(sender)
     {
-        _logger = logger;
     }
 
     [HttpGet("{page:int}")]
@@ -26,7 +22,8 @@ public sealed class ProductsController : ApiController
     {
         var command = new GetAllProductsQuery(page);
         var result = await Sender.Send(command, cancellationToken);
-        return result.IsFailed ? Problem(result.Errors.ToList()[0].Message) : Ok(result.Value);
+        
+        return Ok(result);
     }
     
     [Authorize(Roles = "Admin")]
@@ -35,7 +32,8 @@ public sealed class ProductsController : ApiController
     {
         var command = new GetProductByIdQuery(id);
         var result = await Sender.Send(command, cancellationToken);
-        return result.IsFailed ? Problem(result.Errors.ToList()[0].Message) : Ok(result.Value);
+        
+        return Ok(result);
     }
     
     [Authorize(Roles = "Admin")]
@@ -43,7 +41,8 @@ public sealed class ProductsController : ApiController
     public async Task<IActionResult> CreateProduct(CreateProductCommand createProductCommand, CancellationToken cancellationToken)
     {
         var result = await Sender.Send(createProductCommand, cancellationToken);
-        return result.IsFailed ? Problem(result.Errors.ToList()[0].Message) : Ok(result.Value);
+        
+        return Ok(result);
     }
     
     [Authorize(Roles = "Admin")]
@@ -52,6 +51,7 @@ public sealed class ProductsController : ApiController
     {
         var updateProductCommand = new UpdateProductCommand(id, updateProductDto.Title, updateProductDto.Description, updateProductDto.Author, updateProductDto.Release);
         var result = await Sender.Send(updateProductCommand, cancellationToken);
-        return result.IsFailed ? Problem(result.Errors.ToList()[0].Message) : Ok(result.Value);
+        
+        return Ok(result);
     }
 }
