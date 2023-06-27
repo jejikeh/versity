@@ -14,7 +14,7 @@
       "DangerousAcceptAnyServerCertificateValidator": true
     },
     {
-      "UpstreamPathTemplate": "/api/auth/refreshtoken/{refreshToken}",
+      "UpstreamPathTemplate": "/api/auth/refreshtoken/{userId}/{refreshToken}",
       "UpstreamHttpMethod": ["Post"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -23,7 +23,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/auth/refreshtoken/{refreshToken}",
+      "DownstreamPathTemplate": "/api/auth/refreshtoken/{userId}/{refreshToken}",
       "DangerousAcceptAnyServerCertificateValidator": true
     },
     {
@@ -70,7 +70,7 @@
       "DangerousAcceptAnyServerCertificateValidator": true
     },
     {
-      "UpstreamPathTemplate": "/api/auth/getadminrole",
+      "UpstreamPathTemplate": "/api/auth/giveadminrole/{userId}",
       "UpstreamHttpMethod": ["Post"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -79,7 +79,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/auth/getadminrole",
+      "DownstreamPathTemplate": "/api/auth/getadminrole/{userId}",
       "DangerousAcceptAnyServerCertificateValidator": true,
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
@@ -100,7 +100,7 @@
       "DangerousAcceptAnyServerCertificateValidator": true
     },
     {
-      "UpstreamPathTemplate": "/api/users/{id}",
+      "UpstreamPathTemplate": "/api/users/{userId}",
       "UpstreamHttpMethod": ["Get"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -109,7 +109,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/users/{id}",
+      "DownstreamPathTemplate": "/api/users/{userId}",
       "DangerousAcceptAnyServerCertificateValidator": true,
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
@@ -134,7 +134,7 @@
       }
     },
     {
-      "UpstreamPathTemplate": "/api/users/me/password/",
+      "UpstreamPathTemplate": "/api/users/{userId}/password/",
       "UpstreamHttpMethod": ["Put"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -143,24 +143,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/users/me/password/",
-      "DangerousAcceptAnyServerCertificateValidator": true,
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
-    },
-    {
-      "UpstreamPathTemplate": "/api/users/{id}/password",
-      "UpstreamHttpMethod": ["Put"],
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "versity-users-service",
-          "Port": 443
-        }
-      ],
-      "DownstreamPathTemplate": "/api/users/{id}/password/",
+      "DownstreamPathTemplate": "/api/users/{userId}/password/",
       "DangerousAcceptAnyServerCertificateValidator": true,
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
@@ -198,7 +181,7 @@
       "DangerousAcceptAnyServerCertificateValidator": true
     },
     {
-      "UpstreamPathTemplate": "/api/products/{id}",
+      "UpstreamPathTemplate": "/api/products/{userId}",
       "UpstreamHttpMethod": ["Put"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -207,7 +190,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/products/{id}",
+      "DownstreamPathTemplate": "/api/products/{userId}",
       "DangerousAcceptAnyServerCertificateValidator": true,
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",

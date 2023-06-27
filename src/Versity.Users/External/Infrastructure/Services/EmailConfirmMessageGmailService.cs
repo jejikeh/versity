@@ -25,13 +25,13 @@ public class EmailConfirmMessageGmailService : IEmailConfirmMessageService
         _config = config;
     }
 
-    public async Task GenerateEmailConfirmMessageAsync(VersityUser user)
+    public async Task SendEmailConfirmMessageAsync(VersityUser user)
     {
         var token = await GenerateConfirmationToken(user);
-        var confirmUrl = $"https://localhost:8001/api/auth/confirmemail/{user.Id}/{token}";
+        var confirmUrl = _config.GetSection("EmailConfiguration:ConfirmUrl").Value + $"{user.Id}/{token}";
         var emailBody = $"<h1>Привет {user.FirstName}! Ты мое солнышко :3</h1></br>" +
                         $"Please confirm your email address <a href={System.Text.Encodings.Web.HtmlEncoder.Default.Encode(confirmUrl)}>Confirm</a>";
-        var message = CrateEmailMessage(emailBody, user.Email);
+        var message = CreateEmailMessage(emailBody, user.Email);
         SendEmailMessage(message);
     }
 
@@ -40,10 +40,11 @@ public class EmailConfirmMessageGmailService : IEmailConfirmMessageService
         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
         var tokenGeneratedBytes = Encoding.UTF8.GetBytes(code);
         var codeEncoded = WebEncoders.Base64UrlEncode(tokenGeneratedBytes);
+
         return codeEncoded;
     }
 
-    private MimeMessage CrateEmailMessage(string body, string email)
+    private MimeMessage CreateEmailMessage(string body, string email)
     {
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(
