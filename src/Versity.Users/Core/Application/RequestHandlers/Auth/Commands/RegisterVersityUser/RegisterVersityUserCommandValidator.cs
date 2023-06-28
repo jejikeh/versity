@@ -15,9 +15,11 @@ public class RegisterVersityUserCommandValidator : AbstractValidator<RegisterVer
             .NotEmpty().WithMessage("Phone Number is required.")
             .Matches(new Regex(@"^((8|\+374|\+994|\+995|\+375|\+7|\+380|\+38|\+996|\+998|\+993)[\- ]?)?\(?\d{3,5}\)?[\- ]?\d{1}[\- ]?\d{1}[\- ]?\d{1}[\- ]?\d{1}[\- ]?\d{1}(([\- ]?\d{1})?[\- ]?\d{1})?$")).WithMessage("PhoneNumber not valid");
 
-        RuleFor(user => user.FirstName).NotEmpty().WithMessage("First Name is required.");
+        RuleFor(user => user.FirstName)
+            .NotEmpty().WithMessage("First Name is required.");
         
-        RuleFor(user => user.LastName).NotEmpty().WithMessage("Last Name is required.");
+        RuleFor(user => user.LastName)
+            .NotEmpty().WithMessage("Last Name is required.");
         
         RuleFor(user => user.Password)
             .NotEmpty().WithMessage("Password cannot be empty")

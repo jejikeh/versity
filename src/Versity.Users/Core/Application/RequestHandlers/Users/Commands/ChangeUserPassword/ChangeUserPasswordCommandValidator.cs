@@ -6,7 +6,8 @@ public class ChangeUserPasswordCommandValidator : AbstractValidator<ChangeUserPa
 {
     public ChangeUserPasswordCommandValidator()
     {
-        RuleFor(request => request.OldPassword).NotEmpty().WithMessage("Old Password cannot be empty");
+        RuleFor(request => request.OldPassword)
+            .NotEmpty().WithMessage("Old Password cannot be empty");
         
         RuleFor(request => request.NewPassword)
             .NotEmpty().WithMessage("New Password cannot be empty")
