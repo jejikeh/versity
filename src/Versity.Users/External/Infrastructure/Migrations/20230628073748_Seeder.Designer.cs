@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(VersityUsersDbContext))]
-    partial class VersityUsersDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230628073748_Seeder")]
+    partial class Seeder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -132,17 +135,15 @@ namespace Infrastructure.Migrations
                         {
                             Id = "4e274126-1d8a-4dfd-a025-806987095809",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "940b9862-24d0-4706-b35f-4d71f489a3f5",
+                            ConcurrencyStamp = "3e28fcab-9803-4017-9b83-fb6d6f08f941",
                             Email = "versity.identity.dev@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Versity",
                             LastName = "Admin",
                             LockoutEnabled = false,
-                            NormalizedEmail = "VERSITY.IDENTITY.DEV@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEHJAUFLF091zTtWBRh1eqdVvnw4Iuxl8qxz+A507cK+anUfVKN+qdRTimf8YMLX+fw==",
-                            PhoneNumber = "+000000000000",
+                            PasswordHash = "AQAAAAIAAYagAAAAECZtpX3f5EdwYTFzJpAi86OG65M9CL32GtlvMmybz1546pkX3P2x7YEFURANs+zieg==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "8dddf7d4-5da6-4c9e-be01-d56574d21315",
+                            SecurityStamp = "4c83ee3a-99ef-4fa7-b6f4-bfa9e6c0d0f5",
                             TwoFactorEnabled = false,
                             UserName = "Versity Admin"
                         });

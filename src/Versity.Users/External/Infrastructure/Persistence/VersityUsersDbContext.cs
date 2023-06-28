@@ -11,12 +11,15 @@ public class VersityUsersDbContext : IdentityDbContext<VersityUser>
 
     public VersityUsersDbContext(DbContextOptions options) : base(options)
     {
-        
     }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfiguration(new RefreshTokensConfiguration());
+        modelBuilder
+            .ApplyConfiguration(new RefreshTokensConfiguration())
+            .ApplyConfiguration(new RolesSeederConfiguration())
+            .ApplyConfiguration(new AdminSeederConfiguration())
+            .ApplyConfiguration(new UserWithRolesConfiguration());
     }
 }

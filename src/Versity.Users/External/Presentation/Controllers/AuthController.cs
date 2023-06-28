@@ -30,24 +30,14 @@ public sealed class AuthController : ApiController
         
         return result.Succeeded ? Ok("The confirmation message was send to your email!") : BadRequest(result.Errors);
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> Login(LoginVersityUserDto userDto, CancellationToken cancellationToken)
     {
         var command = new LoginVersityUserCommand(userDto.Email, userDto.Password);
         var token = await Sender.Send(command, cancellationToken);
-        
+
         return Ok(token);
-    }
-    
-    [Authorize(Roles = "Admin")]
-    [HttpPost("{userId}")]
-    public async Task<IActionResult> GiveAdminRole(string userId, CancellationToken cancellationToken)
-    {        
-        var command = new GiveAdminRoleToUserCommand(userId);
-        var token  = await Sender.Send(command, cancellationToken);
-        
-        return Ok(new { Token = token });
     }
 
     [HttpGet("{userId}/{code}")]

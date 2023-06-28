@@ -1,5 +1,6 @@
 ﻿using Application.Dtos;
 using Application.RequestHandlers.Users.Commands.ChangeUserPassword;
+using Application.RequestHandlers.Users.Commands.GiveAdminRoleToUser;
 using Application.RequestHandlers.Users.Queries.GetAllVersityUsers;
 using Application.RequestHandlers.Users.Queries.GetVersityUserById;
 using MediatR;
@@ -47,5 +48,15 @@ public sealed class UsersController : ApiController
         var result = await Sender.Send(command, cancellationToken);
         
         return Ok(result);
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPost("setadmin/{id:guid}")]
+    public async Task<IActionResult> SetAdmin(Guid id, CancellationToken cancellationToken)
+    {        
+        var command = new GiveAdminRoleToUserCommand(id.ToString());
+        var token  = await Sender.Send(command, cancellationToken);
+        
+        return Ok(new { Token = token });
     }
 }

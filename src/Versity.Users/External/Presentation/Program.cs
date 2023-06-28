@@ -1,4 +1,3 @@
-using Infrastructure;
 using Infrastructure.Persistence;
 using Presentation.Extensions;
 
@@ -17,7 +16,6 @@ try
 {
     var versityUsersDbContext = serviceProvider.GetRequiredService<VersityUsersDbContext>();
     versityUsersDbContext.Database.EnsureCreated();
-    await serviceProvider.EnsureRolesExists();
     app.Run();
 }
 catch (Exception ex)

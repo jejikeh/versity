@@ -104,6 +104,8 @@ services:
       - EMAIL__Port=465
       - EMAIL__Username=versity.identity.dev@gmail.com
       - EMAIL__Password=ebqatxmtxaurcdfu
+      - ADMIN__Password=vers1ty.Admin
+      - ADMIN__Email=versity.identity.dev@gmail.com
     volumes:
       - ~/.aspnet/https:/root/.aspnet/https:ro
       - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro

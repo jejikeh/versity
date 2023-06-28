@@ -38,26 +38,4 @@ public static class InfrastructureInjection
         
         return serviceCollection;
     }
-    
-    public static async Task<IServiceProvider> EnsureRolesExists(this IServiceProvider serviceProvider)
-    {
-        var roleManager = serviceProvider.GetRequiredService<IVersityRolesRepository>();
-        var roles = Enum.GetNames(typeof(VersityRole));
-        var anyRoleWasAdded = false;
-        foreach (var role in roles)
-        {
-            if (await roleManager.RoleExistsAsync(role))
-            {
-                continue;
-            }
-            await roleManager.CreateRoleAsync(role);
-            anyRoleWasAdded = true;
-        }
-        if (anyRoleWasAdded)
-        {
-            await serviceProvider.GetRequiredService<VersityUsersDbContext>().SaveChangesAsync();
-        }
-        
-        return serviceProvider;
-    }
 }
