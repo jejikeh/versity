@@ -23,7 +23,7 @@ public class EmailConfirmMessageGmailService : IEmailConfirmMessageService
     public async Task SendEmailConfirmMessageAsync(VersityUser user)
     {
         var token = await GenerateConfirmationToken(user);
-        var confirmUrl = _config.GetSection("EmailConfiguration:ConfirmUrl").Value + $"{user.Id}/{token}";
+        var confirmUrl = Environment.GetEnvironmentVariable("EMAIL__ConfirmUrl") + $"{user.Id}/{token}";
         var emailBody = $"<h1>Привет {user.FirstName}! Ты мое солнышко :3</h1></br>" +
                         $"Please confirm your email address <a href={System.Text.Encodings.Web.HtmlEncoder.Default.Encode(confirmUrl)}>Confirm</a>";
         var message = CreateEmailMessage(emailBody, user.Email);
@@ -44,7 +44,7 @@ public class EmailConfirmMessageGmailService : IEmailConfirmMessageService
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(
             "Versity Identity Server", 
-            Environment.GetEnvironmentVariable("EMAIL__From") ?? _config.GetSection("EmailConfiguration:From").Value));
+            Environment.GetEnvironmentVariable("EMAIL__From")));
         
         message.To.Add(MailboxAddress.Parse(email));
         message.Subject = "Confirm Email";
@@ -60,14 +60,14 @@ public class EmailConfirmMessageGmailService : IEmailConfirmMessageService
     {
         using var client = new SmtpClient();
         client.Connect(
-            Environment.GetEnvironmentVariable("EMAIL__SmtpServer") ?? _config.GetSection("EmailConfiguration:SmtpServer").Value, 
-            int.Parse(Environment.GetEnvironmentVariable("EMAIL__Port") ?? _config.GetSection("EmailConfiguration:Port").Value!), 
+            Environment.GetEnvironmentVariable("EMAIL__SmtpServer"), 
+            int.Parse(Environment.GetEnvironmentVariable("EMAIL__Port")), 
             true);
 
         client.AuthenticationMechanisms.Remove("XOAUTH2");
         client.Authenticate(
-            Environment.GetEnvironmentVariable("EMAIL__Username") ?? _config.GetSection("EmailConfiguration:Username").Value, 
-            Environment.GetEnvironmentVariable("EMAIL__Password") ?? _config.GetSection("EmailConfiguration:Password").Value);
+            Environment.GetEnvironmentVariable("EMAIL__Username"), 
+            Environment.GetEnvironmentVariable("EMAIL__Password"));
 
         client.Send(message);
         client.Disconnect(true);

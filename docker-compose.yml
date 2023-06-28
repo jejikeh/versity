@@ -104,6 +104,7 @@ services:
       - EMAIL__Port=465
       - EMAIL__Username=versity.identity.dev@gmail.com
       - EMAIL__Password=ebqatxmtxaurcdfu
+      - EMAIL__ConfirmUrl=https://localhost:8001/api/auth/confirmemail/
       - ADMIN__Password=vers1ty.Admin
       - ADMIN__Email=versity.identity.dev@gmail.com
     volumes:

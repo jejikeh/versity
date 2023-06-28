@@ -6,6 +6,7 @@ public class GetProductByIdRequestValidator : AbstractValidator<GetProductByIdQu
 {
     public GetProductByIdRequestValidator()
     {
-        RuleFor(x => x.Id).NotEmpty().WithMessage("Id is required.");
+        RuleFor(x => x.Id)
+            .NotEmpty().WithMessage("Id is required.");
     }
 }

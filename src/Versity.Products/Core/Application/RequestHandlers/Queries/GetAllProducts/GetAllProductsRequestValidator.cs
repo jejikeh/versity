@@ -6,6 +6,7 @@ public class GetAllProductsRequestValidator : AbstractValidator<GetAllProductsQu
 {
     public GetAllProductsRequestValidator()
     {
-        RuleFor(x => x.Page).GreaterThan(0).WithMessage("The page must be greater than zero.");
+        RuleFor(x => x.Page)
+            .GreaterThan(0).WithMessage("The page must be greater than zero.");
     }
 }

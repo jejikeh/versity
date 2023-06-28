@@ -12,12 +12,7 @@ public static class InfrastructureInjection
 {
     public static IServiceCollection AddDbContext(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("VersityProductsDb");
-        if (string.IsNullOrEmpty(connectionString))
-        {
-            connectionString = Environment.GetEnvironmentVariable("ConnectionString");
-        }
-
+        var connectionString = Environment.GetEnvironmentVariable("ConnectionString");
         serviceCollection.AddDbContext<VersityProductsDbContext>(options =>
         {
             options.EnableDetailedErrors();
