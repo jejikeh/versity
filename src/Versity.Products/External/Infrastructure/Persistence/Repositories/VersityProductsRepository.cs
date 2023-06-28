@@ -26,6 +26,7 @@ public class VersityProductsRepository : IVersityProductsRepository
     public async Task<Product> CreateProductAsync(Product product, CancellationToken cancellationToken = default)
     {
         var entityEntry = await _context.AddAsync(product, cancellationToken);
+        
         return entityEntry.Entity;
     }
 

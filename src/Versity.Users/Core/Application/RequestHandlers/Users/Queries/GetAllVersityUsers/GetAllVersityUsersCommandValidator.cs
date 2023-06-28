@@ -6,7 +6,6 @@ public class GetAllVersityUsersCommandValidator : AbstractValidator<GetAllVersit
 {
     public GetAllVersityUsersCommandValidator()
     {
-        RuleFor(x => x.Page)
-            .GreaterThan(0).WithMessage("The page must be greater than zero.");
+        RuleFor(x => x.Page).GreaterThan(0).WithMessage("The page must be greater than zero.");
     }
 }

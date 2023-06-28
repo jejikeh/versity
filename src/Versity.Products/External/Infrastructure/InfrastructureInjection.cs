@@ -33,6 +33,7 @@ public static class InfrastructureInjection
     public static IServiceCollection AddRepositories(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<IVersityProductsRepository, VersityProductsRepository>();
+        
         return serviceCollection;
     }
 }

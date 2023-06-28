@@ -1,7 +1,6 @@
 using Infrastructure.Persistence;
 using Presentation.Extensions;
 
-
 var builder = WebApplication
     .CreateBuilder(args)
     .ConfigureBuilder()

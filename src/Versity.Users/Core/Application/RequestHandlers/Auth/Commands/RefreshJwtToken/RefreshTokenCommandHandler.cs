@@ -13,7 +13,11 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, A
     private readonly IAuthTokenGeneratorService _authTokenGeneratorService;
     private readonly IRefreshTokenGeneratorService _refreshTokenGeneratorService;
 
-    public RefreshTokenCommandHandler(IVersityRefreshTokensRepository refreshTokensRepository, IVersityUsersRepository versityUsersRepository, IAuthTokenGeneratorService authTokenGeneratorService, IRefreshTokenGeneratorService refreshTokenGeneratorService)
+    public RefreshTokenCommandHandler(
+        IVersityRefreshTokensRepository refreshTokensRepository, 
+        IVersityUsersRepository versityUsersRepository, 
+        IAuthTokenGeneratorService authTokenGeneratorService, 
+        IRefreshTokenGeneratorService refreshTokenGeneratorService)
     {
         _refreshTokensRepository = refreshTokensRepository;
         _versityUsersRepository = versityUsersRepository;

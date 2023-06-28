@@ -14,7 +14,11 @@ public class LoginVersityUserCommandHandler : IRequestHandler<LoginVersityUserCo
     private readonly IAuthTokenGeneratorService _authTokenGeneratorService;
     private readonly IRefreshTokenGeneratorService _refreshTokenGeneratorService;
 
-    public LoginVersityUserCommandHandler(IAuthTokenGeneratorService authTokenGeneratorService, IVersityUsersRepository versityUsersRepository, IVersityRefreshTokensRepository refreshTokensRepository, IRefreshTokenGeneratorService refreshTokenGeneratorService)
+    public LoginVersityUserCommandHandler(
+        IAuthTokenGeneratorService authTokenGeneratorService, 
+        IVersityUsersRepository versityUsersRepository, 
+        IVersityRefreshTokensRepository refreshTokensRepository, 
+        IRefreshTokenGeneratorService refreshTokenGeneratorService)
     {
         _authTokenGeneratorService = authTokenGeneratorService;
         _versityUsersRepository = versityUsersRepository;
