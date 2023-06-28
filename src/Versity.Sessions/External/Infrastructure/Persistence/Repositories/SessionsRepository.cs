@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
 
-public class SessionRepository : ISessionsRepository
+public class SessionsRepository : ISessionsRepository
 {
     private readonly VersitySessionsServiceDbContext _context;
 
-    public SessionRepository(VersitySessionsServiceDbContext context)
+    public SessionsRepository(VersitySessionsServiceDbContext context)
     {
         _context = context;
     }

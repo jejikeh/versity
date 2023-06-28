@@ -1,6 +1,10 @@
-﻿namespace Application.RequestHandlers.Sessions.Commands.CreateSession;
+﻿using Domain.Models;
+using MediatR;
 
-public class CreateSessionCommand
-{
-    
-}
+namespace Application.RequestHandlers.Sessions.Commands.CreateSession;
+
+public record CreateSessionCommand(
+    string UserId,
+    Guid ProductId,
+    DateTime Start,
+    DateTime Expiry) : IRequest<Session>;
