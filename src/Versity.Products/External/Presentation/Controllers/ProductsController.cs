@@ -1,5 +1,6 @@
 ﻿using Application.Dtos;
 using Application.RequestHandlers.Commands.CreateProduct;
+using Application.RequestHandlers.Commands.DeleteProduct;
 using Application.RequestHandlers.Commands.UpdateProduct;
 using Application.RequestHandlers.Queries.GetAllProducts;
 using Application.RequestHandlers.Queries.GetProductById;
@@ -34,6 +35,16 @@ public sealed class ProductsController : ApiController
         var result = await Sender.Send(command, cancellationToken);
         
         return Ok(result);
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteProductById(Guid id, CancellationToken cancellationToken)
+    {
+        var command = new DeleteProductCommand(id);
+        await Sender.Send(command, cancellationToken);
+        
+        return Ok();
     }
     
     [Authorize(Roles = "Admin")]
