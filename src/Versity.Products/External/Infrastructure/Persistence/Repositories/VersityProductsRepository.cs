@@ -18,12 +18,12 @@ public class VersityProductsRepository : IVersityProductsRepository
         return _context.Products.AsQueryable();
     }
 
-    public async Task<Product?> GetProductByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<Product?> GetProductByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _context.Products.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<Product> CreateProductAsync(Product product, CancellationToken cancellationToken = default)
+    public async Task<Product> CreateProductAsync(Product product, CancellationToken cancellationToken)
     {
         var entityEntry = await _context.AddAsync(product, cancellationToken);
         
@@ -40,7 +40,7 @@ public class VersityProductsRepository : IVersityProductsRepository
         _context.Remove(product);
     }
 
-    public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
+    public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
         await _context.SaveChangesAsync(cancellationToken);
     }
