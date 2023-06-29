@@ -2,7 +2,7 @@
 
 namespace Application.RequestHandlers.Users.Queries.GetAllVersityUsers;
 
-public class GetAllVersityUsersCommandValidator : AbstractValidator<GetAllVersityUsersCommand>
+public class GetAllVersityUsersCommandValidator : AbstractValidator<GetAllVersityUsersQuery>
 {
     public GetAllVersityUsersCommandValidator()
     {

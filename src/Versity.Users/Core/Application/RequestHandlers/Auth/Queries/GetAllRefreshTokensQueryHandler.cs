@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.RequestHandlers.Auth.Queries;
 
-public class GetAllRefreshTokensCommandHandler : IRequestHandler<GetAllRefreshTokensCommand, IEnumerable<RefreshToken>>
+public class GetAllRefreshTokensCommandHandler : IRequestHandler<GetAllRefreshTokensQuery, IEnumerable<RefreshToken>>
 {
     private readonly IVersityRefreshTokensRepository _tokensRepository;
 
@@ -13,7 +13,7 @@ public class GetAllRefreshTokensCommandHandler : IRequestHandler<GetAllRefreshTo
         _tokensRepository = tokensRepository;
     }
 
-    public async Task<IEnumerable<RefreshToken>> Handle(GetAllRefreshTokensCommand request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<RefreshToken>> Handle(GetAllRefreshTokensQuery request, CancellationToken cancellationToken)
     {
         return await _tokensRepository.GetAllAsync(cancellationToken);;
     }

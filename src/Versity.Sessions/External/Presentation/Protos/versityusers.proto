@@ -1,0 +1,15 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Infrastructure";
+
+service GrpcUsers {
+  rpc GetUserRoles (GetUserRolesRequest) returns (GrpcUserRoles);
+}
+
+message GetUserRolesRequest {
+  string userId = 1;
+}
+
+message GrpcUserRoles {
+  repeated string roles = 1;
+}

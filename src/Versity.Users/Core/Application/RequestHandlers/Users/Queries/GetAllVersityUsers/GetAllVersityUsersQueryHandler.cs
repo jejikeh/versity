@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.RequestHandlers.Users.Queries.GetAllVersityUsers;
 
-public class GetAllVersityUsersCommandHandler : IRequestHandler<GetAllVersityUsersCommand, IEnumerable<ViewVersityUserDto>>
+public class GetAllVersityUsersCommandHandler : IRequestHandler<GetAllVersityUsersQuery, IEnumerable<ViewVersityUserDto>>
 {
     private readonly IVersityUsersRepository _versityUsersRepository;
 
@@ -13,7 +13,7 @@ public class GetAllVersityUsersCommandHandler : IRequestHandler<GetAllVersityUse
         _versityUsersRepository = versityUsersRepository;
     }
 
-    public async Task<IEnumerable<ViewVersityUserDto>> Handle(GetAllVersityUsersCommand request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<ViewVersityUserDto>> Handle(GetAllVersityUsersQuery request, CancellationToken cancellationToken)
     {
         var users = _versityUsersRepository
             .GetAllUsers()
