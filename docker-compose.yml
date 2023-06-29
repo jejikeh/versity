@@ -86,6 +86,7 @@ services:
     ports:
       - 80
       - 443
+      - 777
     build:
       context: .
       dockerfile: src/Versity.Users/Dockerfile
