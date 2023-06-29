@@ -2,4 +2,4 @@
 
 namespace Application.RequestHandlers.Sessions.Commands.DeleteSession;
 
-public record DeleteProductCommand(Guid Id) : IRequest;
+public record DeleteSessionCommand(Guid Id) : IRequest;

@@ -5,11 +5,11 @@ using MediatR;
 
 namespace Application.RequestHandlers.Users.Queries.GetVersityUserById;
 
-public class GetVersityUserByIdCommandHandler : IRequestHandler<GetVersityUserByIdQuery, ViewVersityUserDto>
+public class GetVersityUserByIdQueryHandler : IRequestHandler<GetVersityUserByIdQuery, ViewVersityUserDto>
 {
     private readonly IVersityUsersRepository _versityUsersRepository;
 
-    public GetVersityUserByIdCommandHandler(IVersityUsersRepository versityUsersRepository)
+    public GetVersityUserByIdQueryHandler(IVersityUsersRepository versityUsersRepository)
     {
         _versityUsersRepository = versityUsersRepository;
     }

@@ -1,5 +1,4 @@
-﻿using Domain.Models;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace Application.RequestHandlers.Commands.CreateProduct;
 

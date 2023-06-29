@@ -1,6 +1,6 @@
 ﻿namespace Application.Abstractions;
 
-public interface IVersityUsersDataClient
+public interface IVersityUsersDataService
 {
-    public IEnumerable<string> GetUserRoles(string userId);
+    public Task<IEnumerable<string>> GetUserRoles(string userId);
 }

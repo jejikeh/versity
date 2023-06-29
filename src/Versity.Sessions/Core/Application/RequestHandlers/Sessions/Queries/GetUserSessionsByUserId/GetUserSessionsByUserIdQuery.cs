@@ -1,6 +1,6 @@
-﻿namespace Application.RequestHandlers.Sessions.Queries.GetUserSessionsByUserId;
+﻿using Domain.Models;
+using MediatR;
 
-public class GetUserSessionsByUserIdQuery
-{
-    
-}
+namespace Application.RequestHandlers.Sessions.Queries.GetUserSessionsByUserId;
+
+public record GetUserSessionsByUserIdQuery(string UserId) : IRequest<IEnumerable<Session>>;

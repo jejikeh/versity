@@ -1,6 +1,6 @@
-﻿namespace Application.RequestHandlers.Sessions.Queries.GetSessionById;
+﻿using Domain.Models;
+using MediatR;
 
-public class GetSessionByIdQuery
-{
-    
-}
+namespace Application.RequestHandlers.Sessions.Queries.GetSessionById;
+
+public record GetSessionByIdQuery(Guid Id) : IRequest<Session>;

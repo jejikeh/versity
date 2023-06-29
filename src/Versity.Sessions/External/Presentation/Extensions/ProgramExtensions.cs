@@ -1,9 +1,11 @@
 ﻿using Application;
+using Application.Abstractions;
 using Infrastructure;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.OpenApi.Models;
+using Presentation.Services;
 using Serilog;
 
 namespace Presentation.Extensions;
@@ -19,7 +21,8 @@ public static class ProgramExtensions
             .AddJwtAuthentication(builder.Configuration)
             .AddEndpointsApiExplorer()
             .AddControllers();
-        
+
+        builder.Services.AddScoped<IVersityUsersDataService, GrpcUsersDataService>();
         builder.Services.AddSwaggerGen(options =>
         {
             options.UseDateOnlyTimeOnlyStringConverters();

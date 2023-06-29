@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Application.RequestHandlers.Auth.Queries;
 
-public record GetAllRefreshTokensCommand : IRequest<IEnumerable<RefreshToken>>;
+public record GetAllRefreshTokensQuery : IRequest<IEnumerable<RefreshToken>>;

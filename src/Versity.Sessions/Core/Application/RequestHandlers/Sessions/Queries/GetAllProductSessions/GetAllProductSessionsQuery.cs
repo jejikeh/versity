@@ -1,6 +1,6 @@
-﻿namespace Application.RequestHandlers.Sessions.Queries.GetAllProductSessions;
+﻿using Domain.Models;
+using MediatR;
 
-public class GetAllProductSessionsQuery
-{
-    
-}
+namespace Application.RequestHandlers.Sessions.Queries.GetAllProductSessions;
+
+public record GetAllProductSessionsQuery(Guid ProductId) : IRequest<IEnumerable<Session>>;

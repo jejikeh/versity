@@ -1,3 +1,6 @@
-﻿namespace Application.RequestHandlers.Sessions.Queries.GetAllSessions;
+﻿using Domain.Models;
+using MediatR;
 
-public record GetAllSessionsCommand;
+namespace Application.RequestHandlers.Sessions.Queries.GetAllSessions;
+
+public record GetAllSessionsQuery(int Page) : IRequest<IEnumerable<Session>>;

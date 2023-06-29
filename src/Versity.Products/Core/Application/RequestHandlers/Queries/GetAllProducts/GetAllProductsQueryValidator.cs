@@ -2,9 +2,9 @@
 
 namespace Application.RequestHandlers.Queries.GetAllProducts;
 
-public class GetAllProductsRequestValidator : AbstractValidator<GetAllProductsQuery>
+public class GetAllProductsQueryValidator : AbstractValidator<GetAllProductsQuery>
 {
-    public GetAllProductsRequestValidator()
+    public GetAllProductsQueryValidator()
     {
         RuleFor(x => x.Page)
             .GreaterThan(0).WithMessage("The page must be greater than zero.");

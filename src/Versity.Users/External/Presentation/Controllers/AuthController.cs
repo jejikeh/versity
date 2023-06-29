@@ -71,7 +71,7 @@ public sealed class AuthController : ApiController
     [HttpGet]
     public async Task<IActionResult> GetAllRefreshTokens(CancellationToken cancellationToken)
     {
-        var command = new GetAllRefreshTokensCommand();
+        var command = new GetAllRefreshTokensQuery();
         var token = await Sender.Send(command, cancellationToken);
         
         return Ok(token);
