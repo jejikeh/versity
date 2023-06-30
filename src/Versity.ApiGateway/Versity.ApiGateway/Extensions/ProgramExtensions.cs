@@ -1,10 +1,4 @@
-﻿using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
-using Ocelot.DependencyInjection;
+﻿using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 
 namespace Versity.ApiGateway.Extensions;
