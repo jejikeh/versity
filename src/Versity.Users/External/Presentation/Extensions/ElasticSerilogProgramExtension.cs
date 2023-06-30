@@ -16,6 +16,7 @@ public static class ElasticSerilogProgramExtension
             {
                 throw new NullReferenceException("ASPNETCORE_ENVIRONMENT variable is empty!");
             }
+            
             var configurationRoot = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{environment}.json", optional: true)
@@ -41,6 +42,7 @@ public static class ElasticSerilogProgramExtension
         {
             throw new NullReferenceException("ElasticConfiguration:Uri configuration is empty");
         }
+        
         var connectionUri = new Uri(connectionString);
 
         return new ElasticsearchSinkOptions(connectionUri) 

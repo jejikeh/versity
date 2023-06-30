@@ -45,6 +45,7 @@ public class ChangeUserPasswordCommandHandler : IRequestHandler<ChangeUserPasswo
                 throw new ExceptionWithStatusCode(StatusCodes.Status403Forbidden, "Not enough rights");
             }
         }
+        
         var token = await _versityUsersRepository.GeneratePasswordResetTokenAsync(versityUser);
         
         return await _versityUsersRepository.ResetPasswordAsync(versityUser, token, request.NewPassword);

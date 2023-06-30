@@ -26,6 +26,7 @@ public class RegisterVersityUserCommandHandler : IRequestHandler<RegisterVersity
         {
             userId = Guid.NewGuid().ToString();
         }
+        
         var versityUser = new VersityUser
         {
             Id = userId,
@@ -35,6 +36,7 @@ public class RegisterVersityUserCommandHandler : IRequestHandler<RegisterVersity
             LastName = request.LastName,
             UserName = $"{request.FirstName} {request.LastName}",
         };
+        
         var result = await _versityUsersRepository.CreateUserAsync(versityUser, request.Password);
         Utils.AggregateIdentityErrorsAndThrow(result);
         Utils.AggregateIdentityErrorsAndThrow(await _versityUsersRepository.SetUserRoleAsync(versityUser, VersityRole.Member));

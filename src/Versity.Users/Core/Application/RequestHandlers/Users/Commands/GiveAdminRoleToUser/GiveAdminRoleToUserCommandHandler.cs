@@ -25,6 +25,7 @@ public class GiveAdminRoleToUserCommandHandler : IRequestHandler<GiveAdminRoleTo
         {
             throw new NotFoundExceptionWithStatusCode("There is no user with this Id");
         }
+        
         await _versityUsersRepository.SetUserRoleAsync(versityUser, VersityRole.Admin);
         var userRoles = await _versityUsersRepository.GetRolesAsync(versityUser);
         

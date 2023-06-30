@@ -25,10 +25,12 @@ public class ResendEmailVerificationTokenCommandHandler : IRequestHandler<Resend
         { 
             throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
         }
+        
         if (versityUser.EmailConfirmed)
         {
             throw new IdentityExceptionWithStatusCode("The Email already confirmed");
         }
+        
         await _emailConfirmMessageService.SendEmailConfirmMessageAsync(versityUser);
         
         return IdentityResult.Success;

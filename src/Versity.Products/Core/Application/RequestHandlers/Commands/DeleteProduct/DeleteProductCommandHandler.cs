@@ -20,6 +20,7 @@ public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand>
         {
             throw new NotFoundExceptionWithStatusCode("There is no user with this Id");
         }
+        
         _products.DeleteProduct(product);
         await _products.SaveChangesAsync(cancellationToken);
     }
