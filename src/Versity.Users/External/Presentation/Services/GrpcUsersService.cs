@@ -1,5 +1,6 @@
 ﻿using Application.Exceptions;
 using Application.RequestHandlers.Users.Queries.GetVersityUserRoles;
+using Application.RequestHandlers.Users.Queries.IsUserExist;
 using Grpc.Core;
 using Infrastructure;
 using MediatR;
@@ -13,6 +14,22 @@ public class GrpcUsersService : GrpcUsers.GrpcUsersBase
     public GrpcUsersService(ISender sender)
     {
         _sender = sender;
+    }
+
+    public override async Task<GrpcIsUserExistResponse> IsUserExist(GrpcIsUserExistRequest request, ServerCallContext context)
+    {
+        var response = new GrpcIsUserExistResponse();
+        var command = new IsUserExistQuery(request.UserId);
+        try
+        {
+            response.Exist = await _sender.Send(command);
+        }
+        catch (NotFoundExceptionWithStatusCode ex)
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, ex.Message));
+        }
+        
+        return response;
     }
 
     public override async Task<GrpcUserRoles> GetUserRoles(GetUserRolesRequest request, ServerCallContext context)

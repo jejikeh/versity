@@ -31,7 +31,11 @@ public class GetUserSessionsByUserIdQueryHandler : IRequestHandler<GetUserSessio
 
         if (claimId != request.UserId)
         {
-            _usersDataService.GetUserRoles(claimId).
+            var roles = await _usersDataService.GetUserRolesAsync(claimId);
+            if (!roles.Contains("Admin"))
+            {
+                throw new ExceptionWithStatusCode(StatusCodes.Status403Forbidden, "Not enough rights");
+            }
         }
         var session = await _sessions.GetAllUserSessionsAsync(request.UserId, cancellationToken);
         

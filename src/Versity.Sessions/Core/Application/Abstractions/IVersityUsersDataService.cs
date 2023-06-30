@@ -2,5 +2,6 @@
 
 public interface IVersityUsersDataService
 {
-    public Task<IEnumerable<string>> GetUserRoles(string userId);
+    public Task<IEnumerable<string>> GetUserRolesAsync(string userId);
+    public Task<bool> IsUserExistAsync(string userId);
 }

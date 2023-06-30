@@ -16,6 +16,7 @@ try
 }
 catch (Exception ex)
 {
+    Console.WriteLine(ex.Message);
     var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
     logger.LogError(ex, "Host terminated unexpectedly");
 }

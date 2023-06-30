@@ -40,17 +40,6 @@ public static class ProgramExtensions
             policy.AllowAnyOrigin();
         }));
         
-        builder.Services.AddDataProtection().UseCryptographicAlgorithms(new AuthenticatedEncryptorConfiguration
-        {
-            EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
-            ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
-        });
-
-        builder.Services.Configure<IISServerOptions>(options =>
-        {
-            options.AutomaticAuthentication = false;
-        });
-
         return builder;
     }
 
