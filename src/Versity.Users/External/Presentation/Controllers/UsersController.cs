@@ -21,7 +21,7 @@ public sealed class UsersController : ApiController
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetUserById(Guid id, CancellationToken cancellationToken)
     {
-        var command = new GetVersityUserByIdCommand(id.ToString());
+        var command = new GetVersityUserByIdQuery(id.ToString());
         var result = await Sender.Send(command, cancellationToken);
         
         return Ok(result);
@@ -31,13 +31,13 @@ public sealed class UsersController : ApiController
     [HttpGet("{page:int}")]
     public async Task<IActionResult> GetAllUsers(int page, CancellationToken cancellationToken)
     {
-        var command = new GetAllVersityUsersCommand(page);
+        var command = new GetAllVersityUsersQuery(page);
         var result = await Sender.Send(command, cancellationToken);
         
         return Ok(result);
     }
     
-    [Authorize(Roles = "Member")]
+    [Authorize(Roles = "Admin,Member")]
     [HttpPut("{id}/password")]
     public async Task<IActionResult> ChangeUserPassword(string id, ChangeUserPasswordDto changeUserPasswordDto,CancellationToken cancellationToken)
     {

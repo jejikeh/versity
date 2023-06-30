@@ -2,9 +2,9 @@
 
 namespace Application.RequestHandlers.Queries.GetProductById;
 
-public class GetProductByIdRequestValidator : AbstractValidator<GetProductByIdQuery>
+public class GetProductByIdQueryValidator : AbstractValidator<GetProductByIdQuery>
 {
-    public GetProductByIdRequestValidator()
+    public GetProductByIdQueryValidator()
     {
         RuleFor(x => x.Id)
             .NotEmpty().WithMessage("Id is required.");

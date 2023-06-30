@@ -26,7 +26,7 @@ public class ChangeUserPasswordCommandHandler : IRequestHandler<ChangeUserPasswo
         {
             throw new InvalidOperationException("User claims was empty!");
         }
-        
+
         var versityUser = await _versityUsersRepository.GetUserByIdAsync(claimId);
         if (versityUser is null) 
         {

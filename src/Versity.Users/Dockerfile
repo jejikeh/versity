@@ -20,5 +20,6 @@ RUN dotnet publish "Presentation.csproj" -c Release -o /app/publish /p:UseAppHos
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-
+COPY localhost.crt /usr/local/share/ca-certificates
+RUN chmod 644 /usr/local/share/ca-certificates/localhost.crt && update-ca-certificates
 ENTRYPOINT ["dotnet", "Presentation.dll"]

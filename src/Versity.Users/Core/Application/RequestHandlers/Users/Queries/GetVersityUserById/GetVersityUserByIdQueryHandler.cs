@@ -5,16 +5,16 @@ using MediatR;
 
 namespace Application.RequestHandlers.Users.Queries.GetVersityUserById;
 
-public class GetVersityUserByIdCommandHandler : IRequestHandler<GetVersityUserByIdCommand, ViewVersityUserDto>
+public class GetVersityUserByIdQueryHandler : IRequestHandler<GetVersityUserByIdQuery, ViewVersityUserDto>
 {
     private readonly IVersityUsersRepository _versityUsersRepository;
 
-    public GetVersityUserByIdCommandHandler(IVersityUsersRepository versityUsersRepository)
+    public GetVersityUserByIdQueryHandler(IVersityUsersRepository versityUsersRepository)
     {
         _versityUsersRepository = versityUsersRepository;
     }
 
-    public async Task<ViewVersityUserDto> Handle(GetVersityUserByIdCommand request, CancellationToken cancellationToken)
+    public async Task<ViewVersityUserDto> Handle(GetVersityUserByIdQuery request, CancellationToken cancellationToken)
     {
         var versityUser = await _versityUsersRepository.GetUserByIdAsync(request.Id);
         if (versityUser is null)

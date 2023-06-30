@@ -2,9 +2,9 @@
 
 namespace Application.RequestHandlers.Users.Queries.GetVersityUserById;
 
-public class GetVersityUserByIdCommandValidator : AbstractValidator<GetVersityUserByIdCommand>
+public class GetVersityUserByIdQueryValidator : AbstractValidator<GetVersityUserByIdQuery>
 {
-    public GetVersityUserByIdCommandValidator()
+    public GetVersityUserByIdQueryValidator()
     {
         RuleFor(request => request.Id)
             .NotEmpty().WithMessage("User Id is required.")

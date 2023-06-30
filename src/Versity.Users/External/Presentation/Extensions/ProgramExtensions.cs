@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.OpenApi.Models;
+using Presentation.Services;
 using Serilog;
 
 namespace Presentation.Extensions;
@@ -20,7 +21,8 @@ public static class ProgramExtensions
             .AddJwtAuthentication(builder.Configuration)
             .AddEndpointsApiExplorer()
             .AddControllers();
-        
+
+        builder.Services.AddGrpc();
         builder.Services.AddSwaggerGen(options =>
         {
             options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
@@ -38,17 +40,6 @@ public static class ProgramExtensions
             policy.AllowAnyOrigin();
         }));
         
-        builder.Services.AddDataProtection().UseCryptographicAlgorithms(new AuthenticatedEncryptorConfiguration
-        {
-            EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
-            ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
-        });
-
-        builder.Services.Configure<IISServerOptions>(options =>
-        {
-            options.AutomaticAuthentication = false;
-        });
-
         return builder;
     }
 
@@ -71,7 +62,8 @@ public static class ProgramExtensions
         app.UseAuthorization();
         app.UseCors("AllowAll");
         app.MapControllers();
-        
+        app.MapGrpcService<GrpcUsersService>();
+
         return app;
     }
 }

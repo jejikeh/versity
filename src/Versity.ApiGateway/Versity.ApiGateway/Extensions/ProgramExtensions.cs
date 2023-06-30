@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
-using Ocelot.DependencyInjection;
+﻿using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 
 namespace Versity.ApiGateway.Extensions;
@@ -24,20 +21,9 @@ public static class ProgramExtensions
             policy.AllowAnyOrigin();
         }));
         
-        builder.Services.AddDataProtection().UseCryptographicAlgorithms(new AuthenticatedEncryptorConfiguration
-        {
-            EncryptionAlgorithm = EncryptionAlgorithm.AES_256_CBC,
-            ValidationAlgorithm = ValidationAlgorithm.HMACSHA256
-        });
-
-        builder.Services.Configure<IISServerOptions>(options =>
-        {
-            options.AutomaticAuthentication = false;
-        });
-
         return builder;
     }
-
+    
     public static async Task<WebApplication> ConfigureApplication(this WebApplication app)
     {
         await app.UseOcelot();
