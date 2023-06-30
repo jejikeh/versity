@@ -23,9 +23,11 @@ public class EmailConfirmMessageGmailService : IEmailConfirmMessageService
     public async Task SendEmailConfirmMessageAsync(VersityUser user)
     {
         var token = await GenerateConfirmationToken(user);
+        
         var confirmUrl = Environment.GetEnvironmentVariable("EMAIL__ConfirmUrl") + $"{user.Id}/{token}";
         var emailBody = $"<h1>Привет {user.FirstName}! Ты мое солнышко :3</h1></br>" +
                         $"Please confirm your email address <a href={System.Text.Encodings.Web.HtmlEncoder.Default.Encode(confirmUrl)}>Confirm</a>";
+        
         var message = CreateEmailMessage(emailBody, user.Email);
         SendEmailMessage(message);
     }

@@ -42,6 +42,7 @@ public static class ElasticSerilogProgramExtension
         {
             throw new NullReferenceException("ElasticConfiguration:Uri configuration is empty");
         }
+        
         var connectionUri = new Uri(connectionString);
         
         return new ElasticsearchSinkOptions(connectionUri) 

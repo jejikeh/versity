@@ -33,8 +33,10 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, A
         {
             throw new NotFoundExceptionWithStatusCode("There is no user with this Id");
         }
+        
         var userRoles = await _versityUsersRepository.GetRolesAsync(versityUser);
         var userToken = _authTokenGeneratorService.GenerateToken(versityUser.Id, versityUser.Email, userRoles);
+        
         refreshToken.IsUsed = true;
         _refreshTokensRepository.Update(refreshToken);
         await _refreshTokensRepository.SaveChangesAsync(cancellationToken);

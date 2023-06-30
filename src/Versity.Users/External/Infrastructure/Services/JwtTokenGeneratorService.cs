@@ -27,6 +27,7 @@ public class JwtTokenGeneratorService : IAuthTokenGeneratorService
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture))
         };
+        
         claims.AddRange(roles.Select(userRole => new Claim("role", userRole)));
         
         var securityToken = new JwtSecurityToken(

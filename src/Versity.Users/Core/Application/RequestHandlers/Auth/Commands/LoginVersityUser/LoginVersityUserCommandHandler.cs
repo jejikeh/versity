@@ -41,10 +41,12 @@ public class LoginVersityUserCommandHandler : IRequestHandler<LoginVersityUserCo
     private async Task<VersityUser?> GetUserByEmail(LoginVersityUserCommand request)
     {
         var versityUser = await _versityUsersRepository.GetUserByEmailAsync(request.Email);
+        
         if (versityUser is null || !await _versityUsersRepository.CheckPasswordAsync(versityUser, request.Password))
         {
             throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
         }
+        
         if (!versityUser.EmailConfirmed)
         {
             throw new EmailNotConfirmedExceptionWithStatusCode();
