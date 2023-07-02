@@ -34,7 +34,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/auth/GetAllRefreshTokens",
+      "DownstreamPathTemplate": "/api/auth/getallrefreshtokens",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -77,7 +77,7 @@
       "DownstreamPathTemplate": "/api/auth/confirmemail/{userId}/{code}"
     },
     {
-      "UpstreamPathTemplate": "/api/users/SetAdmin/{userId}",
+      "UpstreamPathTemplate": "/api/users/setadmin/{userId}",
       "UpstreamHttpMethod": ["Post"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -86,7 +86,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/users/SetAdmin/{userId}",
+      "DownstreamPathTemplate": "/api/users/setadmin/{userId}",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
