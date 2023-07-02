@@ -1,11 +1,11 @@
 ﻿using Application;
 using Application.Abstractions;
 using Infrastructure;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.OpenApi.Models;
-using Presentation.Services;
 using Serilog;
 
 namespace Presentation.Extensions;

@@ -1,7 +1,8 @@
 ﻿using Application.Abstractions;
 using Grpc.Net.Client;
+using Microsoft.Extensions.Configuration;
 
-namespace Presentation.Services;
+namespace Infrastructure.Services;
 
 public class GrpcUsersDataService : IVersityUsersDataService
 {

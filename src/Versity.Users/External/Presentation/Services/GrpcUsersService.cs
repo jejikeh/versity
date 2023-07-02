@@ -2,7 +2,6 @@
 using Application.RequestHandlers.Users.Queries.GetVersityUserRoles;
 using Application.RequestHandlers.Users.Queries.IsUserExist;
 using Grpc.Core;
-using Infrastructure;
 using MediatR;
 
 namespace Presentation.Services;
@@ -28,7 +27,7 @@ public class GrpcUsersService : GrpcUsers.GrpcUsersBase
         {
             throw new RpcException(new Status(StatusCode.NotFound, ex.Message));
         }
-        
+
         return response;
     }
 
