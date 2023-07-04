@@ -19,6 +19,7 @@ public static class ProgramExtensions
             .AddRepositories()
             .AddApplication()
             .AddHttpContextAccessor()
+            .AddKafkaFlow()
             .AddJwtAuthentication(builder.Configuration)
             .AddEndpointsApiExplorer()
             .AddControllers();
