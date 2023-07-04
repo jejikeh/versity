@@ -1,7 +1,9 @@
 ﻿using System.Reflection;
+using Application.Abstractions;
 using Application.Abstractions.Repositories;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +30,13 @@ public static class InfrastructureInjection
     public static IServiceCollection AddRepositories(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<IVersityProductsRepository, VersityProductsRepository>();
+        
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddSingleton<IProductProducerService, ProductProducerService>();
         
         return serviceCollection;
     }

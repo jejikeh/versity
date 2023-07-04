@@ -1,4 +1,6 @@
-﻿using Application.Abstractions.Repositories;
+﻿using Application.Abstractions;
+using Application.Abstractions.Repositories;
+using Application.Dtos;
 using Application.Exceptions;
 using MediatR;
 
@@ -7,10 +9,12 @@ namespace Application.RequestHandlers.Commands.DeleteProduct;
 public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand>
 {
     private readonly IVersityProductsRepository _products;
+    private readonly IProductProducerService _productProducerService;
 
-    public DeleteProductCommandHandler(IVersityProductsRepository products)
+    public DeleteProductCommandHandler(IVersityProductsRepository products, IProductProducerService productProducerService)
     {
         _products = products;
+        _productProducerService = productProducerService;
     }
 
     public async Task Handle(DeleteProductCommand request, CancellationToken cancellationToken)
@@ -23,5 +27,6 @@ public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand>
         
         _products.DeleteProduct(product);
         await _products.SaveChangesAsync(cancellationToken);
+        await _productProducerService.DeleteProductProduce(new DeleteProductDto(request.Id), cancellationToken);
     }
 }

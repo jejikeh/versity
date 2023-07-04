@@ -1,6 +1,71 @@
 version: '3.1'
 
 services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.2.1
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - dev
+  
+  broker:
+    image: confluentinc/cp-server:7.2.1
+    hostname: broker
+    container_name: broker
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_CONFLUENT_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: broker:29092
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      CONFLUENT_METRICS_ENABLE: 'true'
+      CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+    networks:
+      - dev
+      
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.2.1
+    hostname: schema-registry
+    container_name: schema-registry
+    depends_on:
+      - broker
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:29092'
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    networks:
+      - dev
+      
+  kafka-tools:
+    image: confluentinc/cp-kafka:7.0.5
+    hostname: kafka
+    container_name: kafka
+    command: ["tail", "-f", "/dev/null"]
+    network_mode: "host"
+
   elasticsearch:
     container_name: els
     image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
@@ -14,17 +79,18 @@ services:
     networks:
       - dev
 
-  kibana:
-    container_name: kibana
-    image: docker.elastic.co/kibana/kibana:8.8.0
-    ports:
-      - 5601:5601
-    depends_on:
-      - elasticsearch
-    environment:
-      - ELASTICSEARCH_URL=http://localhost:9200
-    networks:
-      - dev
+  # with kibana to many lags :(
+  # kibana:
+  #   container_name: kibana
+  #   image: docker.elastic.co/kibana/kibana:8.8.0
+  #   ports:
+  #     - 5601:5601
+  #   depends_on:
+  #     - elasticsearch
+  #   environment:
+  #     - ELASTICSEARCH_URL=http://localhost:9200
+  #   networks:
+  #     - dev
 
   versity-products-db:
     image: debezium/postgres:13-alpine
@@ -59,6 +125,9 @@ services:
       - JWT__Key=06AA645D-B70D-446F-90D7-192A5C1CAA6A
       - JWT__Issuer=https://versity.users:4001
       - JWT__Audience=https://versity.users:4001
+      - KAFKA_Host=broker:9092
+      - KAFKA_Topic=versity.products
+      - KAFKA_ProducerName=versity.products.dev
     volumes:
       - ~/.aspnet/https:/root/.aspnet/https:ro
       - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro
@@ -123,7 +192,7 @@ services:
     depends_on:
       - versity-users-service
     ports:
-      - 8001:443
+      - 3001:443
     build:
       context: .
       dockerfile: src/Versity.ApiGateway/Dockerfile
@@ -175,6 +244,8 @@ services:
       - JWT__Key=06AA645D-B70D-446F-90D7-192A5C1CAA6A
       - JWT__Issuer=https://versity.users:4001
       - JWT__Audience=https://versity.users:4001
+      - KAFKA_Host=localhost:9092
+      - KAFKA_Topic=versity.products
     volumes:
       - ~/.aspnet/https:/root/.aspnet/https:ro
       - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro
