@@ -23,6 +23,11 @@ public class ProductRepository : IProductsRepository
         return await _context.Products.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
+    public async Task<Product?> GetProductByExternalIdAsync(Guid externalId, CancellationToken cancellationToken)
+    {
+        return await _context.Products.FirstOrDefaultAsync(x => x.ExternalId == externalId, cancellationToken);
+    }
+
     public async Task<Product> CreateProductAsync(Product product, CancellationToken cancellationToken)
     {
         var entityEntry = await _context.AddAsync(product, cancellationToken);

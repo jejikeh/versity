@@ -17,9 +17,6 @@ try
 {
     var versityUsersDbContext = serviceProvider.GetRequiredService<VersitySessionsServiceDbContext>();
     versityUsersDbContext.Database.EnsureCreated();
-
-    var kafkaBus = app.Services.CreateKafkaBus();
-    await kafkaBus.StartAsync();
     
     await app.RunAsync();
 }

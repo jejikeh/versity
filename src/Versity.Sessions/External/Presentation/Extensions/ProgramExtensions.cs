@@ -2,9 +2,6 @@
 using Application.Abstractions;
 using Infrastructure;
 using Infrastructure.Services;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
@@ -19,7 +16,7 @@ public static class ProgramExtensions
             .AddRepositories()
             .AddApplication()
             .AddHttpContextAccessor()
-            .AddKafkaFlow()
+            .AddKafkaServices()
             .AddJwtAuthentication(builder.Configuration)
             .AddEndpointsApiExplorer()
             .AddControllers();

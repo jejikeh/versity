@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Application.Abstractions.Repositories;
+using Infrastructure.KafkaConsumerService;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,13 @@ public static class InfrastructureInjection
         serviceCollection.AddScoped<ISessionsRepository, SessionsRepository>();
         serviceCollection.AddScoped<IProductsRepository, ProductRepository>();
         
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddKafkaServices(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddHostedService<KafkaProductConsumerService>();
+
         return serviceCollection;
     }
 }

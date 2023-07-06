@@ -34,10 +34,10 @@ public static class InfrastructureInjection
         return serviceCollection;
     }
 
-    public static IServiceCollection AddServices(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddKafkaServices(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<IProductProducerService, ProductProducerService>();
-        
+        serviceCollection.AddTransient<IProductProducerService, KafkaProductProducerService>();
+
         return serviceCollection;
     }
 }

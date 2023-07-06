@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using KafkaFlow;
 using KafkaFlow.Configuration;
 using KafkaFlow.Serializer;
@@ -24,18 +24,17 @@ public static class KafkaInjectionProgramExtension
                         .CreateTopicIfNotExists(kafkaTopic, 1, 1)
                         .AddProducer(
                             kafkaProducerName,
-                            producer => 
+                            producer =>
                             {
                                 producer
                                     .DefaultTopic(kafkaTopic)
-                                    .AddMiddlewares(middlewares => 
-                                        middlewares.AddSerializer<JsonCoreSerializer>())
-                                    .WithCompression(Confluent.Kafka.CompressionType.Gzip);
+                                    .AddMiddlewares(middlewares =>
+                                        middlewares.AddSerializer<JsonCoreSerializer>());
                             }
                         );
                 });
         });
-
+        
         return serviceCollection;
     }
 }

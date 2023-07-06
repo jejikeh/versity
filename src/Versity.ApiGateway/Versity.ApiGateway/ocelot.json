@@ -217,6 +217,22 @@
       }
     },
     {
+      "UpstreamPathTemplate": "/api/sessions/products/{page}",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "sessions.versity.dev",
+          "Port": 443
+        }
+      ],
+      "DownstreamPathTemplate": "/api/sessions/products/{page}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
       "UpstreamPathTemplate": "/api/sessions/user/{id}",
       "UpstreamHttpMethod": ["Get"],
       "DownstreamScheme": "https",

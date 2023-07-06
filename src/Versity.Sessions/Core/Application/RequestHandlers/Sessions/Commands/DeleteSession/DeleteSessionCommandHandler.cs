@@ -16,10 +16,12 @@ public class DeleteSessionCommandHandler : IRequestHandler<DeleteSessionCommand>
     public async Task Handle(DeleteSessionCommand request, CancellationToken cancellationToken)
     {
         var sessions = await _sessions.GetSessionByIdAsync(request.Id, cancellationToken);
+        
         if (sessions is null)
         {
             throw new NotFoundExceptionWithStatusCode("There is no user with this Id");
         }
+        
         _sessions.DeleteSession(sessions);
         await _sessions.SaveChangesAsync(cancellationToken);
     }
