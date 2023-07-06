@@ -39,20 +39,20 @@ public class SessionsController : ApiController
     }
     
     [Authorize(Roles = "Admin,Member")]
-    [HttpGet("users/{id:guid}")]
-    public async Task<IActionResult> GetUserSessionsByUserId(Guid id, CancellationToken cancellationToken)
+    [HttpGet("users/{id:guid}/{page:int}")]
+    public async Task<IActionResult> GetUserSessionsByUserId(Guid id, int page, CancellationToken cancellationToken)
     {
-        var command = new GetUserSessionsByUserIdQuery(id.ToString());
+        var command = new GetUserSessionsByUserIdQuery(id.ToString(), page);
         var result = await Sender.Send(command, cancellationToken);
         
         return Ok(result);
     }
     
     [Authorize(Roles = "Admin")]
-    [HttpGet("products/{id:guid}")]
-    public async Task<IActionResult> GetAllProductSessions(Guid id, CancellationToken cancellationToken)
+    [HttpGet("products/{id:guid}/{page:int}")]
+    public async Task<IActionResult> GetAllProductSessions(Guid id, int page, CancellationToken cancellationToken)
     {
-        var command = new GetAllProductSessionsQuery(id);
+        var command = new GetAllProductSessionsQuery(id, page);
         var result = await Sender.Send(command, cancellationToken);
         
         return Ok(result);

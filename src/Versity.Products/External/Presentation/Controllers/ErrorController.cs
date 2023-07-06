@@ -23,7 +23,7 @@ public sealed class ErrorController : ControllerBase
             _logger.LogError("Request failure, {@Error}", httpResponseException.Message);
             
             return Problem(
-                title: httpResponseException.Value?.ToString(),
+                title: httpResponseException.ErrorMessage,
                 statusCode: httpResponseException.StatusCode);
         }
         
@@ -47,7 +47,7 @@ public sealed class ErrorController : ControllerBase
         
         if (exceptionHandlerFeature.Error is ExceptionWithStatusCode httpResponseException)
         {
-            title = httpResponseException.Value?.ToString();
+            title = httpResponseException.ErrorMessage;
             statusCode = httpResponseException.StatusCode;
         }
         

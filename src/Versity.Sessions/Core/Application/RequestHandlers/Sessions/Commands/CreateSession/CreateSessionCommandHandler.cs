@@ -24,20 +24,16 @@ public class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand,
             throw new NotFoundExceptionWithStatusCode("User with specified Id doesnt exist!");
         }
         
-        var sessionId = Guid.NewGuid();
-        while (await _sessions.GetSessionByIdAsync(sessionId, cancellationToken) is not null)
-        {
-            sessionId = Guid.NewGuid();
-        }
         var session = new Session
         {
-            Id = sessionId,
+            Id = Guid.NewGuid(),
             UserId = request.UserId,
             ProductId = request.ProductId,
             Start = request.Start,
             Expiry = request.Expiry,
             Status = SessionStatus.Inactive
         };
+        
         var result = await _sessions.CreateSessionAsync(session, cancellationToken);
         await _sessions.SaveChangesAsync(cancellationToken);
 

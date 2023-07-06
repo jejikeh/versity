@@ -21,15 +21,9 @@ public class RegisterVersityUserCommandHandler : IRequestHandler<RegisterVersity
 
     public async Task<IdentityResult> Handle(RegisterVersityUserCommand request, CancellationToken cancellationToken)
     {
-        var userId = Guid.NewGuid().ToString();
-        while (await _versityUsersRepository.GetUserByIdAsync(userId) is not null) 
-        {
-            userId = Guid.NewGuid().ToString();
-        }
-        
         var versityUser = new VersityUser
         {
-            Id = userId,
+            Id = Guid.NewGuid().ToString(),
             Email = request.Email,
             PhoneNumber = request.Phone,
             FirstName = request.FirstName,

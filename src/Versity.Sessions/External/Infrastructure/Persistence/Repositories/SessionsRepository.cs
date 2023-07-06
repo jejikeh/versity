@@ -23,14 +23,14 @@ public class SessionsRepository : ISessionsRepository
         return await _context.Sessions.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<Session>> GetAllUserSessionsAsync(string userId, CancellationToken cancellationToken)
+    public IQueryable<Session> GetAllUserSessions(string userId, CancellationToken cancellationToken)
     {
-        return await _context.Sessions.Where(x => x.UserId == userId).ToListAsync(cancellationToken);
+        return _context.Sessions.Where(x => x.UserId == userId);
     }
 
-    public async Task<IEnumerable<Session>> GetAllProductSessionsAsync(Guid productId, CancellationToken cancellationToken)
+    public IQueryable<Session> GetAllProductSessions(Guid productId, CancellationToken cancellationToken)
     {
-        return await _context.Sessions.Where(x => x.ProductId == productId).ToListAsync(cancellationToken);
+        return _context.Sessions.Where(x => x.ProductId == productId);
     }
 
     public async Task<Session> CreateSessionAsync(Session session, CancellationToken cancellationToken)

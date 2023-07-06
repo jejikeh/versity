@@ -1,5 +1,6 @@
 ﻿using Application;
 using Infrastructure;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
@@ -19,30 +20,16 @@ public static class ProgramExtensions
             .AddApplication()
             .AddVersityIdentity()
             .AddJwtAuthentication(builder.Configuration)
+            .AddSwagger()
+            .AddCors(options => options.ConfigureAllowAllCors())
             .AddEndpointsApiExplorer()
             .AddControllers();
 
         builder.Services.AddGrpc();
-        builder.Services.AddSwaggerGen(options =>
-        {
-            options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
-            {
-                In = ParameterLocation.Header,
-                Name = "Authorization",
-                Type = SecuritySchemeType.ApiKey
-            });
-        });
-
-        builder.Services.AddCors(options => options.AddPolicy("AllowAll", policy =>
-        {
-            policy.AllowAnyHeader();
-            policy.AllowAnyMethod();
-            policy.AllowAnyOrigin();
-        }));
         
         return builder;
     }
-
+    
     public static WebApplication ConfigureApplication(this WebApplication app)
     {
         if (app.Environment.IsDevelopment())
@@ -65,5 +52,32 @@ public static class ProgramExtensions
         app.MapGrpcService<GrpcUsersService>();
 
         return app;
+    }
+    
+    private static CorsOptions ConfigureAllowAllCors(this CorsOptions options)
+    {
+        options.AddPolicy("AllowAll", policy =>
+        {
+            policy.AllowAnyHeader();
+            policy.AllowAnyMethod();
+            policy.AllowAnyOrigin();
+        });
+        
+        return options;
+    }
+
+    private static IServiceCollection AddSwagger(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
+            {
+                In = ParameterLocation.Header,
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey
+            });
+        });
+
+        return serviceCollection;
     }
 }

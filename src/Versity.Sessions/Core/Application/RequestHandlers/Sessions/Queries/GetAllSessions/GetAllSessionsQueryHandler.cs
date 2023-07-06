@@ -1,6 +1,8 @@
 ﻿using Application.Abstractions.Repositories;
+using Application.Common;
 using Domain.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.RequestHandlers.Sessions.Queries.GetAllSessions;
 
@@ -13,15 +15,15 @@ public class GetAllSessionsQueryHandler : IRequestHandler<GetAllSessionsQuery, I
         _sessions = sessions;
     }
 
-    public Task<IEnumerable<Session>> Handle(GetAllSessionsQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Session>> Handle(GetAllSessionsQuery request, CancellationToken cancellationToken)
     {
-        var sessions = _sessions
+        var sessions = await _sessions
             .GetAllSessions()
             .OrderBy(x => x.UserId)
-            .Skip(10 * (request.Page - 1))
-            .Take(10)
-            .ToList();
+            .Skip(PageFetchSettings.ItemsOnPage * (request.Page - 1))
+            .Take(PageFetchSettings.ItemsOnPage)
+            .ToListAsync(cancellationToken);
         
-        return Task.Run(() => (IEnumerable<Session>)sessions, cancellationToken);
+        return sessions;
     }
 }

@@ -1,10 +1,12 @@
 ﻿using System.Security.Claims;
 using Application.Abstractions;
 using Application.Abstractions.Repositories;
+using Application.Common;
 using Application.Exceptions;
 using Domain.Models;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.RequestHandlers.Sessions.Queries.GetUserSessionsByUserId;
 
@@ -37,8 +39,14 @@ public class GetUserSessionsByUserIdQueryHandler : IRequestHandler<GetUserSessio
                 throw new ExceptionWithStatusCode(StatusCodes.Status403Forbidden, "Not enough rights");
             }
         }
-        var session = await _sessions.GetAllUserSessionsAsync(request.UserId, cancellationToken);
         
-        return session;
+        var sessions = await _sessions
+            .GetAllUserSessions(request.UserId, cancellationToken)
+            .OrderBy(x => x.UserId)
+            .Skip(PageFetchSettings.ItemsOnPage * (request.Page - 1))
+            .Take(PageFetchSettings.ItemsOnPage)
+            .ToListAsync(cancellationToken);
+        
+        return sessions;
     }
 }

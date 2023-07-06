@@ -77,7 +77,7 @@
       "DownstreamPathTemplate": "/api/auth/confirmemail/{userId}/{code}"
     },
     {
-      "UpstreamPathTemplate": "/api/users/SetAdmin/{userId}",
+      "UpstreamPathTemplate": "/api/users/{userId}/set-admin",
       "UpstreamHttpMethod": ["Post"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -86,7 +86,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/users/SetAdmin/{userId}",
+      "DownstreamPathTemplate": "/api/users/{userId}/set-admin",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -217,7 +217,7 @@
       }
     },
     {
-      "UpstreamPathTemplate": "/api/sessions/user/{id}",
+      "UpstreamPathTemplate": "/api/sessions/user/{id}/{page}",
       "UpstreamHttpMethod": ["Get"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -226,14 +226,14 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/sessions/user/{id}",
+      "DownstreamPathTemplate": "/api/sessions/user/{id}/{page}",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
       }
     },
     {
-      "UpstreamPathTemplate": "/api/sessions/product/{id}",
+      "UpstreamPathTemplate": "/api/sessions/product/{id}/{page}",
       "UpstreamHttpMethod": ["Get"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -242,7 +242,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/sessions/product/{id}",
+      "DownstreamPathTemplate": "/api/sessions/product/{id}/{page}",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
