@@ -1,22 +1,30 @@
-﻿using Application.Abstractions.Repositories;
+﻿using System.Text.Json;
+using Application.Abstractions.Repositories;
 using Application.Exceptions;
 using Domain.Models;
-using MediatR;
+using Infrastructure.KafkaConsumerService.Abstractions;
 using Microsoft.AspNetCore.Http;
 
-namespace Application.RequestHandlers.Products.Commands.CreateProduct;
+namespace Infrastructure.KafkaConsumerService.Handlers.CreateProduct;
 
-public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Product>
+public class CreateProductMessageHandler : IKafkaMessageHandler
 {
     private readonly IProductsRepository _productsRepository;
 
-    public CreateProductCommandHandler(IProductsRepository productsRepository)
+    public CreateProductMessageHandler(IProductsRepository productsRepository)
     {
         _productsRepository = productsRepository;
     }
 
-    public async Task<Product> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+    public async Task Handle(string key, string message, CancellationToken cancellationToken)
     {
+        if (key != "CreateProduct")
+        {
+            return;
+        }
+        
+        var request = JsonSerializer.Deserialize<CreateProductMessage>(message);
+        
         if (await _productsRepository.GetProductByExternalIdAsync(request.Id, cancellationToken) is not null)
         {
             throw new ExceptionWithStatusCode(StatusCodes.Status409Conflict, "Product with specified Id external already exist!");
@@ -35,9 +43,7 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
             Title = request.Title
         };
         
-        var result = await _productsRepository.CreateProductAsync(product, cancellationToken);
+        await _productsRepository.CreateProductAsync(product, cancellationToken);
         await _productsRepository.SaveChangesAsync(cancellationToken);
-
-        return result;
     }
 }

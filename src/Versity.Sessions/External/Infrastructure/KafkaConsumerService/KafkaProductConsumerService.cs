@@ -1,38 +1,24 @@
-﻿using System.Text.Json;
-using Application.RequestHandlers.Products.Commands.CreateProduct;
-using Application.RequestHandlers.Products.Commands.DeleteProduct;
-using Confluent.Kafka;
-using MediatR;
+﻿using Confluent.Kafka;
+using Infrastructure.KafkaConsumerService.Abstractions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using AutoOffsetReset = Confluent.Kafka.AutoOffsetReset;
 
 namespace Infrastructure.KafkaConsumerService;
 
 public class KafkaProductConsumerService : IHostedService, IDisposable
 {
     private readonly ILogger<KafkaProductConsumerService> _logger;
-    private IConsumer<string, string> _consumer;
-    private readonly ISender _sender;
+    private readonly IConsumer<string, string> _consumer;
+    private readonly IKafkaConsumerConfiguration _configuration;
+    private readonly IKafkaHandlersContainer _kafkaHandlersContainer;
 
-    public KafkaProductConsumerService(ILogger<KafkaProductConsumerService> logger, ISender sender)
+    public KafkaProductConsumerService(ILogger<KafkaProductConsumerService> logger, IKafkaConsumerConfiguration configuration, IKafkaHandlersContainer kafkaHandlersContainer)
     {
         _logger = logger;
-        _sender = sender;
+        _configuration = configuration;
+        _kafkaHandlersContainer = kafkaHandlersContainer;
 
-        var config = new ConsumerConfig()
-        {
-            BootstrapServers = Environment.GetEnvironmentVariable("KAFKA_Host"),
-            GroupId = "versity.sessions",
-            SecurityProtocol = SecurityProtocol.Plaintext,
-            EnableAutoCommit = false,
-            StatisticsIntervalMs = 5000,
-            SessionTimeoutMs = 6000,
-            AutoOffsetReset = AutoOffsetReset.Earliest,
-            EnablePartitionEof = true,
-        };
-        
-        _consumer = new ConsumerBuilder<string, string>(config)
+        _consumer = new ConsumerBuilder<string, string>(_configuration.Config)
             .SetErrorHandler((_, e) => _logger.LogError($"Kafka Exception: ErrorCode:[{e.Code}] Reason:[{e.Reason}] Message:[{e.ToString()}]"))
             .Build();
     }
@@ -43,7 +29,7 @@ public class KafkaProductConsumerService : IHostedService, IDisposable
         {
             _logger.LogInformation("Kafka Consumer Service has started.");
 
-            _consumer.Subscribe(new List<string>() { Environment.GetEnvironmentVariable("KAFKA_Topic") });
+            _consumer.Subscribe(new List<string>() { _configuration.Topic });
 
             await Consume(cancellationToken).ConfigureAwait(false);
         }
@@ -71,28 +57,16 @@ public class KafkaProductConsumerService : IHostedService, IDisposable
                     continue;
                 }
 
-                if (consumeResult.Topic.Equals(Environment.GetEnvironmentVariable("KAFKA_Topic")))
+                if (consumeResult.Topic.Equals(_configuration.Topic))
                 {
                     await Task.Run(async () =>
                     {
-                        var json = consumeResult.Message.Value;
-                        _logger.LogInformation($"[{consumeResult.Message.Key}] {consumeResult.Topic} - {json}");
+                        _logger.LogInformation($"[{consumeResult.Message.Key}] {consumeResult.Topic} - {consumeResult.Message.Value}");
 
-                        switch (consumeResult.Message.Key)
-                        {
-                            case "CreateProduct":
-                            {
-                                var command = JsonSerializer.Deserialize<CreateProductCommand>(consumeResult.Message.Value);
-                                await _sender.Send(command, cancellationToken);
-                                break;
-                            }
-                            case "DeleteProduct":
-                            {
-                                var command = JsonSerializer.Deserialize<DeleteProductCommand>(consumeResult.Message.Value);
-                                await _sender.Send(command!, cancellationToken);
-                                break;
-                            }
-                        }
+                        await _kafkaHandlersContainer.ProcessMessage(
+                            consumeResult.Message.Key, 
+                            consumeResult.Message.Value,
+                            cancellationToken);
                     }, 
                         cancellationToken).ConfigureAwait(false);
                 }

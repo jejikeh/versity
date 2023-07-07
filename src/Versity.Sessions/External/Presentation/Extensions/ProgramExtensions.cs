@@ -1,8 +1,13 @@
 ﻿using Application;
 using Application.Abstractions;
 using Infrastructure;
+using Infrastructure.KafkaConsumerService;
+using Infrastructure.KafkaConsumerService.Handlers.CreateProduct;
+using Infrastructure.KafkaConsumerService.Handlers.DeleteProduct;
 using Infrastructure.Services;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.OpenApi.Models;
+using Presentation.Configuration;
 using Serilog;
 
 namespace Presentation.Extensions;
@@ -16,30 +21,15 @@ public static class ProgramExtensions
             .AddRepositories()
             .AddApplication()
             .AddHttpContextAccessor()
-            .AddKafkaServices()
             .AddJwtAuthentication(builder.Configuration)
+            .AddSwagger()
+            .AddCors(options => options.ConfigureAllowAllCors())
+            .AddKafka(new KafkaConsumerConfiguration())
             .AddEndpointsApiExplorer()
             .AddControllers();
-
+        
         builder.Services.AddScoped<IVersityUsersDataService, GrpcUsersDataService>();
-        builder.Services.AddSwaggerGen(options =>
-        {
-            options.UseDateOnlyTimeOnlyStringConverters();
-            options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
-            {
-                In = ParameterLocation.Header,
-                Name = "Authorization",
-                Type = SecuritySchemeType.ApiKey
-            }); 
-        });
-        
-        builder.Services.AddCors(options => options.AddPolicy("AllowAll", policy =>
-        {
-            policy.AllowAnyHeader();
-            policy.AllowAnyMethod();
-            policy.AllowAnyOrigin();
-        }));
-        
+
         return builder;
     }
     
@@ -64,5 +54,32 @@ public static class ProgramExtensions
         app.MapControllers();
         
         return app;
+    }
+    
+    private static CorsOptions ConfigureAllowAllCors(this CorsOptions options)
+    {
+        options.AddPolicy("AllowAll", policy =>
+        {
+            policy.AllowAnyHeader();
+            policy.AllowAnyMethod();
+            policy.AllowAnyOrigin();
+        });
+        
+        return options;
+    }
+
+    private static IServiceCollection AddSwagger(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddSwaggerGen(options =>
+        {
+            options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme()
+            {
+                In = ParameterLocation.Header,
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey
+            });
+        });
+
+        return serviceCollection;
     }
 }

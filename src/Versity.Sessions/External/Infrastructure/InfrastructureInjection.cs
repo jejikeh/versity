@@ -1,6 +1,9 @@
 ﻿using System.Reflection;
 using Application.Abstractions.Repositories;
 using Infrastructure.KafkaConsumerService;
+using Infrastructure.KafkaConsumerService.Abstractions;
+using Infrastructure.KafkaConsumerService.Handlers.CreateProduct;
+using Infrastructure.KafkaConsumerService.Handlers.DeleteProduct;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -34,10 +37,13 @@ public static class InfrastructureInjection
         return serviceCollection;
     }
 
-    public static IServiceCollection AddKafkaServices(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddKafka(this IServiceCollection serviceCollection, IKafkaConsumerConfiguration configuration)
     {
-        serviceCollection.AddHostedService<KafkaProductConsumerService>();
-
+        serviceCollection
+            .AddKafkaHandler<CreateProductMessageHandler>()
+            .AddKafkaHandler<DeleteProductMessageHandler>()
+            .UseKafkaConsumer(configuration);
+        
         return serviceCollection;
     }
 }
