@@ -1,5 +1,4 @@
 using Infrastructure.Persistence;
-using KafkaFlow;
 using Presentation.Extensions;
 
 var builder = WebApplication
@@ -18,7 +17,7 @@ try
     var versityUsersDbContext = serviceProvider.GetRequiredService<VersitySessionsServiceDbContext>();
     versityUsersDbContext.Database.EnsureCreated();
     
-    await app.RunAsync();
+    app.Run();
 }
 catch (Exception ex)
 {

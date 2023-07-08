@@ -1,5 +1,6 @@
 ﻿using Confluent.Kafka;
 using Infrastructure.KafkaConsumerService.Abstractions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -10,13 +11,16 @@ public class KafkaProductConsumerService : IHostedService, IDisposable
     private readonly ILogger<KafkaProductConsumerService> _logger;
     private readonly IConsumer<string, string> _consumer;
     private readonly IKafkaConsumerConfiguration _configuration;
-    private readonly IKafkaHandlersContainer _kafkaHandlersContainer;
+    private readonly IServiceProvider _serviceProvider;
 
-    public KafkaProductConsumerService(ILogger<KafkaProductConsumerService> logger, IKafkaConsumerConfiguration configuration, IKafkaHandlersContainer kafkaHandlersContainer)
+    public KafkaProductConsumerService(
+        ILogger<KafkaProductConsumerService> logger, 
+        IKafkaConsumerConfiguration configuration, 
+        IServiceProvider serviceProvider)
     {
         _logger = logger;
         _configuration = configuration;
-        _kafkaHandlersContainer = kafkaHandlersContainer;
+        _serviceProvider = serviceProvider;
 
         _consumer = new ConsumerBuilder<string, string>(_configuration.Config)
             .SetErrorHandler((_, e) => _logger.LogError($"Kafka Exception: ErrorCode:[{e.Code}] Reason:[{e.Reason}] Message:[{e.ToString()}]"))
@@ -57,19 +61,20 @@ public class KafkaProductConsumerService : IHostedService, IDisposable
                     continue;
                 }
 
-                if (consumeResult.Topic.Equals(_configuration.Topic))
+                if (!consumeResult.Topic.Equals(_configuration.Topic))
                 {
-                    await Task.Run(async () =>
-                    {
-                        _logger.LogInformation($"[{consumeResult.Message.Key}] {consumeResult.Topic} - {consumeResult.Message.Value}");
-
-                        await _kafkaHandlersContainer.ProcessMessage(
-                            consumeResult.Message.Key, 
-                            consumeResult.Message.Value,
-                            cancellationToken);
-                    }, 
-                        cancellationToken).ConfigureAwait(false);
+                    continue;
                 }
+                
+                _logger.LogInformation($"[{consumeResult.Message.Key}] {consumeResult.Topic} - {consumeResult.Message.Value}");
+                    
+                using var scope = _serviceProvider.CreateScope();
+                var kafkaHandlersContainer = scope.ServiceProvider.GetRequiredService<IKafkaHandlersContainer>();
+                    
+                await kafkaHandlersContainer.ProcessMessage(
+                    consumeResult.Message.Key, 
+                    consumeResult.Message.Value,
+                    cancellationToken);
             }
             catch (Exception ex)
             {

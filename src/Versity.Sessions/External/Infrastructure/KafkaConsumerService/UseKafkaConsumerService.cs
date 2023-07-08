@@ -9,15 +9,15 @@ public static class UseKafkaConsumerService
         IKafkaConsumerConfiguration configuration)
     {
         serviceCollection.AddSingleton(configuration);
-        serviceCollection.AddSingleton<IKafkaHandlersContainer, KafkaHandlersContainer>();
         serviceCollection.AddHostedService<KafkaProductConsumerService>();
+        serviceCollection.AddScoped<IKafkaHandlersContainer, KafkaHandlersContainer>();
 
         return serviceCollection;
     }
 
     public static IServiceCollection AddKafkaHandler<T>(this IServiceCollection serviceCollection) where T : class, IKafkaMessageHandler
     {
-        serviceCollection.AddSingleton<IKafkaMessageHandler, T>();
+        serviceCollection.AddScoped<IKafkaMessageHandler, T>();
         
         return serviceCollection;
     }

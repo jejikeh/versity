@@ -169,7 +169,7 @@
       "DownstreamPathTemplate": "/api/products/{page}"
     },
     {
-      "UpstreamPathTemplate": "/api/products/{userId}",
+      "UpstreamPathTemplate": "/api/products/{productId}",
       "UpstreamHttpMethod": ["Put"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -178,14 +178,14 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/products/{userId}",
+      "DownstreamPathTemplate": "/api/products/{productId}",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
       }
     },
     {
-      "UpstreamPathTemplate": "/api/products/{userId}",
+      "UpstreamPathTemplate": "/api/products/{productId}",
       "UpstreamHttpMethod": ["Delete"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -194,7 +194,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/products/{userId}",
+      "DownstreamPathTemplate": "/api/products/{productId}",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -206,7 +206,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "sessions.versity.dev",
+          "Host": "versity-sessions-service",
           "Port": 443
         }
       ],
@@ -233,7 +233,7 @@
       }
     },
     {
-      "UpstreamPathTemplate": "/api/sessions/user/{id}",
+      "UpstreamPathTemplate": "/api/sessions/users/{id}",
       "UpstreamHttpMethod": ["Get"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -242,14 +242,14 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/sessions/user/{id}",
+      "DownstreamPathTemplate": "/api/sessions/users/{id}",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
       }
     },
     {
-      "UpstreamPathTemplate": "/api/sessions/product/{id}",
+      "UpstreamPathTemplate": "/api/sessions/products/{id}",
       "UpstreamHttpMethod": ["Get"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -258,7 +258,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/sessions/product/{id}",
+      "DownstreamPathTemplate": "/api/sessions/products/{id}",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
