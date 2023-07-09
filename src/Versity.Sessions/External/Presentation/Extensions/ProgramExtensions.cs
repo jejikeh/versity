@@ -1,12 +1,10 @@
 ﻿using Application;
 using Application.Abstractions;
 using Infrastructure;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.OpenApi.Models;
-using Presentation.Services;
+using Presentation.Configuration;
 using Serilog;
 
 namespace Presentation.Extensions;
@@ -23,9 +21,10 @@ public static class ProgramExtensions
             .AddJwtAuthentication(builder.Configuration)
             .AddSwagger()
             .AddCors(options => options.ConfigureAllowAllCors())
+            .AddKafka(new KafkaConsumerConfiguration())
             .AddEndpointsApiExplorer()
             .AddControllers();
-
+        
         builder.Services.AddScoped<IVersityUsersDataService, GrpcUsersDataService>();
         
         return builder;

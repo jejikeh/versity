@@ -34,7 +34,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/auth/GetAllRefreshTokens",
+      "DownstreamPathTemplate": "/api/auth/getallrefreshtokens",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -169,7 +169,7 @@
       "DownstreamPathTemplate": "/api/products/{page}"
     },
     {
-      "UpstreamPathTemplate": "/api/products/{userId}",
+      "UpstreamPathTemplate": "/api/products/{productId}",
       "UpstreamHttpMethod": ["Put"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -178,14 +178,14 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/products/{userId}",
+      "DownstreamPathTemplate": "/api/products/{productId}",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
       }
     },
     {
-      "UpstreamPathTemplate": "/api/products/{userId}",
+      "UpstreamPathTemplate": "/api/products/{productId}",
       "UpstreamHttpMethod": ["Delete"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -194,7 +194,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/products/{userId}",
+      "DownstreamPathTemplate": "/api/products/{productId}",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -217,7 +217,7 @@
       }
     },
     {
-      "UpstreamPathTemplate": "/api/sessions/user/{id}/{page}",
+      "UpstreamPathTemplate": "/api/sessions/products/{page}",
       "UpstreamHttpMethod": ["Get"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -226,7 +226,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/sessions/user/{id}/{page}",
+      "DownstreamPathTemplate": "/api/sessions/products/{page}",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []

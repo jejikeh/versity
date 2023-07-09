@@ -6,16 +6,16 @@
     <UserSecretsId>Sessions-57393389627611478466</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.23.3" />
-    <PackageReference Include="Grpc.AspNetCore.Server.ClientFactory" Version="2.54.0" />
-    <PackageReference Include="Grpc.Net.Client" Version="2.55.0-pre1" />
-    <PackageReference Include="Grpc.Tools" Version="2.56.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="KafkaFlow" Version="2.3.0" />
+    <PackageReference Include="KafkaFlow.LogHandler.Console" Version="2.3.0" />
+    <PackageReference Include="KafkaFlow.Microsoft.DependencyInjection" Version="2.3.0" />
+    <PackageReference Include="KafkaFlow.Serializer" Version="2.3.0" />
+    <PackageReference Include="KafkaFlow.Serializer.JsonCore" Version="2.3.0" />
+    <PackageReference Include="KafkaFlow.TypedHandler" Version="2.3.0" />
     <PackageReference Include="MediatR" Version="12.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.7" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="DateOnlyTimeOnly.AspNet" Version="2.1.1" />
     <PackageReference Include="DateOnlyTimeOnly.AspNet.Swashbuckle" Version="2.1.1" />
@@ -28,15 +28,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Protobuf Include="Protos\versityusers.proto">
-      <GrpcServices>Both</GrpcServices>
-      <Access>Public</Access>
-      <ProtoCompile>True</ProtoCompile>
-      <CompileOutputs>True</CompileOutputs>
-      <OutputDir>obj\Debug\net7.0\</OutputDir>
-      <Generator>MSBuild:Compile</Generator>
-    </Protobuf>
   </ItemGroup>
 </Project>

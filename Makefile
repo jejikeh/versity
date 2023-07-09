@@ -29,3 +29,6 @@ up:
 
 .PHONY: all
 all: build-users push-users build-products push-products build-apigateway push-apigateway build-sessions push-sessions up
+
+.PHONY: all
+build-all: build-users push-users build-products push-products build-apigateway push-apigateway build-sessions push-sessions

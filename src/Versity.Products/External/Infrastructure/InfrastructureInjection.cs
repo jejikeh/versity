@@ -1,7 +1,9 @@
 ﻿using System.Reflection;
+using Application.Abstractions;
 using Application.Abstractions.Repositories;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +31,13 @@ public static class InfrastructureInjection
     {
         serviceCollection.AddScoped<IVersityProductsRepository, VersityProductsRepository>();
         
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddKafkaServices(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddTransient<IProductProducerService, KafkaProductProducerService>();
+
         return serviceCollection;
     }
 }

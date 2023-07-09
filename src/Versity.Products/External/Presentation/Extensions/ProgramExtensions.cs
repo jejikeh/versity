@@ -17,6 +17,8 @@ public static class ProgramExtensions
             .AddDbContext(builder.Configuration)
             .AddRepositories()
             .AddApplication()
+            .AddKafkaFlow()
+            .AddKafkaServices()
             .AddJwtAuthentication(builder.Configuration)
             .AddSwagger()
             .AddCors(options => options.ConfigureAllowAllCors())

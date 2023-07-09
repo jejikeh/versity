@@ -1,4 +1,5 @@
-﻿using Application.RequestHandlers.Sessions.Commands.CreateSession;
+﻿using Application.RequestHandlers.Products.Queries.GetAllProducts;
+using Application.RequestHandlers.Sessions.Commands.CreateSession;
 using Application.RequestHandlers.Sessions.Commands.DeleteSession;
 using Application.RequestHandlers.Sessions.Queries.GetAllProductSessions;
 using Application.RequestHandlers.Sessions.Queries.GetAllSessions;
@@ -23,6 +24,16 @@ public class SessionsController : ApiController
     public async Task<IActionResult> GetAllSessions(int page, CancellationToken cancellationToken)
     {
         var command = new GetAllSessionsQuery(page);
+        var result = await Sender.Send(command, cancellationToken);
+        
+        return Ok(result);
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpGet("products/{page:int}")]
+    public async Task<IActionResult> GetAllProducts(int page, CancellationToken cancellationToken)
+    {
+        var command = new GetAllProductsQuery(page);
         var result = await Sender.Send(command, cancellationToken);
         
         return Ok(result);

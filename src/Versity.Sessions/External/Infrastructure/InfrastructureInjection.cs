@@ -2,6 +2,10 @@
 using Application.Abstractions.Repositories;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
+using Infrastructure.Services.KafkaConsumer;
+using Infrastructure.Services.KafkaConsumer.Abstractions;
+using Infrastructure.Services.KafkaConsumer.Handlers.CreateProduct;
+using Infrastructure.Services.KafkaConsumer.Handlers.DeleteProduct;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +33,16 @@ public static class InfrastructureInjection
     {
         serviceCollection.AddScoped<ISessionsRepository, SessionsRepository>();
         serviceCollection.AddScoped<IProductsRepository, ProductRepository>();
+        
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddKafka(this IServiceCollection serviceCollection, IKafkaConsumerConfiguration configuration)
+    {
+        serviceCollection
+            .AddKafkaHandler<CreateProductMessageHandler>()
+            .AddKafkaHandler<DeleteProductMessageHandler>()
+            .UseKafkaConsumer(configuration);
         
         return serviceCollection;
     }
