@@ -233,7 +233,7 @@
       }
     },
     {
-      "UpstreamPathTemplate": "/api/sessions/product/{id}/{page}",
+      "UpstreamPathTemplate": "/api/sessions/products/{id}/{page}",
       "UpstreamHttpMethod": ["Get"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -242,7 +242,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/sessions/product/{id}/{page}",
+      "DownstreamPathTemplate": "/api/sessions/products/{id}/{page}",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -275,6 +275,22 @@
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/{id}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/sessions/users/{id}",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "sessions.versity.dev",
+          "Port": 443
+        }
+      ],
+      "DownstreamPathTemplate": "/api/sessions/users/{id}",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
