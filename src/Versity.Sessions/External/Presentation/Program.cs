@@ -16,8 +16,7 @@ try
 {
     var versityUsersDbContext = serviceProvider.GetRequiredService<VersitySessionsServiceDbContext>();
     versityUsersDbContext.Database.EnsureCreated();
-    
-    app.Run();
+    await app.RunAsync();
 }
 catch (Exception ex)
 {

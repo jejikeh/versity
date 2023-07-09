@@ -1,7 +1,7 @@
-﻿using Infrastructure.KafkaConsumerService.Abstractions;
+﻿using Infrastructure.Services.KafkaConsumer.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.KafkaConsumerService;
+namespace Infrastructure.Services.KafkaConsumer;
 
 public static class UseKafkaConsumerService
 {

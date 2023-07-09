@@ -1,9 +1,6 @@
 ﻿using Application;
 using Application.Abstractions;
 using Infrastructure;
-using Infrastructure.KafkaConsumerService;
-using Infrastructure.KafkaConsumerService.Handlers.CreateProduct;
-using Infrastructure.KafkaConsumerService.Handlers.DeleteProduct;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.OpenApi.Models;

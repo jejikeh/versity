@@ -1,6 +1,6 @@
-﻿using Infrastructure.KafkaConsumerService.Abstractions;
+﻿using Infrastructure.Services.KafkaConsumer.Abstractions;
 
-namespace Infrastructure.KafkaConsumerService;
+namespace Infrastructure.Services.KafkaConsumer;
 
 public class KafkaHandlersContainer : IKafkaHandlersContainer
 {

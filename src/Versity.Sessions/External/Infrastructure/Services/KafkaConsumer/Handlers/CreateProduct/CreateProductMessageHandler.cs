@@ -2,10 +2,10 @@
 using Application.Abstractions.Repositories;
 using Application.Exceptions;
 using Domain.Models;
-using Infrastructure.KafkaConsumerService.Abstractions;
+using Infrastructure.Services.KafkaConsumer.Abstractions;
 using Microsoft.AspNetCore.Http;
 
-namespace Infrastructure.KafkaConsumerService.Handlers.CreateProduct;
+namespace Infrastructure.Services.KafkaConsumer.Handlers.CreateProduct;
 
 public class CreateProductMessageHandler : IKafkaMessageHandler
 {

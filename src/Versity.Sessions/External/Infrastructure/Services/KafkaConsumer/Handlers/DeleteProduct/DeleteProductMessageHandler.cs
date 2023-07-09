@@ -1,12 +1,9 @@
 ﻿using System.Text.Json;
 using Application.Abstractions.Repositories;
 using Application.Exceptions;
-using Domain.Models;
-using Infrastructure.KafkaConsumerService.Abstractions;
-using Infrastructure.KafkaConsumerService.Handlers.CreateProduct;
-using Microsoft.AspNetCore.Http;
+using Infrastructure.Services.KafkaConsumer.Abstractions;
 
-namespace Infrastructure.KafkaConsumerService.Handlers.DeleteProduct;
+namespace Infrastructure.Services.KafkaConsumer.Handlers.DeleteProduct;
 
 public class DeleteProductMessageHandler : IKafkaMessageHandler
 {

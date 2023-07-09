@@ -1,5 +1,5 @@
 ﻿using Confluent.Kafka;
-using Infrastructure.KafkaConsumerService.Abstractions;
+using Infrastructure.Services.KafkaConsumer.Abstractions;
 
 namespace Presentation.Configuration;
 

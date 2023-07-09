@@ -1,12 +1,12 @@
 ﻿using Confluent.Kafka;
-using Infrastructure.KafkaConsumerService.Abstractions;
+using Infrastructure.Services.KafkaConsumer.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Infrastructure.KafkaConsumerService;
+namespace Infrastructure.Services.KafkaConsumer;
 
-public class KafkaProductConsumerService : IHostedService, IDisposable
+public class KafkaProductConsumerService : BackgroundService
 {
     private readonly ILogger<KafkaProductConsumerService> _logger;
     private readonly IConsumer<string, string> _consumer;
@@ -27,64 +27,53 @@ public class KafkaProductConsumerService : IHostedService, IDisposable
             .Build();
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        while (!cancellationToken.IsCancellationRequested)
+        _logger.LogInformation("--> Kafka Consumer Service is running.");
+        
+        while (!stoppingToken.IsCancellationRequested)
         {
-            _logger.LogInformation("Kafka Consumer Service has started.");
-
-            _consumer.Subscribe(new List<string>() { _configuration.Topic });
-
-            await Consume(cancellationToken).ConfigureAwait(false);
-        }
-    }
-
-    public async Task StopAsync(CancellationToken cancellationToken)
-    {
-        _logger.LogInformation("Kafka Consumer Service is stopping.");
-
-        _consumer.Close();
-
-        await Task.CompletedTask;
-    }
-    
-    private async Task Consume(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            try
+            try 
             {
-                var consumeResult = _consumer.Consume(cancellationToken);
+                var consumeResult = _consumer.Consume(stoppingToken);
 
-                if (consumeResult?.Message == null)
+                if (consumeResult?.Message == null || !consumeResult.Topic.Equals(_configuration.Topic))
                 {
                     continue;
                 }
 
-                if (!consumeResult.Topic.Equals(_configuration.Topic))
-                {
-                    continue;
-                }
-                
                 _logger.LogInformation($"[{consumeResult.Message.Key}] {consumeResult.Topic} - {consumeResult.Message.Value}");
-                    
+
                 using var scope = _serviceProvider.CreateScope();
                 var kafkaHandlersContainer = scope.ServiceProvider.GetRequiredService<IKafkaHandlersContainer>();
-                    
+
                 await kafkaHandlersContainer.ProcessMessage(
-                    consumeResult.Message.Key, 
+                    consumeResult.Message.Key,
                     consumeResult.Message.Value,
-                    cancellationToken);
+                    stoppingToken);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogError($"--> Kafka Consume error: {ex.Message}");
             }
         }
     }
-    
-    public void Dispose()
+
+    public override async Task StartAsync(CancellationToken cancellationToken)
     {
-        _consumer.Dispose();
+        _logger.LogInformation("--> Kafka Consumer Service has started.");
+        
+        _consumer.Subscribe(new List<string>() { _configuration.Topic });
+        
+        await base.StartAsync(cancellationToken);
+    }
+
+    public override async Task StopAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("--> Kafka Consumer Service is stopping.");
+
+        _consumer.Close();
+
+        await base.StopAsync(cancellationToken);
     }
 }

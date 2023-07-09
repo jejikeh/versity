@@ -16,8 +16,8 @@ services:
     image: confluentinc/cp-enterprise-kafka:latest
     hostname: kafka
     ports:
-      - "9092:9092"
-      - "29092:29092"
+      - "9092"
+      - "29092"
     depends_on:
       - zookeeper
     environment:
@@ -104,30 +104,30 @@ services:
         aliases:
           - products.versity.dev
 
-  #elasticsearch:
-  #  container_name: els
-  #  image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
-  #  ports:
-  #    - 9200:9200
-  ##  volumes:
-  #    - elasticsearch-data:/usr/share/elasticsearch/data
-  #  environment:
-  #    - xpack.security.enabled=false
-  #    - discovery.type=single-node
-  #  networks:
-  #    - dev
-  #
-  #kibana:
-  #  container_name: kibana
-  #  image: docker.elastic.co/kibana/kibana:8.8.0
-  #  ports:
-  #    - 5601:5601
-  #  depends_on:
-  #    - elasticsearch
-  #  environment:
-  #    - ELASTICSEARCH_URL=http://localhost:9200
-  #  networks:
-  #    - dev
+  elasticsearch:
+   container_name: els
+   image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+   ports:
+     - "9200"
+   volumes:
+     - elasticsearch-data:/usr/share/elasticsearch/data
+   environment:
+     - xpack.security.enabled=false
+     - discovery.type=single-node
+   networks:
+     - dev
+  
+  kibana:
+   container_name: kibana
+   image: docker.elastic.co/kibana/kibana:8.8.0
+   ports:
+     - 5601:5601
+   depends_on:
+     - elasticsearch
+   environment:
+     - ELASTICSEARCH_URL=http://localhost:19200
+   networks:
+     - dev
 
   versity-users-db:
     image: debezium/postgres:13-alpine
@@ -185,7 +185,7 @@ services:
     depends_on:
       - versity-users-service
     ports:
-      - "3001:443"
+      - "8001:443"
     build:
       context: .
       dockerfile: src/Versity.ApiGateway/Dockerfile

@@ -1,6 +1,6 @@
 ﻿using Confluent.Kafka;
 
-namespace Infrastructure.KafkaConsumerService.Abstractions;
+namespace Infrastructure.Services.KafkaConsumer.Abstractions;
 
 public interface IKafkaConsumerConfiguration
 {

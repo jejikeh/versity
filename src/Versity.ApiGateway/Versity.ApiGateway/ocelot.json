@@ -206,7 +206,7 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "versity-sessions-service",
+          "Host": "sessions.versity.dev",
           "Port": 443
         }
       ],

@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
 using Application.Abstractions.Repositories;
-using Infrastructure.KafkaConsumerService;
-using Infrastructure.KafkaConsumerService.Abstractions;
-using Infrastructure.KafkaConsumerService.Handlers.CreateProduct;
-using Infrastructure.KafkaConsumerService.Handlers.DeleteProduct;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
+using Infrastructure.Services.KafkaConsumer;
+using Infrastructure.Services.KafkaConsumer.Abstractions;
+using Infrastructure.Services.KafkaConsumer.Handlers.CreateProduct;
+using Infrastructure.Services.KafkaConsumer.Handlers.DeleteProduct;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
