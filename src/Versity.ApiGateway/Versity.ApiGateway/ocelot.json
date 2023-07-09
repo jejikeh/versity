@@ -77,7 +77,7 @@
       "DownstreamPathTemplate": "/api/auth/confirmemail/{userId}/{code}"
     },
     {
-      "UpstreamPathTemplate": "/api/users/setadmin/{userId}",
+      "UpstreamPathTemplate": "/api/users/{userId}/set-admin",
       "UpstreamHttpMethod": ["Post"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -86,7 +86,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/users/setadmin/{userId}",
+      "DownstreamPathTemplate": "/api/users/{userId}/set-admin",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -233,7 +233,7 @@
       }
     },
     {
-      "UpstreamPathTemplate": "/api/sessions/users/{id}",
+      "UpstreamPathTemplate": "/api/sessions/product/{id}/{page}",
       "UpstreamHttpMethod": ["Get"],
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
@@ -242,23 +242,7 @@
           "Port": 443
         }
       ],
-      "DownstreamPathTemplate": "/api/sessions/users/{id}",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
-    },
-    {
-      "UpstreamPathTemplate": "/api/sessions/products/{id}",
-      "UpstreamHttpMethod": ["Get"],
-      "DownstreamScheme": "https",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "sessions.versity.dev",
-          "Port": 443
-        }
-      ],
-      "DownstreamPathTemplate": "/api/sessions/products/{id}",
+      "DownstreamPathTemplate": "/api/sessions/product/{id}/{page}",
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []

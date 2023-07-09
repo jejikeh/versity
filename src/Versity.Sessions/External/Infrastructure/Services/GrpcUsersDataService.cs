@@ -6,17 +6,18 @@ namespace Infrastructure.Services;
 
 public class GrpcUsersDataService : IVersityUsersDataService
 {
-    private readonly IConfiguration _configuration;
+    private readonly GrpcChannel _channel;
+    private readonly ILogger<GrpcUsersDataService> _logger;
 
-    public GrpcUsersDataService(IConfiguration configuration)
+    public GrpcUsersDataService(IConfiguration configuration, ILogger<GrpcUsersDataService> logger)
     {
-        _configuration = configuration;
+        _logger = logger;
+        _channel = GrpcChannel.ForAddress(configuration["GrpcUsers"]);
     }
 
     public async Task<IEnumerable<string>> GetUserRolesAsync(string userId)
     {
-        var channel = GrpcChannel.ForAddress(_configuration["GrpcUsers"]);
-        var client = new GrpcUsers.GrpcUsersClient(channel);
+        var client = new GrpcUsers.GrpcUsersClient(_channel);
         var request = new GetUserRolesRequest
         {
             UserId = userId
@@ -30,15 +31,14 @@ public class GrpcUsersDataService : IVersityUsersDataService
         }
         catch (Exception e)
         {
-            Console.WriteLine($"--> Could`t call to GRPC server {e.Message}");
+            _logger.LogError($"--> Could`t call to GRPC server {e.Message}");
             throw;
         }
     }
 
     public async Task<bool> IsUserExistAsync(string userId)
     {
-        var channel = GrpcChannel.ForAddress(_configuration["GrpcUsers"]);
-        var client = new GrpcUsers.GrpcUsersClient(channel);
+        var client = new GrpcUsers.GrpcUsersClient(_channel);
         var request = new GrpcIsUserExistRequest()
         {
             UserId = userId
@@ -52,7 +52,7 @@ public class GrpcUsersDataService : IVersityUsersDataService
         }
         catch (Exception e)
         {
-            Console.WriteLine($"--> Could`t call to GRPC server {e.Message}");
+            _logger.LogError($"--> Could`t call to GRPC server {e.Message}");
             throw;
         }
     }

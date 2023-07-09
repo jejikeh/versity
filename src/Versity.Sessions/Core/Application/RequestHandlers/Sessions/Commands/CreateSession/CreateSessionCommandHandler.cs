@@ -40,7 +40,7 @@ public class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand,
         
         var session = new Session
         {
-            Id = sessionId,
+            Id = Guid.NewGuid(),
             UserId = request.UserId,
             ProductId = product.Id,
             Start = request.Start,

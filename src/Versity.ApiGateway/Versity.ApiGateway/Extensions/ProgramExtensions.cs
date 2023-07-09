@@ -1,4 +1,5 @@
-﻿using Ocelot.DependencyInjection;
+﻿using Microsoft.AspNetCore.Cors.Infrastructure;
+using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 
 namespace Versity.ApiGateway.Extensions;
@@ -11,16 +12,12 @@ public static class ProgramExtensions
             .SetBasePath(builder.Environment.ContentRootPath)
             .AddJsonFile("ocelot.json", optional: false, reloadOnChange: true)
             .AddEnvironmentVariables();
-        
-        builder.Services.AddOcelot(builder.Configuration);
-        builder.Services.AddJwtAuthentication(builder.Configuration);
-        builder.Services.AddCors(options => options.AddPolicy("AllowAll", policy =>
-        {
-            policy.AllowAnyHeader();
-            policy.AllowAnyMethod();
-            policy.AllowAnyOrigin();
-        }));
-        
+
+        builder.Services
+            .AddJwtAuthentication(builder.Configuration)
+            .AddCors(options => options.ConfigureAllowAllCors())
+            .AddOcelot(builder.Configuration);
+
         return builder;
     }
     
@@ -33,5 +30,17 @@ public static class ProgramExtensions
         app.UseCors("AllowAll");
 
         return app;
+    }
+    
+    private static CorsOptions ConfigureAllowAllCors(this CorsOptions options)
+    {
+        options.AddPolicy("AllowAll", policy =>
+        {
+            policy.AllowAnyHeader();
+            policy.AllowAnyMethod();
+            policy.AllowAnyOrigin();
+        });
+        
+        return options;
     }
 }

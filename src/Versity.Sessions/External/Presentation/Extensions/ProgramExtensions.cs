@@ -26,7 +26,7 @@ public static class ProgramExtensions
             .AddControllers();
         
         builder.Services.AddScoped<IVersityUsersDataService, GrpcUsersDataService>();
-
+        
         return builder;
     }
     

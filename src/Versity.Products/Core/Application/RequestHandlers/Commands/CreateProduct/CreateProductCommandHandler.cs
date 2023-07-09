@@ -20,15 +20,9 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
 
     public async Task<Product> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
-        var productId = Guid.NewGuid();
-        while (await _products.GetProductByIdAsync(productId, cancellationToken) is not null)
-        {
-            productId = Guid.NewGuid();
-        }
-        
         var product = new Product()
         {
-            Id = productId,
+            Id = Guid.NewGuid(),
             Title = request.Title,
             Description = request.Description,
             Author = request.Author,

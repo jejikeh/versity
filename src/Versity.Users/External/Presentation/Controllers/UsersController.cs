@@ -51,7 +51,7 @@ public sealed class UsersController : ApiController
     }
     
     [Authorize(Roles = "Admin")]
-    [HttpPost("setadmin/{id:guid}")]
+    [HttpPost("{id:guid}/set-admin")]
     public async Task<IActionResult> SetAdmin(Guid id, CancellationToken cancellationToken)
     {        
         var command = new GiveAdminRoleToUserCommand(id.ToString());

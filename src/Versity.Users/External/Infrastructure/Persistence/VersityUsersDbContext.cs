@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using System.Reflection;
+using Domain.Models;
 using Infrastructure.Persistence.Configuration;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -16,10 +17,6 @@ public class VersityUsersDbContext : IdentityDbContext<VersityUser>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder
-            .ApplyConfiguration(new RefreshTokensConfiguration())
-            .ApplyConfiguration(new RolesSeederConfiguration())
-            .ApplyConfiguration(new AdminSeederConfiguration())
-            .ApplyConfiguration(new UserWithRolesConfiguration());
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

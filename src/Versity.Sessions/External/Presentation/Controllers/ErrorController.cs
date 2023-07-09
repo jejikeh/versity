@@ -22,7 +22,7 @@ public sealed class ErrorController : ControllerBase
         {
             _logger.LogError("Request failure, {@Error}", httpResponseException.Message);
             return Problem(
-                title: httpResponseException.Value?.ToString(),
+                title: httpResponseException.ErrorMessage,
                 statusCode: httpResponseException.StatusCode);
         }
         _logger.LogError("Request failure, {@Error}", exception.Message);
@@ -43,7 +43,7 @@ public sealed class ErrorController : ControllerBase
         var statusCode = StatusCodes.Status500InternalServerError;
         if (exceptionHandlerFeature.Error is ExceptionWithStatusCode httpResponseException)
         {
-            title = httpResponseException.Value?.ToString();
+            title = httpResponseException.ErrorMessage;
             statusCode = httpResponseException.StatusCode;
         }
         _logger.LogError("Request failure, {@Error}, debug_trace {@Trace}", title, exceptionHandlerFeature.Error.StackTrace);

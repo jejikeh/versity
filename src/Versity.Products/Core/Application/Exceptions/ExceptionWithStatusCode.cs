@@ -3,11 +3,11 @@
 public class ExceptionWithStatusCode : Exception
 {
     public int StatusCode { get; }
-    public object? Value { get; }
+    public string? ErrorMessage { get; }
 
-    public ExceptionWithStatusCode(int statusCode, object? value = null)
+    public ExceptionWithStatusCode(int statusCode, string? errorMessage = null)
     {
         StatusCode = statusCode;
-        Value = value;
+        ErrorMessage = errorMessage;
     }
 }

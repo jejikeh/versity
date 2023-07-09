@@ -6,8 +6,8 @@ public interface ISessionsRepository
 {
     public IQueryable<Session> GetAllSessions();
     public Task<Session?> GetSessionByIdAsync(Guid id, CancellationToken cancellationToken);
-    public Task<IEnumerable<Session>> GetAllUserSessionsAsync(string userId, CancellationToken cancellationToken);
-    public Task<IEnumerable<Session>> GetAllProductSessionsAsync(Guid productId, CancellationToken cancellationToken);
+    public IQueryable<Session> GetAllUserSessions(string userId, CancellationToken cancellationToken);
+    public IQueryable<Session> GetAllProductSessions(Guid productId, CancellationToken cancellationToken);
     public Task<Session> CreateSessionAsync(Session session, CancellationToken cancellationToken);
     public Session UpdateSession(Session session);
     public void DeleteSession(Session session);
