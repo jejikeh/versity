@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Repositories;
 using Domain.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.RequestHandlers.Products.Queries.GetAllProducts;
 
@@ -13,15 +14,15 @@ public class GetAllProductQueryHandler : IRequestHandler<GetAllProductsQuery, IE
         _productsRepository = productsRepository;
     }
 
-    public Task<IEnumerable<Product>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Product>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
     {
-        var products = _productsRepository
+        var products = await _productsRepository
             .GetAllProducts()
             .OrderBy(x => x.Id)
             .Skip(10 * (request.Page - 1))
             .Take(10)
-            .ToList();
+            .ToListAsync(cancellationToken);
         
-        return Task.Run(() => (IEnumerable<Product>)products, cancellationToken);
+        return products;
     }
 }
