@@ -1,32 +1,57 @@
 ﻿using Application.Abstractions;
-using Application.Exceptions.AuthExceptions;
+using Application.Abstractions.Repositories;
+using Application.Dtos;
+using Application.Exceptions;
 using Domain.Models;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 
 namespace Application.RequestHandlers.Auth.Commands.LoginVersityUser;
 
-public class LoginVersityUserCommandHandler : IRequestHandler<LoginVersityUserCommand, string>
+public class LoginVersityUserCommandHandler : IRequestHandler<LoginVersityUserCommand, AuthTokens>
 {
-    private readonly UserManager<VersityUser> _userManager;
-    private readonly IAuthTokenGeneratorService _tokenGeneratorService;
-    
-    public LoginVersityUserCommandHandler(UserManager<VersityUser> userManager, IAuthTokenGeneratorService tokenGeneratorService)
+    private readonly IVersityUsersRepository _versityUsersRepository;
+    private readonly IVersityRefreshTokensRepository _refreshTokensRepository;
+    private readonly IAuthTokenGeneratorService _authTokenGeneratorService;
+    private readonly IRefreshTokenGeneratorService _refreshTokenGeneratorService;
+
+    public LoginVersityUserCommandHandler(
+        IAuthTokenGeneratorService authTokenGeneratorService, 
+        IVersityUsersRepository versityUsersRepository, 
+        IVersityRefreshTokensRepository refreshTokensRepository, 
+        IRefreshTokenGeneratorService refreshTokenGeneratorService)
     {
-        _userManager = userManager;
-        _tokenGeneratorService = tokenGeneratorService;
+        _authTokenGeneratorService = authTokenGeneratorService;
+        _versityUsersRepository = versityUsersRepository;
+        _refreshTokensRepository = refreshTokensRepository;
+        _refreshTokenGeneratorService = refreshTokenGeneratorService;
     }
 
-    public async Task<string> Handle(LoginVersityUserCommand request, CancellationToken cancellationToken)
+    public async Task<AuthTokens> Handle(LoginVersityUserCommand request, CancellationToken cancellationToken)
     {
-        var versityUser = await _userManager.FindByEmailAsync(request.Email);
-        if (versityUser is null)
-            throw new IncorrectEmailOrPasswordException();
+        var versityUser = await GetUserByEmail(request);
+        var userRoles = await _versityUsersRepository.GetRolesAsync(versityUser);
+        var userToken = _authTokenGeneratorService.GenerateToken(versityUser.Id, versityUser.Email, userRoles);
+        var refreshToken = _refreshTokenGeneratorService.GenerateToken(versityUser.Id);
+        await _refreshTokensRepository.AddAsync(refreshToken, cancellationToken);
+        await _refreshTokensRepository.SaveChangesAsync(cancellationToken);
 
-        if (!await _userManager.CheckPasswordAsync(versityUser, request.Password))
-            throw new IncorrectEmailOrPasswordException();
+        return new AuthTokens(versityUser.Id, userToken, refreshToken.Token);
+    }
 
-        var userRoles = await _userManager.GetRolesAsync(versityUser);
-        return _tokenGeneratorService.GenerateToken(versityUser.Id, versityUser.NormalizedEmail, userRoles);
+    private async Task<VersityUser?> GetUserByEmail(LoginVersityUserCommand request)
+    {
+        var versityUser = await _versityUsersRepository.GetUserByEmailAsync(request.Email);
+        
+        if (versityUser is null || !await _versityUsersRepository.CheckPasswordAsync(versityUser, request.Password))
+        {
+            throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
+        }
+        
+        if (!versityUser.EmailConfirmed)
+        {
+            throw new EmailNotConfirmedExceptionWithStatusCode();
+        }
+
+        return versityUser;
     }
 }

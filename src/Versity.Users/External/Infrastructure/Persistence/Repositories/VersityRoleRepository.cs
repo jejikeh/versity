@@ -6,24 +6,25 @@ namespace Infrastructure.Persistence.Repositories;
 
 public class VersityRoleRepository : IVersityRolesRepository
 {
-    private readonly RoleManager<IdentityRole> _context;
+    private readonly RoleManager<IdentityRole> _roleManager;
 
-    public VersityRoleRepository(RoleManager<IdentityRole> context)
+    public VersityRoleRepository(RoleManager<IdentityRole> roleManager)
     {
-        _context = context;
+        _roleManager = roleManager;
     }
 
-    public async Task<IdentityResult> CreateRoleAsync(VersityRole role)
+    public async Task<IdentityResult> CreateRoleAsync(string role)
     {
-        var roleString = role.ToString();
-        if (!await _context.RoleExistsAsync(roleString))
-            return await _context.CreateAsync(new IdentityRole(roleString));
-
-        return IdentityResult.Failed();
+        return await _roleManager.CreateAsync(new IdentityRole(role));
     }
 
     public async Task<IdentityResult> DeleteRoleAsync(IdentityRole role)
     {
-        return await _context.DeleteAsync(role);
+        return await _roleManager.DeleteAsync(role);
+    }
+
+    public async Task<bool> RoleExistsAsync(string role)
+    {
+        return await _roleManager.RoleExistsAsync(role);
     }
 }
