@@ -1,0 +1,24 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Presentation";
+
+service GrpcUsers {
+  rpc GetUserRoles (GetUserRolesRequest) returns (GrpcUserRoles);
+  rpc IsUserExist (GrpcIsUserExistRequest) returns (GrpcIsUserExistResponse);
+}
+
+message GetUserRolesRequest {
+  string userId = 1;
+}
+
+message GrpcUserRoles {
+  repeated string roles = 1;
+}
+
+message GrpcIsUserExistRequest {
+  string userId = 1;
+}
+
+message GrpcIsUserExistResponse {
+  bool exist = 1;
+}

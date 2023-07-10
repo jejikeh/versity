@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Repositories;
 using Domain.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
 
@@ -61,6 +62,16 @@ public class VersityUsersRepository : IVersityUsersRepository
     public async Task<IEnumerable<string>> GetRolesAsync(VersityUser user)
     {
         return await _userManager.GetRolesAsync(user);
+    }
+
+    public async Task<List<VersityUser>> ToListAsync(IQueryable<VersityUser> users)
+    {
+        return await users.ToListAsync();
+    }
+
+    public async Task<IdentityResult> ConfirmUserEmail(VersityUser user, string code)
+    {
+        return await _userManager.ConfirmEmailAsync(user, code);
     }
 
     public async Task<IdentityResult> ResetPasswordAsync(VersityUser user, string token, string newPassword)
