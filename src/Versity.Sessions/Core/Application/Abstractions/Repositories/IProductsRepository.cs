@@ -10,5 +10,6 @@ public interface IProductsRepository
     public Task<Product> CreateProductAsync(Product product, CancellationToken cancellationToken);
     public Product UpdateProduct(Product product);
     public void DeleteProduct(Product product);
+    public Task<List<Product>> ToListAsync(IQueryable<Product> products);
     public Task SaveChangesAsync(CancellationToken cancellationToken);
 }

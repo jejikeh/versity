@@ -45,6 +45,11 @@ public class ProductRepository : IProductsRepository
         _context.Remove(product);
     }
 
+    public async Task<List<Product>> ToListAsync(IQueryable<Product> products)
+    {
+        return await products.ToListAsync();
+    }
+
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
         await _context.SaveChangesAsync(cancellationToken);

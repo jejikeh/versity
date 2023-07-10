@@ -11,5 +11,6 @@ public interface ISessionsRepository
     public Task<Session> CreateSessionAsync(Session session, CancellationToken cancellationToken);
     public Session UpdateSession(Session session);
     public void DeleteSession(Session session);
+    public Task<List<Session>> ToListAsync(IQueryable<Session> sessions);
     public Task SaveChangesAsync(CancellationToken cancellationToken);
 }
