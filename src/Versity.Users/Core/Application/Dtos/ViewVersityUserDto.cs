@@ -2,7 +2,8 @@
 
 namespace Application.Dtos;
 
-public record ViewVersityUserDto(string Id,
+public record ViewVersityUserDto(
+    string Id,
     string FirstName, 
     string LastName,
     string Email,
@@ -15,8 +16,8 @@ public record ViewVersityUserDto(string Id,
             model.Id, 
             model.FirstName, 
             model.LastName, 
-            model.Email!,
-            model.PhoneNumber!,
+            model.Email,
+            model.PhoneNumber,
             roles);
     }
 }

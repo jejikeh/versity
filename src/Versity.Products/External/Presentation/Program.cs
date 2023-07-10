@@ -1,10 +1,10 @@
 using Infrastructure.Persistence;
 using Presentation.Extensions;
 
-
 var builder = WebApplication
     .CreateBuilder(args)
-    .ConfigureBuilder();
+    .ConfigureBuilder()
+    .AddElasticAndSerilog();
 
 var app = builder
     .Build()
@@ -14,8 +14,8 @@ using var scope = app.Services.CreateScope();
 var serviceProvider = scope.ServiceProvider;
 try
 {
-    var versityUsersDbContext = serviceProvider.GetRequiredService<VersityProductsDbContext>();
-    versityUsersDbContext.Database.EnsureCreated();
+    var versityProductsDbContext = serviceProvider.GetRequiredService<VersityProductsDbContext>();
+    versityProductsDbContext.Database.EnsureCreated();
     app.Run();
 }
 catch (Exception ex)

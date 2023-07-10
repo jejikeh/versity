@@ -1,7 +1,9 @@
 ﻿using System.Reflection;
+using Application.Abstractions;
 using Application.Abstractions.Repositories;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
+using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,12 +14,7 @@ public static class InfrastructureInjection
 {
     public static IServiceCollection AddDbContext(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("VersityProductsDb");
-        if (string.IsNullOrEmpty(connectionString))
-        {
-            connectionString = Environment.GetEnvironmentVariable("ConnectionString");
-        }
-
+        var connectionString = Environment.GetEnvironmentVariable("ConnectionString");
         serviceCollection.AddDbContext<VersityProductsDbContext>(options =>
         {
             options.EnableDetailedErrors();
@@ -33,6 +30,14 @@ public static class InfrastructureInjection
     public static IServiceCollection AddRepositories(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<IVersityProductsRepository, VersityProductsRepository>();
+        
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddKafkaServices(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddTransient<IProductProducerService, KafkaProductProducerService>();
+
         return serviceCollection;
     }
 }

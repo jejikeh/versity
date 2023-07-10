@@ -21,25 +21,20 @@ public class RegisterVersityUserCommandHandler : IRequestHandler<RegisterVersity
 
     public async Task<IdentityResult> Handle(RegisterVersityUserCommand request, CancellationToken cancellationToken)
     {
-        var userId = Guid.NewGuid().ToString();
-        while (await _versityUsersRepository.GetUserByIdAsync(userId) is not null) 
-        {
-            userId = Guid.NewGuid().ToString();
-        }
-
         var versityUser = new VersityUser
         {
-            Id = userId,
+            Id = Guid.NewGuid().ToString(),
             Email = request.Email,
             PhoneNumber = request.Phone,
             FirstName = request.FirstName,
             LastName = request.LastName,
             UserName = $"{request.FirstName} {request.LastName}",
         };
+        
         var result = await _versityUsersRepository.CreateUserAsync(versityUser, request.Password);
         Utils.AggregateIdentityErrorsAndThrow(result);
         Utils.AggregateIdentityErrorsAndThrow(await _versityUsersRepository.SetUserRoleAsync(versityUser, VersityRole.Member));
-        await _emailConfirmMessageService.GenerateEmailConfirmMessageAsync(versityUser);
+        await _emailConfirmMessageService.SendEmailConfirmMessageAsync(versityUser);
         
         return result;
     }

@@ -5,7 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-      <UserSecretsId>db82811c-1c45-4f7b-8b50-546a0935d532</UserSecretsId>
+      <UserSecretsId>ApiGateway-57393389627611478466</UserSecretsId>
   </PropertyGroup>
 
     <ItemGroup>

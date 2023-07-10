@@ -50,6 +50,9 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId", "Token")
+                        .IsUnique();
+
                     b.ToTable("RefreshTokens");
                 });
 
@@ -123,6 +126,26 @@ namespace Infrastructure.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "4e274126-1d8a-4dfd-a025-806987095809",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "940b9862-24d0-4706-b35f-4d71f489a3f5",
+                            Email = "versity.identity.dev@gmail.com",
+                            EmailConfirmed = true,
+                            FirstName = "Versity",
+                            LastName = "Admin",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "VERSITY.IDENTITY.DEV@GMAIL.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHJAUFLF091zTtWBRh1eqdVvnw4Iuxl8qxz+A507cK+anUfVKN+qdRTimf8YMLX+fw==",
+                            PhoneNumber = "+000000000000",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "8dddf7d4-5da6-4c9e-be01-d56574d21315",
+                            TwoFactorEnabled = false,
+                            UserName = "Versity Admin"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -149,6 +172,18 @@ namespace Infrastructure.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "e56d08b9-8788-4c58-958a-1a7bcb585fc2",
+                            Name = "Admin"
+                        },
+                        new
+                        {
+                            Id = "a337651d-2193-4c2d-bfe3-4cccc2ac82fa",
+                            Name = "Member"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -236,6 +271,13 @@ namespace Infrastructure.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "4e274126-1d8a-4dfd-a025-806987095809",
+                            RoleId = "e56d08b9-8788-4c58-958a-1a7bcb585fc2"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>

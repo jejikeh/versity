@@ -1,5 +1,5 @@
-﻿using Application.Abstractions.Messaging;
-using Domain.Models;
+﻿using Domain.Models;
+using MediatR;
 
 namespace Application.RequestHandlers.Commands.UpdateProduct;
 
@@ -8,4 +8,4 @@ public record UpdateProductCommand(
     string? Title,
     string? Description,
     string? Author,
-    DateOnly? Release) : ICommand<Product>;
+    DateOnly? Release) : IRequest<Product>;

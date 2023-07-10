@@ -4,5 +4,5 @@ namespace Application.Abstractions;
 
 public interface IEmailConfirmMessageService
 {
-    public Task GenerateEmailConfirmMessageAsync(VersityUser user);
+    public Task SendEmailConfirmMessageAsync(VersityUser user);
 }

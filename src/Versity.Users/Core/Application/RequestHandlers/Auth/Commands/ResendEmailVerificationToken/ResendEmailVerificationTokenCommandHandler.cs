@@ -12,7 +12,6 @@ public class ResendEmailVerificationTokenCommandHandler : IRequestHandler<Resend
     private readonly IVersityUsersRepository _versityUsersRepository;
     private readonly IEmailConfirmMessageService _emailConfirmMessageService;
 
-
     public ResendEmailVerificationTokenCommandHandler(IVersityUsersRepository versityUsersRepository, IEmailConfirmMessageService emailConfirmMessageService)
     {
         _versityUsersRepository = versityUsersRepository;
@@ -26,11 +25,13 @@ public class ResendEmailVerificationTokenCommandHandler : IRequestHandler<Resend
         { 
             throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
         }
+        
         if (versityUser.EmailConfirmed)
         {
             throw new IdentityExceptionWithStatusCode("The Email already confirmed");
         }
-        await _emailConfirmMessageService.GenerateEmailConfirmMessageAsync(versityUser);
+        
+        await _emailConfirmMessageService.SendEmailConfirmMessageAsync(versityUser);
         
         return IdentityResult.Success;
     }

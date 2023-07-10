@@ -27,24 +27,17 @@ public sealed class AuthController : ApiController
     {
         var command = new RegisterVersityUserCommand(userDto.FirstName, userDto.LastName, userDto.Email, userDto.Phone, userDto.Password);
         var result = await Sender.Send(command, cancellationToken);
+        
         return result.Succeeded ? Ok("The confirmation message was send to your email!") : BadRequest(result.Errors);
     }
-    
+
     [HttpPost]
     public async Task<IActionResult> Login(LoginVersityUserDto userDto, CancellationToken cancellationToken)
     {
         var command = new LoginVersityUserCommand(userDto.Email, userDto.Password);
         var token = await Sender.Send(command, cancellationToken);
-        return Ok(new { Token = token });
-    }
-    
-    [Authorize]
-    [HttpPost]
-    public async Task<IActionResult> GetAdminRole(CancellationToken cancellationToken)
-    {        
-        var command = new GiveAdminRoleToUserCommand();
-        var token  = await Sender.Send(command, cancellationToken);
-        return Ok(new { Token = token });
+
+        return Ok(token);
     }
 
     [HttpGet("{userId}/{code}")]
@@ -52,6 +45,7 @@ public sealed class AuthController : ApiController
     {
         var command = new ConfirmEmailCommand(userId, Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code)));
         var token  = await Sender.Send(command, cancellationToken);
+        
         return Ok(token.Succeeded ? "Thank you for confirming your mail." : "Your Email is not confirmed");
     }
     
@@ -60,14 +54,16 @@ public sealed class AuthController : ApiController
     {
         var command = new ResendEmailVerificationTokenCommand(userDto.Email, userDto.Password);
         var token = await Sender.Send(command, cancellationToken);
+        
         return Ok(token.Succeeded ? "Email verification token was send" : "Email verification token didnt send");
     }
     
-    [HttpPost("{refreshToken}")]
-    public async Task<IActionResult> RefreshToken(string refreshToken, CancellationToken cancellationToken)
+    [HttpPost("{userId}/{refreshToken}")]
+    public async Task<IActionResult> RefreshToken(string userId, string refreshToken, CancellationToken cancellationToken)
     {
-        var command = new RefreshTokenCommand(refreshToken);
+        var command = new RefreshTokenCommand(userId, refreshToken);
         var token = await Sender.Send(command, cancellationToken);
+        
         return Ok(token);
     }
     
@@ -75,8 +71,9 @@ public sealed class AuthController : ApiController
     [HttpGet]
     public async Task<IActionResult> GetAllRefreshTokens(CancellationToken cancellationToken)
     {
-        var command = new GetAllRefreshTokensCommand();
+        var command = new GetAllRefreshTokensQuery();
         var token = await Sender.Send(command, cancellationToken);
+        
         return Ok(token);
     }
 }

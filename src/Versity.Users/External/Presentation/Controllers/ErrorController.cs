@@ -21,10 +21,12 @@ public sealed class ErrorController : ControllerBase
         if (exception is ExceptionWithStatusCode httpResponseException)
         {
             _logger.LogError("Request failure, {@Error}", httpResponseException.Message);
+            
             return Problem(
-                title: httpResponseException.Value?.ToString(),
+                title: httpResponseException.ErrorMessage,
                 statusCode: httpResponseException.StatusCode);
         }
+        
         _logger.LogError("Request failure, {@Error}", exception.Message);
         
         return Problem(title: "Ops 🤨! Something went wrong...");
@@ -38,14 +40,17 @@ public sealed class ErrorController : ControllerBase
         {
             return NotFound();
         }
+        
         var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>()!;
         var title = exceptionHandlerFeature.Error.Message;
         var statusCode = StatusCodes.Status500InternalServerError;
+        
         if (exceptionHandlerFeature.Error is ExceptionWithStatusCode httpResponseException)
         {
-            title = httpResponseException.Value?.ToString();
+            title = httpResponseException.ErrorMessage;
             statusCode = httpResponseException.StatusCode;
         }
+        
         _logger.LogError("Request failure, {@Error}, debug_trace {@Trace}", title, exceptionHandlerFeature.Error.StackTrace);
         
         return Problem(

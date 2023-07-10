@@ -21,16 +21,13 @@ public class ChangeUserPasswordCommandHandler : IRequestHandler<ChangeUserPasswo
     public async Task<IdentityResult> Handle(ChangeUserPasswordCommand request, CancellationToken cancellationToken)
     {
         var userId = request.Id;
-        if (string.IsNullOrEmpty(userId))
+        var claimId = _httpContextAccessor.HttpContext?.User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        if (string.IsNullOrEmpty(claimId)) 
         {
-            userId = _httpContextAccessor.HttpContext?.User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-            if (string.IsNullOrEmpty(userId)) 
-            { 
-                throw new InvalidOperationException("User claims was empty!");
-            }
+            throw new InvalidOperationException("User claims was empty!");
         }
 
-        var versityUser = await _versityUsersRepository.GetUserByIdAsync(userId);
+        var versityUser = await _versityUsersRepository.GetUserByIdAsync(claimId);
         if (versityUser is null) 
         {
             throw new NotFoundExceptionWithStatusCode("There is no user with this Id");
@@ -39,6 +36,16 @@ public class ChangeUserPasswordCommandHandler : IRequestHandler<ChangeUserPasswo
         {
             throw new IncorrectEmailOrPasswordExceptionWithStatusCode();
         }
+        
+        if (userId != claimId)
+        {
+            var userRoles = await _versityUsersRepository.GetUserRolesAsync(versityUser);
+            if (!userRoles.Contains("Admin"))
+            {
+                throw new ExceptionWithStatusCode(StatusCodes.Status403Forbidden, "Not enough rights");
+            }
+        }
+        
         var token = await _versityUsersRepository.GeneratePasswordResetTokenAsync(versityUser);
         
         return await _versityUsersRepository.ResetPasswordAsync(versityUser, token, request.NewPassword);
