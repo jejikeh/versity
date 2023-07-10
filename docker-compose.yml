@@ -1,30 +1,133 @@
 version: '3.1'
 
 services:
-  elasticsearch:
-    container_name: els
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    hostname: zookeeper
     ports:
-      - 9200:9200
-    volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
+      - "32181:32181"
     environment:
-      - xpack.security.enabled=false
-      - discovery.type=single-node
+      ZOOKEEPER_CLIENT_PORT: 32181
+      ZOOKEEPER_TICK_TIME: 2000
     networks:
       - dev
 
-  kibana:
-    container_name: kibana
-    image: docker.elastic.co/kibana/kibana:8.8.0
+  kafka:
+    image: confluentinc/cp-enterprise-kafka:latest
+    hostname: kafka
     ports:
-      - 5601:5601
+      - "9092"
+      - "29092"
     depends_on:
-      - elasticsearch
+      - zookeeper
     environment:
-      - ELASTICSEARCH_URL=http://localhost:9200
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:32181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://:29092,PLAINTEXT_HOST://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://kafka.versity.dev:9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_METRIC_REPORTERS: io.confluent.metrics.reporter.ConfluentMetricsReporter
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: kafka:29092
+      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: zookeeper:32181
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      CONFLUENT_METRICS_ENABLE: 'true'
+      CONFLUENT_SUPPORT_CUSTOMER_ID: 'anonymous'
+    networks:
+      dev:
+        aliases:
+          - kafka.versity.dev
+
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:latest
+    hostname: control-center
+    container_name: control-center
+    depends_on:
+      - zookeeper
+      - kafka
+    ports:
+      - "9021:9021"
+    environment:
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: 'kafka.versity.dev:29092' # TODO(): check host name 
+      CONTROL_CENTER_ZOOKEEPER_CONNECT: 'zookeeper:32181'
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+      CONFLUENT_METRICS_TOPIC_REPLICATION: 1
+      PORT: 9021
     networks:
       - dev
+
+  versity-products-db:
+    image: debezium/postgres:13-alpine
+    environment:
+      - POSTGRES_DATABASE=versity_products_dev
+      - POSTGRES_USER=versity_dev
+      - POSTGRES_PASSWORD=versity_dev
+    ports:
+      - "5432"
+    volumes:
+      - postgres-data:/data/db
+    networks:
+      - dev
+  
+  versity-products-service:
+    image: jejikeh/versity.products:latest
+    container_name: versity-products-service
+    depends_on:
+      - versity-products-db
+    ports:
+      - "80"
+      - "443"
+    build:
+      context: .
+      dockerfile: src/Versity.Products/Dockerfile
+    environment:
+      - ConnectionString=Host=versity-products-db;Port=5432;Username=versity_dev;Password=versity_dev;Database=versity_products_dev;
+      - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
+      - ASPNETCORE_URLS=https://+;http://+
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=localhost
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/root/.aspnet/https/localhost.pfx
+      - JWT__Key=06AA645D-B70D-446F-90D7-192A5C1CAA6A
+      - JWT__Issuer=https://versity.users:4001
+      - JWT__Audience=https://versity.users:4001
+      - KAFKA_Host=kafka.versity.dev:9092
+      - KAFKA_Topic=versity.products
+      - KAFKA_ProducerName=versity.products.dev
+    volumes:
+      - ~/.aspnet/https:/root/.aspnet/https:ro
+      - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro
+    networks:
+      dev:
+        aliases:
+          - products.versity.dev
+
+  elasticsearch:
+   container_name: els
+   image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+   ports:
+     - "9200"
+   volumes:
+     - elasticsearch-data:/usr/share/elasticsearch/data
+   environment:
+     - xpack.security.enabled=false
+     - discovery.type=single-node
+   networks:
+     - dev
+  
+  kibana:
+   container_name: kibana
+   image: docker.elastic.co/kibana/kibana:8.8.0
+   ports:
+     - 5601:5601
+   depends_on:
+     - elasticsearch
+   environment:
+     - ELASTICSEARCH_URL=http://localhost:19200
+   networks:
+     - dev
 
   versity-users-db:
     image: debezium/postgres:13-alpine
@@ -33,20 +136,7 @@ services:
       - POSTGRES_USER=versity_dev
       - POSTGRES_PASSWORD=versity_dev
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres-data:/data/db
-    networks:
-      - dev
-  
-  versity-products-db:
-    image: debezium/postgres:13-alpine
-    environment:
-      - POSTGRES_DATABASE=versity_products_dev
-      - POSTGRES_USER=versity_dev
-      - POSTGRES_PASSWORD=versity_dev
-    ports:
-      - "5433:5432"
+      - "5432"
     volumes:
       - postgres-data:/data/db
     networks:
@@ -58,70 +148,54 @@ services:
     depends_on:
       - versity-users-db
     ports:
-      - 80
-      - 443
+      - "443"
+      - "777"
     build:
       context: .
       dockerfile: src/Versity.Users/Dockerfile
     environment:
       - ConnectionString=Host=versity-users-db;Port=5432;Username=versity_dev;Password=versity_dev;Database=versity_users_dev;
+      - Mailgun__Private__ApiKey=43304ec0eca931e64b1adee47aaab749-135a8d32-174884e4
       - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
-      - ASPNETCORE_URLS=https://+;http://+  
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=versity
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/root/.aspnet/https/aspnetapp.pfx
+      - ASPNETCORE_URLS=https://+443;http://+80
       - JWT__Key=06AA645D-B70D-446F-90D7-192A5C1CAA6A
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=localhost
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/root/.aspnet/https/localhost.pfx
       - JWT__Issuer=https://versity.users:4001
       - JWT__Audience=https://versity.users:4001
+      - EMAIL__From=versity.identity.dev@gmail.com
+      - EMAIL__SmtpServer=smtp.gmail.com
+      - EMAIL__Port=465
+      - EMAIL__Username=versity.identity.dev@gmail.com
+      - EMAIL__Password=ebqatxmtxaurcdfu
+      - EMAIL__ConfirmUrl=https://localhost:8001/api/auth/confirmemail/
+      - ADMIN__Password=vers1ty.Admin
+      - ADMIN__Email=versity.identity.dev@gmail.com
     volumes:
       - ~/.aspnet/https:/root/.aspnet/https:ro
       - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro
     networks:
-      - dev
-        
-  versity-products-service:
-    image: jejikeh/versity.products:latest
-    container_name: versity-products-service
-    depends_on:
-      - versity-products-db
-    ports:
-      - 80
-      - 443
-    build:
-      context: .
-      dockerfile: src/Versity.Products/Dockerfile
-    environment:
-      - ConnectionString=Host=versity-products-db;Port=5432;Username=versity_dev;Password=versity_dev;Database=versity_products_dev;
-      - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
-      - ASPNETCORE_URLS=https://+;http://+
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=versity
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/root/.aspnet/https/aspnetapp.pfx
-      - JWT__Key=06AA645D-B70D-446F-90D7-192A5C1CAA6A
-      - JWT__Issuer=https://versity.products:4001
-      - JWT__Audience=https://versity.products:4001
-    volumes:
-      - ~/.aspnet/https:/root/.aspnet/https:ro
-      - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro
-    networks:
-      - dev
+      dev:
+        aliases:
+          - users.versity.dev
   
   versity-apigateway-service:
     image: jejikeh/versity.apigateway:latest
     container_name: versity-apigateway-service
     depends_on:
       - versity-users-service
-      - versity-products-service
     ports:
-      - 8000:80
-      - 8001:443
+      - "8001:443"
     build:
       context: .
       dockerfile: src/Versity.ApiGateway/Dockerfile
     environment:
       - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
-      - ASPNETCORE_URLS=https://+;http://+
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=versity
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/root/.aspnet/https/aspnetapp.pfx
+      - ASPNETCORE_URLS=https://+443;http://+80
+      - ASPNETCORE_HTTPS_PORT=8001
       - JWT__Key=06AA645D-B70D-446F-90D7-192A5C1CAA6A
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=localhost
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/root/.aspnet/https/localhost.pfx
       - JWT__Issuer=https://versity.users:4001
       - JWT__Audience=https://versity.users:4001
     volumes:
@@ -129,6 +203,49 @@ services:
       - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro
     networks:
       - dev
+    
+  versity-sessions-db:
+    image: debezium/postgres:13-alpine
+    environment:
+      - POSTGRES_DATABASE=versity_session_dev
+      - POSTGRES_USER=versity_dev
+      - POSTGRES_PASSWORD=versity_dev
+    ports:
+      - "5432"
+    volumes:
+      - postgres-data:/data/db
+    networks:
+      - dev
+  
+  versity-sessions-service:
+    image: jejikeh/versity.sessions:latest
+    container_name: versity-sessions-service
+    depends_on:
+      - versity-sessions-db
+    ports:
+      - "80"
+      - "443"
+    build:
+      context: .
+      dockerfile: src/Versity.Sessions/Dockerfile
+    environment:
+      - ConnectionString=Host=versity-sessions-db;Port=5432;Username=versity_dev;Password=versity_dev;Database=versity_sessions_dev;
+      - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
+      - ASPNETCORE_URLS=https://+443;http://+80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=localhost
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/root/.aspnet/https/localhost.pfx
+      - JWT__Key=06AA645D-B70D-446F-90D7-192A5C1CAA6A
+      - JWT__Issuer=https://versity.users:4001
+      - JWT__Audience=https://versity.users:4001
+      - KAFKA_Host=kafka.versity.dev:9092
+      - KAFKA_Topic=versity.products
+    volumes:
+      - ~/.aspnet/https:/root/.aspnet/https:ro
+      - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro
+    networks:
+      dev:
+        aliases:
+          - sessions.versity.dev
 
 networks:
   dev:

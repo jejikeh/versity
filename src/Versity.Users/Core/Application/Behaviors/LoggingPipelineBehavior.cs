@@ -3,8 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Behaviors;
 
-public class LoggingPipelineBehavior<TRequest, TResponse> 
-    : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
+public class LoggingPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse>
 {
     private readonly ILogger<LoggingPipelineBehavior<TRequest, TResponse>> _logger;
 
@@ -21,6 +20,7 @@ public class LoggingPipelineBehavior<TRequest, TResponse>
             DateTime.UtcNow);
 
         var result = await next();
+        
         _logger.LogInformation(
             "Completed request {@RequestName}, {@DateTimeUtc}",
             typeof(TRequest).Name,

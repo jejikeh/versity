@@ -1,5 +1,4 @@
-﻿using Domain.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace Application.Abstractions.Repositories;
 

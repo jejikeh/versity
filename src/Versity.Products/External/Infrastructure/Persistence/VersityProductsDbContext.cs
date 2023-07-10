@@ -9,11 +9,5 @@ public class VersityProductsDbContext : DbContext
 
     public VersityProductsDbContext(DbContextOptions<VersityProductsDbContext> options) : base(options)
     {
-        
-    }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
     }
 }
