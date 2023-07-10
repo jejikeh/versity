@@ -17,4 +17,6 @@ public interface IVersityUsersRepository
     public Task<IEnumerable<string>> GetRolesAsync(VersityUser user);
     public Task<IdentityResult> ResetPasswordAsync(VersityUser user, string token, string newPassword);
     public Task<string> GeneratePasswordResetTokenAsync(VersityUser user);
+    public Task<List<VersityUser>> ToListAsync(IQueryable<VersityUser> users);
+    public Task<IdentityResult> ConfirmUserEmail(VersityUser user, string code);
 }

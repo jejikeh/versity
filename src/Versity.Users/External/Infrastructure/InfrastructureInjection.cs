@@ -11,49 +11,27 @@ namespace Infrastructure;
 
 public static class InfrastructureInjection
 {
-    public static IServiceCollection AddPersistence(this IServiceCollection serviceCollection,
-        IConfiguration configuration)
+    public static IServiceCollection AddDbContext(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("VersityUsersDb");
-        if (string.IsNullOrEmpty(connectionString))
-        {
-            connectionString = Environment.GetEnvironmentVariable("ConnectionString");
-        }
-
+        var connectionString = Environment.GetEnvironmentVariable("ConnectionString");
         serviceCollection.AddDbContext<VersityUsersDbContext>(options =>
         {
             options.EnableDetailedErrors();
             options.UseNpgsql(
-                connectionString, 
+                connectionString,
                 builder => builder.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName));
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         });
 
-        serviceCollection.AddScoped<IVersityUsersRepository, VersityUsersRepository>();
-        serviceCollection.AddScoped<IVersityRolesRepository, VersityRoleRepository>();
-        
         return serviceCollection;
     }
-
-    public static async Task<IServiceProvider> EnsureRolesExists(this IServiceProvider serviceProvider)
+    
+    public static IServiceCollection AddRepositories(this IServiceCollection serviceCollection)
     {
-        var roleManager = serviceProvider.GetRequiredService<IVersityRolesRepository>();
-        var roles = Enum.GetNames(typeof(VersityRole));
-        var anyRoleWasAdded = false;
-        foreach (var role in roles)
-        {
-            if (await roleManager.RoleExistsAsync(role))
-            {
-                continue;
-            }
-            await roleManager.CreateRoleAsync(role);
-            anyRoleWasAdded = true;
-        }
-
-        if (anyRoleWasAdded)
-        {
-            await serviceProvider.GetRequiredService<VersityUsersDbContext>().SaveChangesAsync();
-        }
-        return serviceProvider;
+        serviceCollection.AddScoped<IVersityUsersRepository, VersityUsersRepository>();
+        serviceCollection.AddScoped<IVersityRolesRepository, VersityRoleRepository>();
+        serviceCollection.AddScoped<IVersityRefreshTokensRepository, VersityRefreshTokensRepository>();
+        
+        return serviceCollection;
     }
 }

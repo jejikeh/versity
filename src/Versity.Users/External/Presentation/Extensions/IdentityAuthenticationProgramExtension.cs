@@ -11,25 +11,30 @@ namespace Presentation.Extensions;
 
 public static class IdentityAuthenticationProgramExtension
 {
-    public static IServiceCollection AddIdentityJwtAuthentication(
-        this IServiceCollection serviceCollection,
-        IConfiguration configuration)
+    public static IServiceCollection AddVersityIdentity(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddIdentity<VersityUser, IdentityRole>(options =>
-            {
-                options.Password.RequiredLength = 8;
-                options.Password.RequireUppercase = true;
-                options.Password.RequireLowercase = true;
-                options.User.RequireUniqueEmail = true;
-                options.User.AllowedUserNameCharacters =
-                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
-            })
-            .AddEntityFrameworkStores<VersityUsersDbContext>()
-            .AddDefaultTokenProviders()
-            .AddRoles<IdentityRole>();
+        {
+            options.Password.RequiredLength = 8;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireLowercase = true;
+            options.User.RequireUniqueEmail = true;
+            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+ абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
+            options.SignIn.RequireConfirmedEmail = true;
+        })
+        .AddEntityFrameworkStores<VersityUsersDbContext>()
+        .AddDefaultTokenProviders()
+        .AddRoles<IdentityRole>();
 
-        serviceCollection.AddTransient<IAuthTokenGeneratorService, JwtTokenGeneratorService>();
+        return serviceCollection;
+    }
 
+    public static IServiceCollection AddJwtAuthentication(this IServiceCollection serviceCollection, IConfiguration configuration)
+    {
+        serviceCollection.AddTransient<IEmailConfirmMessageService, EmailConfirmMessageGmailService>();
+        serviceCollection.AddScoped<IAuthTokenGeneratorService, JwtTokenGeneratorService>();
+        serviceCollection.AddScoped<IRefreshTokenGeneratorService, RefreshTokenGeneratorService>();
+        
         serviceCollection.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -43,13 +48,12 @@ public static class IdentityAuthenticationProgramExtension
                 ValidateAudience = true,
                 RequireExpirationTime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = configuration.GetSection("Jwt:Issuer").Value,
-                ValidAudience = configuration.GetSection("Jwt:Audience").Value,
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(configuration.GetSection("Jwt:Key").Value))
+                ValidIssuer = Environment.GetEnvironmentVariable("JWT__Issuer") ?? configuration.GetSection("Jwt:Issuer").Value,
+                ValidAudience = Environment.GetEnvironmentVariable("JWT__Audience") ?? configuration.GetSection("Jwt:Audience").Value,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT__Key") ?? configuration.GetSection("Jwt:Key").Value))
             };
         });
-        
+
         return serviceCollection;
     }
 }
