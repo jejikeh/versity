@@ -31,12 +31,6 @@ public class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand,
         {
             throw new NotFoundExceptionWithStatusCode("Product with specified Id doesnt exist!");
         }
-
-        var sessionId = Guid.NewGuid();
-        while (await _sessions.GetSessionByIdAsync(sessionId, cancellationToken) is not null)
-        {
-            sessionId = Guid.NewGuid();
-        }
         
         var session = new Session
         {
