@@ -59,4 +59,9 @@ public class SessionsRepository : ISessionsRepository
     {
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    public void SaveChanges()
+    {
+        _context.SaveChanges();
+    }
 }

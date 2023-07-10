@@ -1,5 +1,6 @@
 ﻿using Application;
 using Application.Abstractions;
+using Hangfire;
 using Infrastructure;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -22,6 +23,7 @@ public static class ProgramExtensions
             .AddSwagger()
             .AddCors(options => options.ConfigureAllowAllCors())
             .AddKafka(new KafkaConsumerConfiguration())
+            .AddHangfireService()
             .AddEndpointsApiExplorer()
             .AddControllers();
         
@@ -29,6 +31,8 @@ public static class ProgramExtensions
         
         return builder;
     }
+    
+    private const string CronEveryMinute = "0 * * ? * *";
     
     public static WebApplication ConfigureApplication(this WebApplication app)
     {
@@ -48,8 +52,19 @@ public static class ProgramExtensions
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseCors("AllowAll");
+        app.UseHangfireDashboard();
         app.MapControllers();
         
+        RecurringJob.AddOrUpdate<UpdateSessionStatusService>(
+            "ExpireExpiredSessions",
+            x => x.ExpireExpiredSessions(), 
+            Cron.Minutely);
+        
+        RecurringJob.AddOrUpdate<UpdateSessionStatusService>(
+            "OpenInactiveSessions",
+            x => x.OpenInactiveSessions(), 
+            Cron.Minutely);
+
         return app;
     }
     
