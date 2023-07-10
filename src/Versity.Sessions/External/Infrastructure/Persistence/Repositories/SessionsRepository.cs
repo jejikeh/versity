@@ -50,6 +50,11 @@ public class SessionsRepository : ISessionsRepository
         _context.Remove(session);
     }
 
+    public async Task<List<Session>> ToListAsync(IQueryable<Session> sessions)
+    {
+        return await sessions.ToListAsync();
+    }
+
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
         await _context.SaveChangesAsync(cancellationToken);

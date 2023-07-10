@@ -2,7 +2,6 @@
 using Application.Common;
 using Domain.Models;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.RequestHandlers.Queries.GetAllProducts;
 
@@ -17,13 +16,12 @@ public class GetAllProductsQueryHandler : IRequestHandler<GetAllProductsQuery, I
 
     public async Task<IEnumerable<Product>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
     {
-        var products = await _products
+        var products = _products
             .GetAllProducts()
             .OrderBy(x => x.Title)
             .Skip(PageFetchSettings.ItemsOnPage * (request.Page - 1))
-            .Take(PageFetchSettings.ItemsOnPage)
-            .ToListAsync(cancellationToken);
+            .Take(PageFetchSettings.ItemsOnPage);
 
-        return products;
+        return await _products.ToListAsync(products);
     }
 }
