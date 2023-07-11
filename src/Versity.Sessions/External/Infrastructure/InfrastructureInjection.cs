@@ -37,6 +37,7 @@ public static class InfrastructureInjection
     {
         serviceCollection.AddScoped<ISessionsRepository, SessionsRepository>();
         serviceCollection.AddScoped<IProductsRepository, ProductRepository>();
+        serviceCollection.AddScoped<ICachedSessionsRepository, CachedSessionsRepository>();
         
         return serviceCollection;
     }

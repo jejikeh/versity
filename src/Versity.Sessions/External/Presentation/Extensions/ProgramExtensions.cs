@@ -32,8 +32,6 @@ public static class ProgramExtensions
         return builder;
     }
     
-    private const string CronEveryMinute = "0 * * ? * *";
-    
     public static WebApplication ConfigureApplication(this WebApplication app)
     {
         if (app.Environment.IsDevelopment())
