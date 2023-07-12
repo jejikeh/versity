@@ -7,9 +7,9 @@ namespace Application.RequestHandlers.Sessions.Queries.GetSessionById;
 
 public class GetSessionByIdQueryHandler : IRequestHandler<GetSessionByIdQuery, Session>
 {
-    private readonly ICachedSessionsRepository _sessions;
+    private readonly ISessionsRepository _sessions;
 
-    public GetSessionByIdQueryHandler(ICachedSessionsRepository sessions)
+    public GetSessionByIdQueryHandler(ISessionsRepository sessions)
     {
         _sessions = sessions;
     }

@@ -17,7 +17,7 @@ public class GetAllProductSessionsQueryHandler : IRequestHandler<GetAllProductSe
     public async Task<IEnumerable<Session>> Handle(GetAllProductSessionsQuery request, CancellationToken cancellationToken)
     {
         var sessions = _sessionsRepository
-            .GetAllProductSessions(request.ProductId, cancellationToken)
+            .GetAllProductSessions(request.ProductId)
             .OrderBy(x => x.UserId)
             .Skip(PageFetchSettings.ItemsOnPage * (request.Page - 1))
             .Take(PageFetchSettings.ItemsOnPage);

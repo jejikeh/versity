@@ -141,12 +141,26 @@ services:
       - postgres-data:/data/db
     networks:
       - dev
+  
+  redis-users-cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes:
+      - users-cache:/data
+    networks:
+      dev:
+        aliases:
+          - redis.users.versity.dev
 
   versity-users-service:
     image: jejikeh/versity.users:latest
     container_name: versity-users-service
     depends_on:
       - versity-users-db
+      - redis-users-cache
     ports:
       - "443"
       - "777"
@@ -171,6 +185,7 @@ services:
       - EMAIL__ConfirmUrl=https://localhost:8001/api/auth/confirmemail/
       - ADMIN__Password=vers1ty.Admin
       - ADMIN__Email=versity.identity.dev@gmail.com
+      - REDIS_Host=redis.users.versity.dev:6379,password=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
     volumes:
       - ~/.aspnet/https:/root/.aspnet/https:ro
       - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro
@@ -217,11 +232,25 @@ services:
     networks:
       - dev
   
+  redis-sessions-cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes:
+      - sessions-cache:/data
+    networks:
+      dev:
+        aliases:
+          - redis.sessions.versity.dev
+  
   versity-sessions-service:
     image: jejikeh/versity.sessions:latest
     container_name: versity-sessions-service
     depends_on:
       - versity-sessions-db
+      - redis-sessions-cache
     ports:
       - "80"
       - "443"
@@ -239,6 +268,7 @@ services:
       - JWT__Audience=https://versity.users:4001
       - KAFKA_Host=kafka.versity.dev:9092
       - KAFKA_Topic=versity.products
+      - REDIS_Host=redis.sessions.versity.dev:6379,password=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
     volumes:
       - ~/.aspnet/https:/root/.aspnet/https:ro
       - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro
@@ -254,3 +284,5 @@ networks:
 volumes:
   elasticsearch-data:
   postgres-data:
+  sessions-cache:
+  users-cache:

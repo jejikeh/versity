@@ -1,45 +1,51 @@
 ﻿using Application.Abstractions.Repositories;
 using Domain.Models;
-using Microsoft.Extensions.Caching.Memory;
+using Infrastructure.Extensions;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace Infrastructure.Persistence.Repositories;
 
-public class CachedSessionsRepository : ICachedSessionsRepository
+public class CachedSessionsRepository : ISessionsRepository
 {
-    private readonly SessionsRepository _sessions;
-    private readonly IMemoryCache _memoryCache;
-
-    public CachedSessionsRepository(SessionsRepository sessions, IMemoryCache memoryCache)
+    private readonly ISessionsRepository _sessions;
+    private readonly IDistributedCache _distributedCache;
+    private readonly VersitySessionsServiceDbContext _context;
+    
+    public CachedSessionsRepository(ISessionsRepository sessions, IDistributedCache distributedCache, VersitySessionsServiceDbContext context)
     {
         _sessions = sessions;
-        _memoryCache = memoryCache;
+        _distributedCache = distributedCache;
+        _context = context;
     }
 
     public IQueryable<Session> GetAllSessions()
     {
-        return _sessions.GetAllSessions();
+        return _distributedCache.GetOrCreateQueryable(
+            $"sessions",
+            () => _sessions.GetAllSessions());
     }
 
-    public Task<Session?> GetSessionByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<Session?> GetSessionByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return _memoryCache.GetOrCreateAsync(
+        return await _distributedCache.GetOrCreateAsync(
+            _context,
             $"session-by-id-{id}",
-            entry =>
-            {
-                entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(2));
-                
-                return _sessions.GetSessionByIdAsync(id, cancellationToken);
-            });
+            cancellationToken,
+            async () => await _sessions.GetSessionByIdAsync(id, cancellationToken));
     }
 
-    public IQueryable<Session> GetAllUserSessions(string userId, CancellationToken cancellationToken)
+    public IQueryable<Session> GetAllUserSessions(string userId)
     {
-        return _sessions.GetAllUserSessions(userId, cancellationToken);
+        return _distributedCache.GetOrCreateQueryable(
+            $"sessions-by-user-id-{userId}",
+            () => _sessions.GetAllUserSessions(userId))!;
     }
 
-    public IQueryable<Session> GetAllProductSessions(Guid productId, CancellationToken cancellationToken)
+    public IQueryable<Session> GetAllProductSessions(Guid productId)
     {
-        return _sessions.GetAllProductSessions(productId, cancellationToken);
+        return _distributedCache.GetOrCreateQueryable(
+            $"sessions-by-product-id-{productId}",
+            () => _sessions.GetAllProductSessions(productId))!;
     }
 
     public Task<Session> CreateSessionAsync(Session session, CancellationToken cancellationToken)
@@ -59,7 +65,7 @@ public class CachedSessionsRepository : ICachedSessionsRepository
 
     public Task<List<Session>> ToListAsync(IQueryable<Session> sessions)
     {
-        return _sessions.ToListAsync(sessions);
+        return sessions is IAsyncEnumerable<Session> ? _sessions.ToListAsync(sessions) : Task.Run(sessions.ToList);
     }
 
     public Task SaveChangesAsync(CancellationToken cancellationToken)

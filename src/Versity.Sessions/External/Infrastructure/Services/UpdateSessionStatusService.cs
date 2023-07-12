@@ -1,6 +1,5 @@
 ﻿using Application.Abstractions.Repositories;
 using Domain.Models;
-using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Services;

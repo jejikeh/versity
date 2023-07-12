@@ -40,7 +40,7 @@ public class GetUserSessionsByUserIdQueryHandler : IRequestHandler<GetUserSessio
         }
 
         var sessions = _sessions
-            .GetAllUserSessions(request.UserId, cancellationToken)
+            .GetAllUserSessions(request.UserId)
             .OrderBy(x => x.UserId)
             .Skip(PageFetchSettings.ItemsOnPage * (request.Page - 1))
             .Take(PageFetchSettings.ItemsOnPage);

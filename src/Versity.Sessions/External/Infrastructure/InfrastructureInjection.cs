@@ -37,7 +37,17 @@ public static class InfrastructureInjection
     {
         serviceCollection.AddScoped<ISessionsRepository, SessionsRepository>();
         serviceCollection.AddScoped<IProductsRepository, ProductRepository>();
-        serviceCollection.AddScoped<ICachedSessionsRepository, CachedSessionsRepository>();
+        
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddRedisCaching(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.Decorate<ISessionsRepository, CachedSessionsRepository>();
+        serviceCollection.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = Environment.GetEnvironmentVariable("REDIS_Host");
+        });
         
         return serviceCollection;
     }
