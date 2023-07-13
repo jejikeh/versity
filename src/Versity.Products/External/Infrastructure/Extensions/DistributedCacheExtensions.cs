@@ -17,7 +17,10 @@ public static class DistributedCacheExtensions
         if (string.IsNullOrEmpty(cachedMember))
         {
             member = factory.Invoke();
-            cache.SetString(key, JsonSerializer.Serialize(member.ToList()));
+            cache.SetString(
+                key, 
+                JsonSerializer.Serialize(member.ToList()),
+                DistributedCacheOptions.ConfigureCacheTimeOffsetExpire(TimeSpan.FromMinutes(1)));
 
             return member;
         }
