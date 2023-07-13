@@ -29,6 +29,7 @@ public static class ProgramExtensions
             .AddControllers();
         
         builder.Services.AddScoped<IVersityUsersDataService, GrpcUsersDataService>();
+        builder.Services.AddSignalR();
         
         return builder;
     }
@@ -53,17 +54,8 @@ public static class ProgramExtensions
         app.UseCors("AllowAll");
         app.UseHangfireDashboard();
         app.MapControllers();
+        InfrastructureInjection.AddHangfireProcesses();
         
-        RecurringJob.AddOrUpdate<UpdateSessionStatusService>(
-            "ExpireExpiredSessions",
-            x => x.ExpireExpiredSessions(), 
-            Cron.Minutely);
-        
-        RecurringJob.AddOrUpdate<UpdateSessionStatusService>(
-            "OpenInactiveSessions",
-            x => x.OpenInactiveSessions(), 
-            Cron.Minutely);
-
         return app;
     }
     
