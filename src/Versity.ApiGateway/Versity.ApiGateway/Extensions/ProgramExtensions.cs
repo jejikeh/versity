@@ -25,11 +25,12 @@ public static class ProgramExtensions
     
     public static async Task<WebApplication> ConfigureApplication(this WebApplication app)
     {
-        await app.UseOcelot();
         app.UseHttpsRedirection();
         app.UseAuthorization();
         app.UseAuthentication();
         app.UseCors("AllowAll");
+        app.UseWebSockets();
+        await app.UseOcelot();
 
         return app;
     }
