@@ -74,4 +74,17 @@ public static class InfrastructureInjection
         
         return serviceCollection;
     }
+
+    public static void AddHangfireProcesses()
+    {
+        RecurringJob.AddOrUpdate<UpdateSessionStatusService>(
+            "ExpireExpiredSessions",
+            x => x.ExpireExpiredSessions(), 
+            Cron.Minutely);
+        
+        RecurringJob.AddOrUpdate<UpdateSessionStatusService>(
+            "OpenInactiveSessions",
+            x => x.OpenInactiveSessions(), 
+            Cron.Minutely);
+    }
 }
