@@ -18,6 +18,8 @@ public static class ProgramExtensions
             .AddCors(options => options.ConfigureAllowAllCors())
             .AddOcelot(builder.Configuration);
 
+        builder.Services.AddSignalR();
+        
         return builder;
     }
     

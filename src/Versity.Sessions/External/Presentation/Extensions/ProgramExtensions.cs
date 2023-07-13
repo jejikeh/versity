@@ -6,6 +6,7 @@ using Infrastructure.Services;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.OpenApi.Models;
 using Presentation.Configuration;
+using Presentation.Hubs;
 using Serilog;
 
 namespace Presentation.Extensions;
@@ -29,7 +30,13 @@ public static class ProgramExtensions
             .AddControllers();
         
         builder.Services.AddScoped<IVersityUsersDataService, GrpcUsersDataService>();
-        builder.Services.AddSignalR();
+        
+        builder.Services.AddSignalR(hubOptions =>
+        {
+            hubOptions.EnableDetailedErrors = true;
+            hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(10);
+            hubOptions.HandshakeTimeout = TimeSpan.FromSeconds(5);
+        });
         
         return builder;
     }
@@ -55,6 +62,7 @@ public static class ProgramExtensions
         app.UseHangfireDashboard();
         app.MapControllers();
         InfrastructureInjection.AddHangfireProcesses();
+        app.MapHub<SignalHub>("hub");
         
         return app;
     }

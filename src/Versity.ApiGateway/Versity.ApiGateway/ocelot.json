@@ -311,6 +311,18 @@
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
       }
+    },
+    {
+      "DownstreamPathTemplate": "/hub/",
+      "DownstreamScheme": "ws",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "sessions.versity.dev",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/hub/",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ]
     }
   ],
   "GlobalConfiguration": {
