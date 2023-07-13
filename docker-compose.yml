@@ -72,12 +72,26 @@ services:
       - postgres-data:/data/db
     networks:
       - dev
+    
+  redis-products-cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes:
+      - products-cache:/data
+    networks:
+      dev:
+        aliases:
+          - redis.products.versity.dev
   
   versity-products-service:
     image: jejikeh/versity.products:latest
     container_name: versity-products-service
     depends_on:
       - versity-products-db
+      - redis-products-cache
     ports:
       - "80"
       - "443"
@@ -96,6 +110,7 @@ services:
       - KAFKA_Host=kafka.versity.dev:9092
       - KAFKA_Topic=versity.products
       - KAFKA_ProducerName=versity.products.dev
+      - REDIS_Host=redis.products.versity.dev:6379,password=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
     volumes:
       - ~/.aspnet/https:/root/.aspnet/https:ro
       - ~/AppData/Roaming/Microsoft/UserSecrets/:/root/.microsoft/usersecrets:ro
@@ -286,3 +301,4 @@ volumes:
   postgres-data:
   sessions-cache:
   users-cache:
+  products-cache:
