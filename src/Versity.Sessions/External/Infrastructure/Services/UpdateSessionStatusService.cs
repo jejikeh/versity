@@ -22,7 +22,7 @@ public class UpdateSessionStatusService
         var expiredSessions = _sessionsRepository
             .GetAllSessions()
             .Where(x => x.Expiry < DateTime.Today)
-            .Where(x => x.Status != SessionStatus.Closed || x.Status != SessionStatus.Expired)
+            .Where(x => x.Status != SessionStatus.Closed && x.Status != SessionStatus.Expired)
             .ToList();
     
         foreach (var session in expiredSessions)
