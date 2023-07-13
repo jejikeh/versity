@@ -49,7 +49,7 @@ public class UpdateSessionStatusService
         {
             session.Status = SessionStatus.Open;
             _sessionsRepository.UpdateSession(session);
-            _logger.LogInformation($"--> Session {session.Id} has been expired!");
+            _logger.LogInformation($"--> Session {session.Id} was open!");
         }
 
         _sessionsRepository.SaveChanges();
