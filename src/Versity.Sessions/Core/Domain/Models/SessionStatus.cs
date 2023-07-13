@@ -5,5 +5,6 @@ public enum SessionStatus
     Open,
     Closed,
     Expired,
-    Inactive
+    Inactive,
+    Active
 }

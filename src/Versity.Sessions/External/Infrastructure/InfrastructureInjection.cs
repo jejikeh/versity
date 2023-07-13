@@ -1,11 +1,15 @@
 ﻿using System.Reflection;
 using Application.Abstractions.Repositories;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
+using Infrastructure.Services;
 using Infrastructure.Services.KafkaConsumer;
 using Infrastructure.Services.KafkaConsumer.Abstractions;
 using Infrastructure.Services.KafkaConsumer.Handlers.CreateProduct;
 using Infrastructure.Services.KafkaConsumer.Handlers.DeleteProduct;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,6 +41,17 @@ public static class InfrastructureInjection
         return serviceCollection;
     }
 
+    public static IServiceCollection AddRedisCaching(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.Decorate<ISessionsRepository, CachedSessionsRepository>();
+        serviceCollection.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = Environment.GetEnvironmentVariable("REDIS_Host");
+        });
+        
+        return serviceCollection;
+    }
+
     public static IServiceCollection AddKafka(this IServiceCollection serviceCollection, IKafkaConsumerConfiguration configuration)
     {
         serviceCollection
@@ -45,5 +60,31 @@ public static class InfrastructureInjection
             .UseKafkaConsumer(configuration);
         
         return serviceCollection;
+    }
+    
+    public static IServiceCollection AddHangfireService(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddHangfireServer();
+        serviceCollection.AddHangfire(configuration => configuration
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UsePostgreSqlStorage(Environment.GetEnvironmentVariable("ConnectionString")));
+
+        serviceCollection.AddTransient<UpdateSessionStatusService>();
+        
+        return serviceCollection;
+    }
+
+    public static void AddHangfireProcesses()
+    {
+        RecurringJob.AddOrUpdate<UpdateSessionStatusService>(
+            "ExpireExpiredSessions",
+            x => x.ExpireExpiredSessions(), 
+            Cron.Minutely);
+        
+        RecurringJob.AddOrUpdate<UpdateSessionStatusService>(
+            "OpenInactiveSessions",
+            x => x.OpenInactiveSessions(), 
+            Cron.Minutely);
     }
 }

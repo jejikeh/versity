@@ -23,12 +23,12 @@ public class SessionsRepository : ISessionsRepository
         return await _context.Sessions.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public IQueryable<Session> GetAllUserSessions(string userId, CancellationToken cancellationToken)
+    public IQueryable<Session> GetAllUserSessions(string userId)
     {
         return _context.Sessions.Where(x => x.UserId == userId);
     }
 
-    public IQueryable<Session> GetAllProductSessions(Guid productId, CancellationToken cancellationToken)
+    public IQueryable<Session> GetAllProductSessions(Guid productId)
     {
         return _context.Sessions.Where(x => x.ProductId == productId);
     }
@@ -58,5 +58,10 @@ public class SessionsRepository : ISessionsRepository
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
         await _context.SaveChangesAsync(cancellationToken);
+    }
+
+    public void SaveChanges()
+    {
+        _context.SaveChanges();
     }
 }

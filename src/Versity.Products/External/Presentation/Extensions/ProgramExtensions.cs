@@ -1,9 +1,6 @@
 ﻿using Application;
 using Infrastructure;
 using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
@@ -16,6 +13,7 @@ public static class ProgramExtensions
         builder.Services
             .AddDbContext(builder.Configuration)
             .AddRepositories()
+            .AddRedisCaching()
             .AddApplication()
             .AddKafkaFlow()
             .AddKafkaServices()

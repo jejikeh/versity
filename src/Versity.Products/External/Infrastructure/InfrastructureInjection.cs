@@ -40,4 +40,15 @@ public static class InfrastructureInjection
 
         return serviceCollection;
     }
+    
+    public static IServiceCollection AddRedisCaching(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.Decorate<IVersityProductsRepository, CachedProductsRepository>();
+        serviceCollection.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = Environment.GetEnvironmentVariable("REDIS_Host");
+        });
+        
+        return serviceCollection;
+    }
 }

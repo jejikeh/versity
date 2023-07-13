@@ -25,12 +25,24 @@ public static class InfrastructureInjection
 
         return serviceCollection;
     }
-    
+
     public static IServiceCollection AddRepositories(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<IVersityUsersRepository, VersityUsersRepository>();
         serviceCollection.AddScoped<IVersityRolesRepository, VersityRoleRepository>();
         serviceCollection.AddScoped<IVersityRefreshTokensRepository, VersityRefreshTokensRepository>();
+        
+        return serviceCollection;
+    }
+    
+    public static IServiceCollection AddRedisCaching(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.Decorate<IVersityRefreshTokensRepository, CachedRefreshTokensRepository>();
+
+        serviceCollection.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = Environment.GetEnvironmentVariable("REDIS_Host");
+        });
         
         return serviceCollection;
     }

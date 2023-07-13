@@ -17,6 +17,7 @@ public static class ProgramExtensions
         builder.Services
             .AddDbContext(builder.Configuration)
             .AddRepositories()
+            .AddRedisCaching()
             .AddApplication()
             .AddVersityIdentity()
             .AddJwtAuthentication(builder.Configuration)

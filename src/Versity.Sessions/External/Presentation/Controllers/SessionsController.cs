@@ -1,4 +1,5 @@
 ﻿using Application.RequestHandlers.Products.Queries.GetAllProducts;
+using Application.RequestHandlers.Sessions.Commands.CloseSession;
 using Application.RequestHandlers.Sessions.Commands.CreateSession;
 using Application.RequestHandlers.Sessions.Commands.DeleteSession;
 using Application.RequestHandlers.Sessions.Queries.GetAllProductSessions;
@@ -83,6 +84,16 @@ public class SessionsController : ApiController
     public async Task<IActionResult> DeleteSession(Guid id, CancellationToken cancellationToken)
     {
         var command = new DeleteSessionCommand(id);
+        await Sender.Send(command, cancellationToken);
+        
+        return Ok();
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPut("{id:guid}/close")]
+    public async Task<IActionResult> CloseSession(Guid id, CancellationToken cancellationToken)
+    {
+        var command = new CloseSessionCommand(id);
         await Sender.Send(command, cancellationToken);
         
         return Ok();

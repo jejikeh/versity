@@ -1,5 +1,6 @@
 ﻿using Application;
 using Application.Abstractions;
+using Hangfire;
 using Infrastructure;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -16,16 +17,19 @@ public static class ProgramExtensions
         builder.Services
             .AddDbContext(builder.Configuration)
             .AddRepositories()
+            .AddRedisCaching()
             .AddApplication()
             .AddHttpContextAccessor()
             .AddJwtAuthentication(builder.Configuration)
             .AddSwagger()
             .AddCors(options => options.ConfigureAllowAllCors())
             .AddKafka(new KafkaConsumerConfiguration())
+            .AddHangfireService()
             .AddEndpointsApiExplorer()
             .AddControllers();
         
         builder.Services.AddScoped<IVersityUsersDataService, GrpcUsersDataService>();
+        builder.Services.AddSignalR();
         
         return builder;
     }
@@ -48,7 +52,9 @@ public static class ProgramExtensions
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseCors("AllowAll");
+        app.UseHangfireDashboard();
         app.MapControllers();
+        InfrastructureInjection.AddHangfireProcesses();
         
         return app;
     }
