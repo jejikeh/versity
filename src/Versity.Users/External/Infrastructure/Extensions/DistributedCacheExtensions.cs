@@ -6,27 +6,6 @@ namespace Infrastructure.Extensions;
 
 public static class DistributedCacheExtensions
 {
-    public static IQueryable<T> GetOrCreateQueryable<T>(
-        this IDistributedCache cache, 
-        string key,
-        Func<IQueryable<T>> factory) where T : class?
-    {
-        IQueryable<T> member;
-        var cachedMember = cache.GetString(key);
-
-        if (string.IsNullOrEmpty(cachedMember))
-        {
-            member = factory.Invoke();
-            cache.SetString(key, JsonSerializer.Serialize(member.ToList()));
-
-            return member;
-        }
-
-        member = JsonSerializer.Deserialize<List<T>>(cachedMember)!.AsQueryable();
-
-        return member;
-    }
-    
     public static async Task<T?> GetOrCreateAsync<T>(
         this IDistributedCache cache,
         VersityUsersDbContext dbContext,
