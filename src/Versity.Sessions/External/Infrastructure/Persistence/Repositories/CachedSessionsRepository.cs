@@ -65,6 +65,7 @@ public class CachedSessionsRepository : ISessionsRepository
 
     public Task<List<Session>> ToListAsync(IQueryable<Session> sessions)
     {
+        // TODO
         return sessions is IAsyncEnumerable<Session> ? _sessions.ToListAsync(sessions) : Task.Run(sessions.ToList);
     }
 

@@ -377,7 +377,7 @@
       }
     },
     {
-      "DownstreamPathTemplate": "/hub/",
+      "DownstreamPathTemplate": "/hub/{any}",
       "DownstreamScheme": "ws",
       "DownstreamHostAndPorts": [
         {
@@ -385,7 +385,7 @@
           "Port": 80
         }
       ],
-      "UpstreamPathTemplate": "/hub/",
+      "UpstreamPathTemplate": "/hub/{any}",
       "QoSOptions": {
         "TimeoutValue": 320000
       },

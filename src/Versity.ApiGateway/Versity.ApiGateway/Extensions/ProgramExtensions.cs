@@ -39,9 +39,11 @@ public static class ProgramExtensions
     {
         options.AddPolicy("AllowAll", policy =>
         {
-            policy.AllowAnyHeader();
-            policy.AllowAnyMethod();
-            policy.AllowAnyOrigin();
+            policy
+                .WithOrigins("http://localhost:3000")
+                .AllowAnyHeader()
+                .WithMethods("GET", "POST")
+                .AllowCredentials();
         });
         
         return options;
