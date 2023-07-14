@@ -59,6 +59,31 @@ services:
       PORT: 9021
     networks:
       - dev
+  
+  elasticsearch:
+    container_name: els
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+    ports:
+      - "9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    networks:
+      - dev
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:8.8.0
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_URL=http://localhost:19200
+    networks:
+      - dev
 
   versity-products-db:
     image: debezium/postgres:13-alpine
@@ -69,7 +94,7 @@ services:
     ports:
       - "5432"
     volumes:
-      - postgres-data:/data/db
+      - products-data:/data/db
     networks:
       - dev
     
@@ -118,32 +143,7 @@ services:
       dev:
         aliases:
           - products.versity.dev
-
-  elasticsearch:
-   container_name: els
-   image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
-   ports:
-     - "9200"
-   volumes:
-     - elasticsearch-data:/usr/share/elasticsearch/data
-   environment:
-     - xpack.security.enabled=false
-     - discovery.type=single-node
-   networks:
-     - dev
   
-  kibana:
-   container_name: kibana
-   image: docker.elastic.co/kibana/kibana:8.8.0
-   ports:
-     - 5601:5601
-   depends_on:
-     - elasticsearch
-   environment:
-     - ELASTICSEARCH_URL=http://localhost:19200
-   networks:
-     - dev
-
   versity-users-db:
     image: debezium/postgres:13-alpine
     environment:
@@ -153,7 +153,7 @@ services:
     ports:
       - "5432"
     volumes:
-      - postgres-data:/data/db
+      - users-data:/data/db
     networks:
       - dev
   
@@ -237,13 +237,13 @@ services:
   versity-sessions-db:
     image: debezium/postgres:13-alpine
     environment:
-      - POSTGRES_DATABASE=versity_session_dev
+      - POSTGRES_DATABASE=versity_sessions_dev
       - POSTGRES_USER=versity_dev
       - POSTGRES_PASSWORD=versity_dev
     ports:
       - "5432"
     volumes:
-      - postgres-data:/data/db
+      - sessions-data:/data/db
     networks:
       - dev
   
@@ -273,7 +273,7 @@ services:
       context: .
       dockerfile: src/Versity.Sessions/Dockerfile
     environment:
-      - ConnectionString=Host=versity-sessions-db;Port=5432;Username=versity_dev;Password=versity_dev;Database=versity_sessions_dev;
+      - ConnectionString=Host=versity-sessions-db;Port=5432;Username=versity_dev;Password=versity_dev;Database=versity_sessions_dev;Include Error Detail=true;
       - ASPNETCORE_ENVIRONMENT=DEVELOPMENT
       - ASPNETCORE_URLS=https://+443;http://+80
       - ASPNETCORE_Kestrel__Certificates__Default__Password=localhost
@@ -298,7 +298,9 @@ networks:
 
 volumes:
   elasticsearch-data:
-  postgres-data:
   sessions-cache:
   users-cache:
   products-cache:
+  products-data:
+  users-data:
+  sessions-data:

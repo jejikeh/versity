@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Application.Abstractions.Repositories;
+using Domain.Models.SessionLogging;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Infrastructure.Persistence;
@@ -37,6 +38,8 @@ public static class InfrastructureInjection
     {
         serviceCollection.AddScoped<ISessionsRepository, SessionsRepository>();
         serviceCollection.AddScoped<IProductsRepository, ProductRepository>();
+        serviceCollection.AddScoped<ISessionLogsRepository, SessionLogsRepository>();
+        serviceCollection.AddScoped<ILogsDataRepository, LogsDataRepository>();
         
         return serviceCollection;
     }

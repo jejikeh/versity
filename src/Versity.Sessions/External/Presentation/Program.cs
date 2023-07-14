@@ -14,8 +14,8 @@ using var scope = app.Services.CreateScope();
 var serviceProvider = scope.ServiceProvider;
 try
 {
-    var versityUsersDbContext = serviceProvider.GetRequiredService<VersitySessionsServiceDbContext>();
-    versityUsersDbContext.Database.EnsureCreated();
+    var versitySessionsServiceDbContext = serviceProvider.GetRequiredService<VersitySessionsServiceDbContext>();
+    versitySessionsServiceDbContext.Database.EnsureCreated();
     await app.RunAsync();
 }
 catch (Exception ex)

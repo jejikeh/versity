@@ -15,12 +15,18 @@ public class SessionsRepository : ISessionsRepository
 
     public IQueryable<Session> GetAllSessions()
     {
-        return _context.Sessions.AsQueryable();
+        return _context.Sessions
+            .Include(x => x.Product)
+            .Include(x => x.Logs)
+            .AsQueryable();
     }
 
     public async Task<Session?> GetSessionByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _context.Sessions.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return await _context.Sessions
+            .Include(x => x.Product)
+            .Include(x => x.Logs)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
     public IQueryable<Session> GetAllUserSessions(string userId)
@@ -30,7 +36,7 @@ public class SessionsRepository : ISessionsRepository
 
     public IQueryable<Session> GetAllProductSessions(Guid productId)
     {
-        return _context.Sessions.Where(x => x.ProductId == productId);
+        return _context.Sessions.Where(x => x.Product.Id == productId);
     }
 
     public async Task<Session> CreateSessionAsync(Session session, CancellationToken cancellationToken)
