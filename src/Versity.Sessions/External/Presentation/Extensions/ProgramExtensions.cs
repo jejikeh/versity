@@ -23,7 +23,7 @@ public static class ProgramExtensions
             .AddHttpContextAccessor()
             .AddJwtAuthentication(builder.Configuration)
             .AddSwagger()
-            .AddCors(options => options.ConfigureAllowAllCors())
+            .AddCors(options => options.ConfigureApiGatewayCors())
             .AddKafka(new KafkaConsumerConfiguration())
             .AddHangfireService()
             .AddEndpointsApiExplorer()
@@ -67,13 +67,15 @@ public static class ProgramExtensions
         return app;
     }
     
-    private static CorsOptions ConfigureAllowAllCors(this CorsOptions options)
+    private static CorsOptions ConfigureApiGatewayCors(this CorsOptions options)
     {
         options.AddPolicy("AllowAll", policy =>
         {
-            policy.AllowAnyHeader();
-            policy.AllowAnyMethod();
-            policy.AllowAnyOrigin();
+            policy
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
+                .WithOrigins("http://localhost:3000");
         });
         
         return options;

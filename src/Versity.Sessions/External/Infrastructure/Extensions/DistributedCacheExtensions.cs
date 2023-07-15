@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 
 namespace Infrastructure.Extensions;
@@ -58,11 +59,12 @@ public static class DistributedCacheExtensions
         }
         
         member = JsonSerializer.Deserialize<T>(cachedMember);
-        if (member is not null)
+        
+        if (member is not null && dbContext.Entry(member).State != EntityState.Modified)
         {
             dbContext.Set<T>().Attach(member);
         }
-        
+
         return member;
     }
 }

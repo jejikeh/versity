@@ -4,19 +4,19 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Presentation.Hubs;
 
-[Authorize]
-public class SignalHub : Hub<ISessionClient>
+public class SignalHub : Hub
 {
     private readonly ILogger<SignalHub> _logger;
+    private readonly string _botUser;
 
     public SignalHub(ILogger<SignalHub> logger)
     {
         _logger = logger;
+        _botUser = "MyChatBot";
     }
 
-    [Authorize("Admin")]
-    public override async Task OnConnectedAsync()
+    public async Task JoinToSession(UserConnection userConnection)
     {
-        await Clients.All.ConnectToSession($"{Context.ConnectionId} connect to session");
+        await Clients.All.SendAsync("ReceiveMessage", _botUser,$"{userConnection.User} has joined {userConnection.Session}");
     }
 }

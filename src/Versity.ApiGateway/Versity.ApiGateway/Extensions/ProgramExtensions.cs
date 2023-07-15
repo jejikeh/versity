@@ -15,7 +15,7 @@ public static class ProgramExtensions
 
         builder.Services
             .AddJwtAuthentication(builder.Configuration)
-            .AddCors(options => options.ConfigureAllowAllCors())
+            .AddCors(options => options.ConfigureFrontendCors())
             .AddOcelot(builder.Configuration);
 
         builder.Services.AddSignalR();
@@ -35,15 +35,15 @@ public static class ProgramExtensions
         return app;
     }
     
-    private static CorsOptions ConfigureAllowAllCors(this CorsOptions options)
+    private static CorsOptions ConfigureFrontendCors(this CorsOptions options)
     {
         options.AddPolicy("AllowAll", policy =>
         {
             policy
-                .WithOrigins("http://localhost:3000")
+                .AllowAnyMethod()
                 .AllowAnyHeader()
-                .WithMethods("GET", "POST")
-                .AllowCredentials();
+                .AllowCredentials()
+                .WithOrigins("http://localhost:3000");
         });
         
         return options;

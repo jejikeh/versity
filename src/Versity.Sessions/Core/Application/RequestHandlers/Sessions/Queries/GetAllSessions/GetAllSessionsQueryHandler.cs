@@ -23,12 +23,8 @@ public class GetAllSessionsQueryHandler : IRequestHandler<GetAllSessionsQuery, I
             .Skip(PageFetchSettings.ItemsOnPage * (request.Page - 1))
             .Take(PageFetchSettings.ItemsOnPage);
         
-        var viewModels = new List<SessionViewModel>();
-        foreach (var session in await _sessionsRepository.ToListAsync(sessions)) 
-        {
-            viewModels.Add(SessionViewModel.MapWithModel(session));
-        }
-
+        var viewModels = SessionViewModel.MapWithModels(await _sessionsRepository.ToListAsync(sessions));
+        
         return viewModels;
     }
 }

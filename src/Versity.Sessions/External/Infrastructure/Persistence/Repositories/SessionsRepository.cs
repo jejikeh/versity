@@ -31,12 +31,18 @@ public class SessionsRepository : ISessionsRepository
 
     public IQueryable<Session> GetAllUserSessions(string userId)
     {
-        return _context.Sessions.Where(x => x.UserId == userId);
+        return _context.Sessions
+            .Include(x => x.Product)
+            .Include(x => x.Logs)
+            .Where(x => x.UserId == userId);
     }
 
     public IQueryable<Session> GetAllProductSessions(Guid productId)
     {
-        return _context.Sessions.Where(x => x.Product.Id == productId);
+        return _context.Sessions
+            .Include(x => x.Product)
+            .Include(x => x.Logs)
+            .Where(x => x.Product.Id == productId);
     }
 
     public async Task<Session> CreateSessionAsync(Session session, CancellationToken cancellationToken)

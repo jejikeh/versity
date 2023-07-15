@@ -23,4 +23,15 @@ public record SessionViewModel(
             session.Expiry,
             session.Status);
     }
+
+    public static IEnumerable<SessionViewModel> MapWithModels(List<Session> models)
+    {
+        var viewModels = new List<SessionViewModel>();
+        foreach (var session in models) 
+        {
+            viewModels.Add(MapWithModel(session));
+        }
+
+        return viewModels;
+    }
 }

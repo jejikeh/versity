@@ -21,7 +21,7 @@ public class UpdateSessionStatusService
 
         var expiredSessions = _sessionsRepository
             .GetAllSessions()
-            .Where(x => x.Expiry < DateTime.Today)
+            .Where(x => x.Expiry < DateTime.Now)
             .Where(x => x.Status != SessionStatus.Closed && x.Status != SessionStatus.Expired)
             .ToList();
     
@@ -41,7 +41,7 @@ public class UpdateSessionStatusService
 
         var expiredSessions = _sessionsRepository
             .GetAllSessions()
-            .Where(x => x.Start <= DateTime.Today)
+            .Where(x => x.Start <= DateTime.Now)
             .Where(x => x.Status == SessionStatus.Inactive)
             .ToList();
     

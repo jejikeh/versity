@@ -55,7 +55,7 @@ const Home: FC = () => {
             </Grid>
             <Grid xs={6}>
                 <Card sx={{ maxWidth: 345 }}>
-                    <CardActionArea>
+                    <CardActionArea href='/sessions'>
                         <CardMedia
                         component="img"
                         height="240"
@@ -64,7 +64,7 @@ const Home: FC = () => {
                         />
                         <CardContent>
                         <Typography gutterBottom variant="h5" component="div">
-                            Connect to session
+                            Sessions
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                             Lizards are a widespread group of squamate reptiles, with over 6,000

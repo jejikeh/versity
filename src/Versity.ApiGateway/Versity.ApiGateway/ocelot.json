@@ -377,19 +377,19 @@
       }
     },
     {
-      "DownstreamPathTemplate": "/hub/{any}",
-      "DownstreamScheme": "ws",
+      "UpstreamPathTemplate": "/hub/",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "DownstreamPathTemplate": "/hub/",
+      "DownstreamScheme": "wss",
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions.versity.dev",
-          "Port": 80
+          "Port": 443
         }
       ],
-      "UpstreamPathTemplate": "/hub/{any}",
       "QoSOptions": {
         "TimeoutValue": 320000
-      },
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS" ]
+      }
     }
   ],
   "GlobalConfiguration": {

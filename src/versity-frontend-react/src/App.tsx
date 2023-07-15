@@ -8,6 +8,9 @@ import { observer } from 'mobx-react-lite';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './pages/Home';
 import RegisterForm from './components/RegisterForm';
+import Sessions from './pages/Sessions';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 const App: FC = () => {
   const {store} = useContext(Context);
@@ -32,13 +35,16 @@ const App: FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Router>
-        <Routes>
-          <Route path='/' element={<Home/>}/>
-          <Route path='/login' element={<LoginForm/>}/>
-          <Route path='/register' element={<RegisterForm/>}/>
-        </Routes>
-      </Router>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <Router>
+          <Routes>
+            <Route path='/' element={<Home/>}/>
+            <Route path='/login' element={<LoginForm/>}/>
+            <Route path='/register' element={<RegisterForm/>}/>
+            <Route path='/sessions' element={<Sessions/>}/>
+          </Routes>
+        </Router>
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }
