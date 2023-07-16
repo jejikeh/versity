@@ -1,5 +1,9 @@
-﻿using Application.Abstractions.Repositories;
+﻿using Application.Abstractions.Hubs;
+using Application.Abstractions.Notifications;
+using Application.Abstractions.Repositories;
+using Application.Dtos;
 using Domain.Models;
+using Hangfire;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Services;
@@ -8,11 +12,13 @@ public class UpdateSessionStatusService
 {
     private readonly ISessionsRepository _sessionsRepository;
     private readonly ILogger<UpdateSessionStatusService> _logger;
-
-    public UpdateSessionStatusService(ISessionsRepository sessionsRepository, ILogger<UpdateSessionStatusService> logger)
+    private readonly INotificationSender _notificationSender;
+    
+    public UpdateSessionStatusService(ISessionsRepository sessionsRepository, ILogger<UpdateSessionStatusService> logger, INotificationSender notificationSender)
     {
         _sessionsRepository = sessionsRepository;
         _logger = logger;
+        _notificationSender = notificationSender;
     }
 
     public void ExpireExpiredSessions()
@@ -29,6 +35,7 @@ public class UpdateSessionStatusService
         {
             session.Status = SessionStatus.Expired;
             _sessionsRepository.UpdateSession(session);
+            _notificationSender.PushClosedSession(session.UserId, UserSessionsViewModel.MapWithModel(session));
             _logger.LogInformation($"--> Session {session.Id} has been expired!");
         }
 
@@ -49,6 +56,7 @@ public class UpdateSessionStatusService
         {
             session.Status = SessionStatus.Open;
             _sessionsRepository.UpdateSession(session);
+            _notificationSender.PushCreatedNewSession(session.UserId, UserSessionsViewModel.MapWithModel(session));
             _logger.LogInformation($"--> Session {session.Id} was open!");
         }
 

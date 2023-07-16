@@ -377,9 +377,9 @@
       }
     },
     {
-      "UpstreamPathTemplate": "/hub/",
+      "UpstreamPathTemplate": "/sessions-hub/",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      "DownstreamPathTemplate": "/hub/",
+      "DownstreamPathTemplate": "/sessions-hub/",
       "DownstreamScheme": "wss",
       "DownstreamHostAndPorts": [
         {

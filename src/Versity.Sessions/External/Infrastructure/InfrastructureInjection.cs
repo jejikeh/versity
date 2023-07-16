@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
+using Application.Abstractions.Notifications;
 using Application.Abstractions.Repositories;
-using Domain.Models.SessionLogging;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Infrastructure.Persistence;
@@ -10,7 +10,6 @@ using Infrastructure.Services.KafkaConsumer;
 using Infrastructure.Services.KafkaConsumer.Abstractions;
 using Infrastructure.Services.KafkaConsumer.Handlers.CreateProduct;
 using Infrastructure.Services.KafkaConsumer.Handlers.DeleteProduct;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -76,6 +75,13 @@ public static class InfrastructureInjection
         serviceCollection.AddTransient<UpdateSessionStatusService>();
         
         return serviceCollection;
+    }
+
+    public static IServiceCollection AddNotificationServices(this IServiceCollection servicesCollection)
+    {
+        servicesCollection.AddScoped<INotificationSender, SessionNotificationsSenderService>();
+
+        return servicesCollection;
     }
 
     public static void AddHangfireProcesses()

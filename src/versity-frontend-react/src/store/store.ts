@@ -7,6 +7,7 @@ import { API_URL } from "../https";
 
 export default class Store {
     refreshtoken = "";
+    token = "";
     userId = "";
     isAuth = false;
     
@@ -26,6 +27,10 @@ export default class Store {
         this.userId = id;
     }
 
+    setToken(token: string) {
+        this.token = token;
+    }
+
     async login(email: string, password: string) {
         try {
             const response = await AuthService.login(email, password);
@@ -35,6 +40,7 @@ export default class Store {
             this.setAuth(true);
             this.setRefteshToken(response.data.refreshToken);
             this.setUserId(response.data.id);
+            this.setToken(response.data.token);
         } catch (e) {
 
         }
@@ -56,6 +62,7 @@ export default class Store {
             this.setAuth(false);
             this.setRefteshToken("");
             this.setUserId("");
+            this.setToken("");
         } catch (e) {
 
         }
@@ -68,6 +75,7 @@ export default class Store {
             this.setAuth(true);
             this.setRefteshToken(response.data.refreshToken);
             this.setUserId(response.data.id);
+            this.setToken(response.data.token);
         } catch (e) {
 
         }

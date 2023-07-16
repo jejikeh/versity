@@ -1,4 +1,4 @@
-﻿namespace Presentation.Hubs;
+﻿namespace Infrastructure.Hubs;
 
 public class UserConnection
 {

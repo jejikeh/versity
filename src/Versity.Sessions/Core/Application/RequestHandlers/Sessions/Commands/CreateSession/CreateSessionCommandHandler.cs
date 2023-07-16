@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Abstractions.Notifications;
 using Application.Abstractions.Repositories;
 using Application.Dtos;
 using Application.Exceptions;
@@ -14,13 +15,20 @@ public class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand,
     private readonly IVersityUsersDataService _users;
     private readonly IProductsRepository _productsRepository;
     private readonly ISessionLogsRepository _sessionLogsRepository;
+    private readonly INotificationSender _notificationSender;
 
-    public CreateSessionCommandHandler(ISessionsRepository sessionsRepository, IVersityUsersDataService users, IProductsRepository productsRepository, ISessionLogsRepository sessionLogsRepository)
+    public CreateSessionCommandHandler(
+        ISessionsRepository sessionsRepository, 
+        IVersityUsersDataService users, 
+        IProductsRepository productsRepository, 
+        ISessionLogsRepository sessionLogsRepository, 
+        INotificationSender notificationSender)
     {
         _sessions = sessionsRepository;
         _users = users;
         _productsRepository = productsRepository;
         _sessionLogsRepository = sessionLogsRepository;
+        _notificationSender = notificationSender;
     }
 
     public async Task<SessionViewModel> Handle(CreateSessionCommand request, CancellationToken cancellationToken)
@@ -59,7 +67,10 @@ public class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand,
         
         await _sessionLogsRepository.SaveChangesAsync(cancellationToken);
         await _sessions.SaveChangesAsync(cancellationToken);
+
+        var sessionViewModel = SessionViewModel.MapWithModel(result);
+        _notificationSender.PushCreatedNewSession(result.UserId, UserSessionsViewModel.MapWithModel(session));
         
-        return SessionViewModel.MapWithModel(result);
+        return sessionViewModel;
     }
 }

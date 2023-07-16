@@ -1,7 +1,9 @@
 ﻿using Application;
 using Application.Abstractions;
+using Application.Abstractions.Hubs;
 using Hangfire;
 using Infrastructure;
+using Infrastructure.Hubs;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.OpenApi.Models;
@@ -20,7 +22,9 @@ public static class ProgramExtensions
             .AddRepositories()
             .AddRedisCaching()
             .AddApplication()
+            .InjectSignalR()
             .AddHttpContextAccessor()
+            .AddNotificationServices()
             .AddJwtAuthentication(builder.Configuration)
             .AddSwagger()
             .AddCors(options => options.ConfigureApiGatewayCors())
@@ -30,13 +34,6 @@ public static class ProgramExtensions
             .AddControllers();
         
         builder.Services.AddScoped<IVersityUsersDataService, GrpcUsersDataService>();
-        
-        builder.Services.AddSignalR(hubOptions =>
-        {
-            hubOptions.EnableDetailedErrors = true;
-            hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(10);
-            hubOptions.HandshakeTimeout = TimeSpan.FromSeconds(5);
-        });
         
         return builder;
     }
@@ -62,7 +59,7 @@ public static class ProgramExtensions
         app.UseHangfireDashboard();
         app.MapControllers();
         InfrastructureInjection.AddHangfireProcesses();
-        app.MapHub<SignalHub>("hub");
+        app.MapHub<SessionsHub>("sessions-hub");
         
         return app;
     }
@@ -92,6 +89,20 @@ public static class ProgramExtensions
                 Type = SecuritySchemeType.ApiKey
             });
         });
+
+        return serviceCollection;
+    }
+
+    private static IServiceCollection InjectSignalR(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddSignalR(hubOptions =>
+        {
+            hubOptions.EnableDetailedErrors = true;
+            hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(10);
+            hubOptions.HandshakeTimeout = TimeSpan.FromSeconds(5);
+        });
+        
+        serviceCollection.AddScoped<ISessionsHubHelper, SessionsHubHelper>();
 
         return serviceCollection;
     }
