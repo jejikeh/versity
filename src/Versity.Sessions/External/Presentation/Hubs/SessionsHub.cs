@@ -1,5 +1,4 @@
 ﻿using Application.Abstractions.Hubs;
-using Infrastructure.Hubs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
@@ -15,8 +14,11 @@ public class SessionsHub : Hub<ISessionsHubClient>
     }
     
     [Authorize(Roles = "Member")]
-    public async Task JoinToSession(UserConnection userConnection)
+    public async Task UploadStream(IAsyncEnumerable<string> stream)
     {
-        await Clients.All.JoinToSession($"{userConnection.User} has joined with id {Context.UserIdentifier}");
+        await foreach (var item in stream)
+        {
+            _logger.LogInformation("--> New message in stream " + item);
+        }
     }
 }

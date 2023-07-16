@@ -28,7 +28,11 @@ const UserSessionsViewModelTable = ({
       </TableCell>
       {model?.status == 0 ? (
         <TableCell align="right">
-          <Button variant="outlined" size="large" onClick={() => {}}>
+          <Button
+            variant="outlined"
+            size="large"
+            href={"sessions/" + model?.id}
+          >
             Connect
           </Button>
         </TableCell>
