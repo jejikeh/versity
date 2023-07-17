@@ -20,9 +20,7 @@ public class CachedSessionsRepository : ISessionsRepository
 
     public IQueryable<Session> GetAllSessions()
     {
-        return _distributedCache.GetOrCreateQueryable(
-            $"sessions",
-            () => _sessions.GetAllSessions());
+        return _sessions.GetAllSessions();
     }
 
     public async Task<Session?> GetSessionByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -36,16 +34,12 @@ public class CachedSessionsRepository : ISessionsRepository
 
     public IQueryable<Session> GetAllUserSessions(string userId)
     {
-        return _distributedCache.GetOrCreateQueryable(
-            $"sessions-by-user-id-{userId}",
-            () => _sessions.GetAllUserSessions(userId))!;
+        return _sessions.GetAllUserSessions(userId);
     }
 
     public IQueryable<Session> GetAllProductSessions(Guid productId)
     {
-        return _distributedCache.GetOrCreateQueryable(
-            $"sessions-by-product-id-{productId}",
-            () => _sessions.GetAllProductSessions(productId))!;
+        return _sessions.GetAllProductSessions(productId);
     }
 
     public Task<Session> CreateSessionAsync(Session session, CancellationToken cancellationToken)
@@ -65,8 +59,7 @@ public class CachedSessionsRepository : ISessionsRepository
 
     public Task<List<Session>> ToListAsync(IQueryable<Session> sessions)
     {
-        // TODO
-        return sessions is IAsyncEnumerable<Session> ? _sessions.ToListAsync(sessions) : Task.Run(sessions.ToList);
+        return _sessions.ToListAsync(sessions);
     }
 
     public Task SaveChangesAsync(CancellationToken cancellationToken)

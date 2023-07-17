@@ -20,9 +20,7 @@ public class CachedProductsRepository : IVersityProductsRepository
 
     public IQueryable<Product> GetAllProducts()
     {
-        return _distributedCache.GetOrCreateQueryable(
-            $"products",
-            () => _productsRepository.GetAllProducts());
+        return _productsRepository.GetAllProducts();
     }
 
     public async Task<Product?> GetProductByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -51,7 +49,7 @@ public class CachedProductsRepository : IVersityProductsRepository
 
     public Task<List<Product>> ToListAsync(IQueryable<Product> products)
     {
-        return products is IAsyncEnumerable<Product> ? _productsRepository.ToListAsync(products) : Task.Run(products.ToList);
+        return _productsRepository.ToListAsync(products);
     }
 
     public Task SaveChangesAsync(CancellationToken cancellationToken)
