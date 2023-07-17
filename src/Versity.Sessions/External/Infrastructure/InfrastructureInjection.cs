@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Application.Abstractions;
 using Application.Abstractions.Notifications;
 using Application.Abstractions.Repositories;
 using Hangfire;
@@ -13,6 +14,7 @@ using Infrastructure.Services.KafkaConsumer.Handlers.DeleteProduct;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace Infrastructure;
 
@@ -46,10 +48,8 @@ public static class InfrastructureInjection
     public static IServiceCollection AddRedisCaching(this IServiceCollection serviceCollection)
     {
         serviceCollection.Decorate<ISessionsRepository, CachedSessionsRepository>();
-        serviceCollection.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration = Environment.GetEnvironmentVariable("REDIS_Host");
-        });
+        serviceCollection.AddSingleton(ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS_Host")));
+        serviceCollection.AddSingleton<ICacheService, RedisCacheService>();
         
         return serviceCollection;
     }
@@ -94,6 +94,11 @@ public static class InfrastructureInjection
         RecurringJob.AddOrUpdate<UpdateSessionStatusService>(
             "OpenInactiveSessions",
             x => x.OpenInactiveSessions(), 
+            Cron.Minutely);
+        
+        RecurringJob.AddOrUpdate<UpdateSessionStatusService>(
+            "PushSessionsLogs",
+            x => x.PushSessionLogs(), 
             Cron.Minutely);
     }
 }
