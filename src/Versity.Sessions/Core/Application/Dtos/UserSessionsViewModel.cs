@@ -4,7 +4,8 @@ namespace Application.Dtos;
 
 public record UserSessionsViewModel(
     Guid Id, 
-    string ProductTitle, 
+    string ProductTitle,
+    Guid SessionLogsId,
     DateTime Start,
     DateTime Expiry,
     SessionStatus Status)
@@ -14,6 +15,7 @@ public record UserSessionsViewModel(
         return new UserSessionsViewModel(
             session.Id,
             session.Product.Title,
+            session.Logs.Id,
             session.Start,
             session.Expiry,
             session.Status);

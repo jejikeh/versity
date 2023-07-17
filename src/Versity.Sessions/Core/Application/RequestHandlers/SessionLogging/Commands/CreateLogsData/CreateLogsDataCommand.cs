@@ -1,4 +1,5 @@
-﻿using Application.RequestHandlers.SessionLogging.Commands.CreateLogData;
+﻿using Application.Dtos;
+using Application.RequestHandlers.SessionLogging.Commands.CreateLogData;
 using Domain.Models.SessionLogging;
 using MediatR;
 

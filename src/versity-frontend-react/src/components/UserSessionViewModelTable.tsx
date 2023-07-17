@@ -31,7 +31,7 @@ const UserSessionsViewModelTable = ({
           <Button
             variant="outlined"
             size="large"
-            href={"sessions/" + model?.id}
+            href={"sessions/" + model?.sessionLogsId}
           >
             Connect
           </Button>

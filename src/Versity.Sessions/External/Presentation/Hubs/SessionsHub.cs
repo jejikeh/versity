@@ -1,4 +1,6 @@
 ﻿using Application.Abstractions.Hubs;
+using Application.RequestHandlers.SessionLogging.Commands.CreateLogData;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
@@ -6,19 +8,19 @@ namespace Presentation.Hubs;
 
 public class SessionsHub : Hub<ISessionsHubClient>
 {
-    private readonly ILogger<SessionsHub> _logger;
+    private readonly ISender _sender;
 
-    public SessionsHub(ILogger<SessionsHub> logger)
+    public SessionsHub(ISender sender)
     {
-        _logger = logger;
+        _sender = sender;
     }
     
     [Authorize(Roles = "Member")]
-    public async Task UploadStream(IAsyncEnumerable<string> stream)
+    public async Task UploadStream(IAsyncEnumerable<CreateLogDataCommand> stream)
     {
         await foreach (var item in stream)
         {
-            _logger.LogInformation("--> New message in stream " + item);
+            await _sender.Send(item);
         }
     }
 }

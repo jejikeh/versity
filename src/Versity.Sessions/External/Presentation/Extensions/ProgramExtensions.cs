@@ -3,7 +3,6 @@ using Application.Abstractions;
 using Application.Abstractions.Hubs;
 using Hangfire;
 using Infrastructure;
-using Infrastructure.Hubs;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.OpenApi.Models;

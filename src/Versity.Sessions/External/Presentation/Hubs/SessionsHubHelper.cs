@@ -1,6 +1,5 @@
 ﻿using Application.Abstractions.Hubs;
 using Application.Dtos;
-using Infrastructure.Hubs;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Presentation.Hubs;

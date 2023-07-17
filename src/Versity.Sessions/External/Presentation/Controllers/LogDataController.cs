@@ -1,4 +1,5 @@
-﻿using Application.RequestHandlers.SessionLogging.Commands.CreateLogData;
+﻿using Application.Dtos;
+using Application.RequestHandlers.SessionLogging.Commands.CreateLogData;
 using Application.RequestHandlers.SessionLogging.Commands.CreateLogsData;
 using Application.RequestHandlers.SessionLogging.Queries.GetAllLogsData;
 using Application.RequestHandlers.SessionLogging.Queries.GetLogDataById;

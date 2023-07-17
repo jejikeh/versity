@@ -47,16 +47,28 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
 import UserSessionsViewModelTable from "../components/UserSessionViewModelTable";
+import {
+  CreateLogData,
+  CreateLogDataHelper,
+} from "../models/session/commands/CreateLogData";
 
 const Session: FC = () => {
   const urlParams = useParams();
   const { store } = useContext(Context);
   const [connection, setConnection] = useState<HubConnection>();
 
-  const setupStreaming = (): Subject<unknown> => {
-    const subject = new Subject();
+  const setupStreaming = (): Subject<CreateLogData> => {
+    const subject = new Subject<CreateLogData>();
     connection?.send("UploadStream", subject);
-    subject?.next("Connected to the hub");
+    if (urlParams.id) {
+      subject?.next(
+        CreateLogDataHelper.toCreateLogData(
+          urlParams.id,
+          0,
+          `${urlParams.id} connected`
+        )
+      );
+    }
     return subject;
   };
 
@@ -69,10 +81,25 @@ const Session: FC = () => {
       if (!connection || connection.state !== "Connected") {
         setConnection(await SessionConnectionService.connect(store.token));
       }
+
+      connection?.on("closedsession", (message: UserSessionsViewModel) => {
+        handleCloseNofification(message);
+      });
     };
 
     fetchConnection();
   }, [store.userId, connection]);
+
+  const [openCloseNotificationState, setCloseNotificationOpen] =
+    useState(false);
+
+  const handleCloseNofification = (
+    viewModel: UserSessionsViewModel | undefined
+  ) => {
+    if (viewModel?.id == urlParams.id) {
+      setCloseNotificationOpen(true);
+    }
+  };
 
   const stream = setupStreaming();
 
@@ -85,6 +112,27 @@ const Session: FC = () => {
 
   return (
     <Container sx={{ pt: 8 }}>
+      <Dialog
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        open={openCloseNotificationState}
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"New session was created for your account!"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            You can view details of the session here.
+            <br></br>Click Connect button, if you want to connect to the new
+            session, otherwise click Cancel button to refresh the current page.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button href="/sessions" autoFocus>
+            Ok
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Stack sx={{ pb: 8 }} spacing={2}>
         <Typography
           variant="h1"
@@ -117,13 +165,45 @@ const Session: FC = () => {
           </div>
         )}
         <Stack direction={"row"} spacing={2}>
-          <Button color="error" onClick={() => stream?.next("Red Button")}>
+          <Button
+            color="error"
+            onClick={() =>
+              stream?.next(
+                CreateLogDataHelper.toCreateLogData(
+                  urlParams.id ? urlParams.id : "ERROR",
+                  0,
+                  `Red button is pressed`
+                )
+              )
+            }
+          >
             Red Button
           </Button>
-          <Button color="success" onClick={() => stream?.next("Green Button")}>
+          <Button
+            color="success"
+            onClick={() => {
+              stream?.next(
+                CreateLogDataHelper.toCreateLogData(
+                  urlParams.id ? urlParams.id : "ERROR",
+                  0,
+                  `Green button is pressed`
+                )
+              );
+            }}
+          >
             Green Button
           </Button>
-          <Button onClick={() => stream?.next("Blue Button")}>
+          <Button
+            onClick={() => {
+              stream?.next(
+                CreateLogDataHelper.toCreateLogData(
+                  urlParams.id ? urlParams.id : "ERROR",
+                  0,
+                  `Blue button is pressed`
+                )
+              );
+            }}
+          >
             Blue Button
           </Button>
         </Stack>
