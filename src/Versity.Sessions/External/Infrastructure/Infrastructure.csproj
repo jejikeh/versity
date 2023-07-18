@@ -29,6 +29,7 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
+      <PackageReference Include="NRedisStack" Version="0.8.0" />
       <PackageReference Include="Scrutor" Version="4.2.2" />
     </ItemGroup>
     <ItemGroup>

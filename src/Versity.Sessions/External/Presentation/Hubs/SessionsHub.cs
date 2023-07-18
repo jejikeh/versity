@@ -1,5 +1,5 @@
 ﻿using Application.Abstractions.Hubs;
-using Application.RequestHandlers.SessionLogging.Commands.CreateLogData;
+using Application.RequestHandlers.SessionLogging.Commands.CacheLogData;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -16,7 +16,7 @@ public class SessionsHub : Hub<ISessionsHubClient>
     }
     
     [Authorize(Roles = "Member")]
-    public async Task UploadStream(IAsyncEnumerable<CreateLogDataCommand> stream)
+    public async Task UploadStream(IAsyncEnumerable<CacheLogDataCommand> stream)
     {
         await foreach (var item in stream)
         {

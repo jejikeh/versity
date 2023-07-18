@@ -1,9 +1,7 @@
-﻿using Application.Abstractions.Hubs;
-using Application.Abstractions.Notifications;
+﻿using Application.Abstractions;
 using Application.Abstractions.Repositories;
 using Application.Dtos;
 using Domain.Models;
-using Hangfire;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Services;
@@ -13,8 +11,8 @@ public class UpdateSessionStatusService
     private readonly ISessionsRepository _sessionsRepository;
     private readonly ILogger<UpdateSessionStatusService> _logger;
     private readonly INotificationSender _notificationSender;
-    
-    public UpdateSessionStatusService(ISessionsRepository sessionsRepository, ILogger<UpdateSessionStatusService> logger, INotificationSender notificationSender)
+
+    public UpdateSessionStatusService(ISessionsRepository sessionsRepository, ILogger<UpdateSessionStatusService> logger, INotificationSender notificationSender, ICacheService cacheService, ISessionLogsRepository sessionLogsRepository, ILogsDataRepository logsDataRepository)
     {
         _sessionsRepository = sessionsRepository;
         _logger = logger;

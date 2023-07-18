@@ -19,7 +19,7 @@ public class GetAllSessionsQueryHandler : IRequestHandler<GetAllSessionsQuery, I
     {
         var sessions = _sessionsRepository
             .GetAllSessions()
-            .OrderBy(x => x.UserId)
+            .OrderBy(x => x.Status)
             .Skip(PageFetchSettings.ItemsOnPage * (request.Page - 1))
             .Take(PageFetchSettings.ItemsOnPage);
         

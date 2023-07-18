@@ -26,6 +26,7 @@ public class SubBasedUserIdProvider : IUserIdProvider
         }
         
         _logger.LogInformation("--> Claim was`t founded! Default to empty guid!");
+        
         return new Guid().ToString();
     }
 }

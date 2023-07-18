@@ -10,4 +10,5 @@ public interface ILogsDataRepository
     public Task CreateRangeLogsDataAsync(IEnumerable<LogData> logsData, CancellationToken cancellationToken);
     public Task<List<LogData>> ToListAsync(IQueryable<LogData> logsData);
     public Task SaveChangesAsync(CancellationToken cancellationToken);
+    public void SaveChanges();
 }

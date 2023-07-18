@@ -46,7 +46,7 @@ public class GetUserSessionsByUserIdQueryHandler
 
         var sessions = _sessions
             .GetAllUserSessions(request.UserId)
-            .OrderBy(x => x.UserId)
+            .OrderBy(x => x.Status)
             .Skip(PageFetchSettings.ItemsOnPage * (request.Page - 1))
             .Take(PageFetchSettings.ItemsOnPage);
 

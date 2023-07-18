@@ -48,4 +48,9 @@ public class SessionLogsRepository : ISessionLogsRepository
     {
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    public void SaveChanges()
+    {
+        _context.SaveChanges();
+    }
 }

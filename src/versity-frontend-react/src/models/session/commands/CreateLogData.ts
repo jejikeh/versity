@@ -17,21 +17,21 @@ export class CreateLogDataHelper {
     console.log(
       `${this.AddZero(time.getFullYear().toString())}-${this.AddZero(
         (time.getMonth() + 1).toString()
-      )}-${this.AddZero(
-        time.getDate().toString()
-      )}T${time.getHours()}:${this.AddZero(
-        time.getMinutes().toString()
-      )}:${this.AddZero(time.getSeconds().toString())}`
+      )}-${this.AddZero(time.getDate().toString())}T${this.AddZero(
+        time.getHours().toString()
+      )}:${this.AddZero(time.getMinutes().toString())}:${this.AddZero(
+        time.getSeconds().toString()
+      )}`
     );
     return {
       sessionLogsId,
       time: `${this.AddZero(time.getFullYear().toString())}-${this.AddZero(
         (time.getMonth() + 1).toString()
-      )}-${this.AddZero(
-        time.getDate().toString()
-      )}T${time.getHours()}:${this.AddZero(
-        time.getMinutes().toString()
-      )}:${this.AddZero(time.getSeconds().toString())}`,
+      )}-${this.AddZero(time.getDate().toString())}T${this.AddZero(
+        time.getHours().toString()
+      )}:${this.AddZero(time.getMinutes().toString())}:${this.AddZero(
+        time.getSeconds().toString()
+      )}`,
       logLevel,
       data,
     };

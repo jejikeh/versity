@@ -19,7 +19,7 @@ public class GetAllProductSessionsQueryHandler : IRequestHandler<GetAllProductSe
     {
         var sessions = _sessionsRepository
             .GetAllProductSessions(request.ProductId)
-            .OrderBy(x => x.UserId)
+            .OrderBy(x => x.Status)
             .Skip(PageFetchSettings.ItemsOnPage * (request.Page - 1))
             .Take(PageFetchSettings.ItemsOnPage);
         

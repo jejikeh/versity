@@ -1,21 +1,19 @@
-﻿using Application.Abstractions.Repositories;
+﻿using Application.Abstractions;
+using Application.Abstractions.Repositories;
+using Application.Common;
 using Domain.Models;
-using Infrastructure.Extensions;
-using Microsoft.Extensions.Caching.Distributed;
 
 namespace Infrastructure.Persistence.Repositories;
 
 public class CachedSessionsRepository : ISessionsRepository
 {
     private readonly ISessionsRepository _sessions;
-    private readonly IDistributedCache _distributedCache;
-    private readonly VersitySessionsServiceDbContext _context;
+    private readonly ICacheService _distributedCache;
     
-    public CachedSessionsRepository(ISessionsRepository sessions, IDistributedCache distributedCache, VersitySessionsServiceDbContext context)
+    public CachedSessionsRepository(ISessionsRepository sessions, ICacheService distributedCache)
     {
         _sessions = sessions;
         _distributedCache = distributedCache;
-        _context = context;
     }
 
     public IQueryable<Session> GetAllSessions()
@@ -26,9 +24,7 @@ public class CachedSessionsRepository : ISessionsRepository
     public async Task<Session?> GetSessionByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _distributedCache.GetOrCreateAsync(
-            _context,
-            $"session-by-id-{id}",
-            cancellationToken,
+            CachingKeys.SessionById(id),
             async () => await _sessions.GetSessionByIdAsync(id, cancellationToken));
     }
 
