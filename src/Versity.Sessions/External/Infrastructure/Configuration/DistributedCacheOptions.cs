@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
-
-namespace Infrastructure.Extensions;
+﻿namespace Infrastructure.Configuration;
 
 public static class DistributedCacheOptions
 {

@@ -73,6 +73,7 @@ public static class InfrastructureInjection
             .UsePostgreSqlStorage(Environment.GetEnvironmentVariable("ConnectionString")));
 
         serviceCollection.AddTransient<UpdateSessionStatusService>();
+        serviceCollection.AddTransient<BackgroundWorkersCacheService>();
         
         return serviceCollection;
     }
@@ -96,7 +97,7 @@ public static class InfrastructureInjection
             x => x.OpenInactiveSessions(), 
             Cron.Minutely);
         
-        RecurringJob.AddOrUpdate<UpdateSessionStatusService>(
+        RecurringJob.AddOrUpdate<BackgroundWorkersCacheService>(
             "PushSessionsLogs",
             x => x.PushSessionLogs(), 
             Cron.Minutely);

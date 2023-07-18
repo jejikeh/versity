@@ -9,4 +9,5 @@ public interface ISessionLogsRepository
     public Task<SessionLogs> CreateSessionLogsAsync(SessionLogs sessionLogs, CancellationToken cancellationToken);
     public Task<List<SessionLogs>> ToListAsync(IQueryable<SessionLogs> sessionLogs);
     public Task SaveChangesAsync(CancellationToken cancellationToken);
+    public void SaveChanges();
 }

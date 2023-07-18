@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using Application.Abstractions;
-using Infrastructure.Extensions;
+using Infrastructure.Configuration;
 using StackExchange.Redis;
 
 namespace Infrastructure.Services;
@@ -23,9 +23,15 @@ public class RedisCacheService : ICacheService
         }
         
         await _database.StringSetAsync(key, JsonSerializer.Serialize(value), DistributedCacheOptions.CacheExpiryTime);
+        
         return value;
     }
-    
+
+    public void SetRemoveMember<T>(string key, T member)
+    {
+        _database.SetRemove(key, JsonSerializer.Serialize(member));
+    }
+
     public async Task SetAddAsync<T>(string key, Func<Task<T?>> factory)
     {
         var value = await factory.Invoke();
@@ -53,7 +59,9 @@ public class RedisCacheService : ICacheService
 
     public IQueryable<T> GetSetOrAddRangeQueryableAsync<T>(string key, Func<IQueryable<T>> factory)
     {
+        _database.KeyExpire(key, DistributedCacheOptions.CacheExpiryTime);
         var collection = GetSetOrAddRangeAsync(key, factory);
+        
         return collection.ToBlockingEnumerable().AsQueryable();
     }
 
@@ -66,6 +74,7 @@ public class RedisCacheService : ICacheService
             foreach (var value in values)
             {
                 await _database.SetAddAsync(key, JsonSerializer.Serialize(value));
+                
                 yield return value;
             }
         }
