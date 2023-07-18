@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions;
 using Application.Abstractions.Repositories;
+using Application.Common;
 using Application.Exceptions;
 using Application.RequestHandlers.SessionLogging.Commands.CacheLogData;
 using Domain.Models.SessionLogging;
@@ -27,7 +28,7 @@ public class BackgroundWorkersCacheService
         _logger.LogInformation("--> Start pushing session logs...");
 
         var logs = _cacheService
-            .GetSetAsync<CacheLogDataCommand>("session-logs")
+            .GetSetAsync<CacheLogDataCommand>(CachingKeys.SessionLogs)
             .ToBlockingEnumerable();
     
         foreach (var log in logs)
@@ -50,7 +51,7 @@ public class BackgroundWorkersCacheService
             
             sessionLogs.Logs.Add(logData);
             _logsDataRepository.CreateLogDataAsync(logData, default);
-            _cacheService.SetRemoveMember("session-logs", log);
+            _cacheService.SetRemoveMember(CachingKeys.SessionLogs, log);
         }
 
         _logsDataRepository.SaveChanges();

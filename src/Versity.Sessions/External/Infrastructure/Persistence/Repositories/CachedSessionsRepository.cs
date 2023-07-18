@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions;
 using Application.Abstractions.Repositories;
+using Application.Common;
 using Domain.Models;
 
 namespace Infrastructure.Persistence.Repositories;
@@ -23,7 +24,7 @@ public class CachedSessionsRepository : ISessionsRepository
     public async Task<Session?> GetSessionByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _distributedCache.GetOrCreateAsync(
-            $"sessions",
+            CachingKeys.SessionById(id),
             async () => await _sessions.GetSessionByIdAsync(id, cancellationToken));
     }
 

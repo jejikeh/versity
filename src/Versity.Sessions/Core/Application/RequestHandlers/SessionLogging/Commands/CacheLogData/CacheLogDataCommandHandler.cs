@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Common;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -17,6 +18,6 @@ public class CacheLogDataCommandHandler : IRequestHandler<CacheLogDataCommand>
 
     public async Task Handle(CacheLogDataCommand request, CancellationToken cancellationToken)
     {
-        await _cacheService.SetAddAsync("session-logs", request);
+        await _cacheService.SetAddAsync(CachingKeys.SessionLogs, request);
     }
 }
