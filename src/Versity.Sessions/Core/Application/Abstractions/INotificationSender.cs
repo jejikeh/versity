@@ -1,7 +1,6 @@
 ﻿using Application.Dtos;
-using MediatR;
 
-namespace Application.Abstractions.Notifications;
+namespace Application.Abstractions;
 
 public interface INotificationSender
 {

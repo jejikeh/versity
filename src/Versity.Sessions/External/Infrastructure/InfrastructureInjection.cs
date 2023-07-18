@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Application.Abstractions;
-using Application.Abstractions.Notifications;
 using Application.Abstractions.Repositories;
 using Hangfire;
 using Hangfire.PostgreSql;
