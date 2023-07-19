@@ -31,4 +31,8 @@
       <ProjectReference Include="..\..\External\Presentation\Presentation.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Infrastructure\EmailServices\" />
+    </ItemGroup>
+
 </Project>

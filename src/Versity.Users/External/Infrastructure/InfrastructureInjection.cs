@@ -1,8 +1,12 @@
 ﻿using System.Reflection;
+using Application.Abstractions;
 using Application.Abstractions.Repositories;
 using Domain.Models;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
+using Infrastructure.Services;
+using Infrastructure.Services.EmailServices;
+using MailKit.Net.Smtp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +35,15 @@ public static class InfrastructureInjection
         serviceCollection.AddScoped<IVersityUsersRepository, VersityUsersRepository>();
         serviceCollection.AddScoped<IVersityRolesRepository, VersityRoleRepository>();
         serviceCollection.AddScoped<IVersityRefreshTokensRepository, VersityRefreshTokensRepository>();
+        
+        return serviceCollection;
+    }
+    
+    public static IServiceCollection AddServices(this IServiceCollection serviceCollection, IEmailServicesConfiguration emailServicesConfiguration)
+    {
+        serviceCollection.UseEmailServices(emailServicesConfiguration);
+        serviceCollection.AddScoped<IAuthTokenGeneratorService, JwtTokenGeneratorService>();
+        serviceCollection.AddScoped<IRefreshTokenGeneratorService, RefreshTokenGeneratorService>();
         
         return serviceCollection;
     }

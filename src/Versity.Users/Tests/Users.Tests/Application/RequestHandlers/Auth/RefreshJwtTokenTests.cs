@@ -64,7 +64,7 @@ public class RefreshJwtTokenTests
                 It.IsAny<CancellationToken>()))!.ReturnsAsync(new RefreshToken() { Token = "dd44e461-7217-41ab-8a41-f230381e0ed8"});
 
         _versityUsersRepository.Setup(
-                x => x.GetRolesAsync(It.IsAny<VersityUser>()))
+                x => x.GetUserRolesAsync(It.IsAny<VersityUser>()))
             .ReturnsAsync(new List<string>() { "Member" });
         
         _authTokenGeneratorService.Setup(

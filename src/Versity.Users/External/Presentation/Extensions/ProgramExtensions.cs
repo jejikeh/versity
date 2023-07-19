@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.OpenApi.Models;
+using Presentation.Configuration;
 using Presentation.Services;
 using Serilog;
 
@@ -20,6 +21,7 @@ public static class ProgramExtensions
             .AddRedisCaching()
             .AddApplication()
             .AddVersityIdentity()
+            .AddServices(new EmailServicesConfiguration())
             .AddJwtAuthentication(builder.Configuration)
             .AddSwagger()
             .AddCors(options => options.ConfigureAllowAllCors())

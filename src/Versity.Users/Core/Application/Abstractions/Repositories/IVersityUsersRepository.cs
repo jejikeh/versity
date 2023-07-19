@@ -14,7 +14,6 @@ public interface IVersityUsersRepository
     public Task<IdentityResult> DeleteUserAsync(VersityUser user);
     public Task<IdentityResult> SetUserRoleAsync(VersityUser user, VersityRole role);
     public Task<bool> CheckPasswordAsync(VersityUser user, string requestPassword);
-    public Task<IEnumerable<string>> GetRolesAsync(VersityUser user);
     public Task<IdentityResult> ResetPasswordAsync(VersityUser user, string token, string newPassword);
     public Task<string> GeneratePasswordResetTokenAsync(VersityUser user);
     public Task<List<VersityUser>> ToListAsync(IQueryable<VersityUser> users);

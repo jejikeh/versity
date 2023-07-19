@@ -29,7 +29,7 @@ public class LoginVersityUserCommandHandler : IRequestHandler<LoginVersityUserCo
     public async Task<AuthTokens> Handle(LoginVersityUserCommand request, CancellationToken cancellationToken)
     {
         var versityUser = await GetUserByEmail(request);
-        var userRoles = await _versityUsersRepository.GetRolesAsync(versityUser);
+        var userRoles = await _versityUsersRepository.GetUserRolesAsync(versityUser);
         
         var userToken = _authTokenGeneratorService.GenerateToken(versityUser.Id, versityUser.Email, userRoles);
         var refreshToken = _refreshTokenGeneratorService.GenerateToken(versityUser.Id);

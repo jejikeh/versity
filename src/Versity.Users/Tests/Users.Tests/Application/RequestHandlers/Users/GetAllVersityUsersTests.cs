@@ -7,7 +7,7 @@ using Moq;
 
 namespace Users.Tests.Application.RequestHandlers.Users;
 
-public class GetAllVersityUsersQueryTests
+public class GetAllVersityUsersTests
 {
     public static readonly List<VersityUser> VersityUsersPayload = new List<VersityUser>()
     {
@@ -112,7 +112,7 @@ public class GetAllVersityUsersQueryTests
         },
     };
 
-    private static List<ViewVersityUserDto> _dtoPayload = new List<ViewVersityUserDto>()
+    public static List<ViewVersityUserDto> DtoPayload = new List<ViewVersityUserDto>()
     {
         ViewVersityUserDto.MapFromModel(VersityUsersPayload[0], new List<string>() { "Admin" }),
         ViewVersityUserDto.MapFromModel(VersityUsersPayload[1], new List<string>() { "Admin" }),
@@ -128,7 +128,7 @@ public class GetAllVersityUsersQueryTests
     
     private readonly Mock<IVersityUsersRepository> _versityUsersRepository;
 
-    public GetAllVersityUsersQueryTests()
+    public GetAllVersityUsersTests()
     {
         _versityUsersRepository = new Mock<IVersityUsersRepository>();
     }
@@ -143,14 +143,14 @@ public class GetAllVersityUsersQueryTests
             x.ToListAsync(It.IsAny<IQueryable<VersityUser>>())).ReturnsAsync(VersityUsersPayload.GetRange(0, 10));
 
         _versityUsersRepository.Setup(x =>
-            x.GetRolesAsync(It.IsAny<VersityUser>())).ReturnsAsync(new[] { "Admin" });
+            x.GetUserRolesAsync(It.IsAny<VersityUser>())).ReturnsAsync(new[] { "Admin" });
         
         var request = new GetAllVersityUsersQuery(1);
         var handler = new GetAllVersityUsersQueryHandler(_versityUsersRepository.Object);
         
         var act = await handler.Handle(request, default);
         
-        act.Should().BeEquivalentTo(_dtoPayload);
+        act.Should().BeEquivalentTo(DtoPayload);
     }
     
     [Fact]

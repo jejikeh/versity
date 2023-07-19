@@ -1,4 +1,4 @@
-﻿using Application.Abstractions;
+using Application.Abstractions;
 using Application.Abstractions.Repositories;
 using Application.Exceptions;
 using Application.RequestHandlers.Users.Commands.GiveAdminRoleToUser;
@@ -45,7 +45,7 @@ public class GiveAdminRoleToUserTests
             .ReturnsAsync(new VersityUser());
 
         _versityUsersRepository.Setup(x =>
-                x.GetRolesAsync(It.IsAny<VersityUser>()))
+                x.GetUserRolesAsync(It.IsAny<VersityUser>()))
             .ReturnsAsync(new []{VersityRole.Admin.ToString()});
 
         _tokenGeneratorService.Setup(x =>
