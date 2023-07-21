@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(VersitySessionsServiceDbContext))]
-    [Migration("20230714005332_AddLogs")]
-    partial class AddLogs
+    [Migration("20230720235344_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

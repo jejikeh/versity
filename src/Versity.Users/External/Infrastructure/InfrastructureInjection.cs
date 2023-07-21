@@ -6,10 +6,12 @@ using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services;
 using Infrastructure.Services.EmailServices;
+using Infrastructure.Services.TokenServices;
 using MailKit.Net.Smtp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace Infrastructure;
 
@@ -39,11 +41,10 @@ public static class InfrastructureInjection
         return serviceCollection;
     }
     
-    public static IServiceCollection AddServices(this IServiceCollection serviceCollection, IEmailServicesConfiguration emailServicesConfiguration)
+    public static IServiceCollection AddServices(this IServiceCollection serviceCollection, IEmailServicesConfiguration emailServicesConfiguration, ITokenGenerationConfiguration tokenGenerationConfiguration)
     {
         serviceCollection.UseEmailServices(emailServicesConfiguration);
-        serviceCollection.AddScoped<IAuthTokenGeneratorService, JwtTokenGeneratorService>();
-        serviceCollection.AddScoped<IRefreshTokenGeneratorService, RefreshTokenGeneratorService>();
+        serviceCollection.UseTokenServices(tokenGenerationConfiguration);
         
         return serviceCollection;
     }
@@ -51,12 +52,10 @@ public static class InfrastructureInjection
     public static IServiceCollection AddRedisCaching(this IServiceCollection serviceCollection)
     {
         serviceCollection.Decorate<IVersityRefreshTokensRepository, CachedRefreshTokensRepository>();
+        serviceCollection.AddSingleton(ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS_Host")));
+        serviceCollection.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(provider => provider.GetService<ConnectionMultiplexer>());
+        serviceCollection.AddSingleton<ICacheService, RedisCacheService>();
 
-        serviceCollection.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration = Environment.GetEnvironmentVariable("REDIS_Host");
-        });
-        
         return serviceCollection;
     }
 }

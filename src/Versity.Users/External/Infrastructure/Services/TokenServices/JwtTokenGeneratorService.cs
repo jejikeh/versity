@@ -3,19 +3,18 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Application.Abstractions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
-namespace Infrastructure.Services;
+namespace Infrastructure.Services.TokenServices;
 
 public class JwtTokenGeneratorService : IAuthTokenGeneratorService
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public JwtTokenGeneratorService(IHttpContextAccessor httpContextAccessor)
+    private readonly ITokenGenerationConfiguration _configuration;
+    
+    public JwtTokenGeneratorService(ITokenGenerationConfiguration configuration)
     {
-        _httpContextAccessor = httpContextAccessor;
+        _configuration = configuration;
     }
 
     public string GenerateToken(string userId, string userEmail, IEnumerable<string> roles)
@@ -33,10 +32,10 @@ public class JwtTokenGeneratorService : IAuthTokenGeneratorService
         var securityToken = new JwtSecurityToken(
             claims: claims,
             expires: DateTime.UtcNow.AddHours(6),
-            issuer: Environment.GetEnvironmentVariable("JWT__Issuer"),
-            audience: Environment.GetEnvironmentVariable("JWT__Audience"),
+            issuer: _configuration.Issuer,
+            audience: _configuration.Audience,
             signingCredentials: new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT__Key"))), 
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.Key)), 
                 SecurityAlgorithms.HmacSha512Signature));
         
         return new JwtSecurityTokenHandler().WriteToken(securityToken);

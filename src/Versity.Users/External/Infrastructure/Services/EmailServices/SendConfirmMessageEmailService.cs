@@ -6,22 +6,24 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace Infrastructure.Services.EmailServices;
 
-public class EmailConfirmMessageGmailService : IEmailConfirmMessageService
+public class SendConfirmMessageEmailService : IEmailConfirmMessageService
 {
     private readonly UserManager<VersityUser> _userManager;
     private readonly IEmailSenderService _emailSenderService;
+    private readonly IEmailServicesConfiguration _configuration;
 
-    public EmailConfirmMessageGmailService(UserManager<VersityUser> userManager, IEmailSenderService emailSenderService)
+    public SendConfirmMessageEmailService(UserManager<VersityUser> userManager, IEmailSenderService emailSenderService, IEmailServicesConfiguration configuration)
     {
         _userManager = userManager;
         _emailSenderService = emailSenderService;
+        _configuration = configuration;
     }
 
     public async Task SendEmailConfirmMessageAsync(VersityUser user)
     {
         var token = await GenerateConfirmationToken(user);
         
-        var confirmUrl = Environment.GetEnvironmentVariable("EMAIL__ConfirmUrl") + $"{user.Id}/{token}";
+        var confirmUrl = _configuration.ConfirmUrl + $"{user.Id}/{token}";
         var emailBody = GenerateEmailBody(user, confirmUrl);
 
         await _emailSenderService.SendEmailAsync("Versity Identity Server", user.Email, "Confirm Email", emailBody);

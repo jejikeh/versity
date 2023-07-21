@@ -21,7 +21,9 @@ public static class ProgramExtensions
             .AddRedisCaching()
             .AddApplication()
             .AddVersityIdentity()
-            .AddServices(new EmailServicesConfiguration())
+            .AddServices(
+                new EmailServicesConfiguration(), 
+                new TokenGenerationConfiguration())
             .AddJwtAuthentication(builder.Configuration)
             .AddSwagger()
             .AddCors(options => options.ConfigureAllowAllCors())

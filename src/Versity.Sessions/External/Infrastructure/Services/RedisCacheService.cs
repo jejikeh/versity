@@ -9,7 +9,7 @@ public class RedisCacheService : ICacheService
 {
     private readonly IDatabase _database;
     
-    public RedisCacheService(ConnectionMultiplexer connectionMultiplexer)
+    public RedisCacheService(IConnectionMultiplexer connectionMultiplexer)
     {
         _database = connectionMultiplexer.GetDatabase();
     }

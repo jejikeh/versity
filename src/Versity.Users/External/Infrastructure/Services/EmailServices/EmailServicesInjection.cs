@@ -9,7 +9,7 @@ public static class EmailServicesInjection
     public static IServiceCollection UseEmailServices(this IServiceCollection serviceCollection, IEmailServicesConfiguration configuration)
     {
         serviceCollection.AddSingleton(configuration);
-        serviceCollection.AddTransient<IEmailConfirmMessageService, EmailConfirmMessageGmailService>();
+        serviceCollection.AddTransient<IEmailConfirmMessageService, SendConfirmMessageEmailService>();
         serviceCollection.AddTransient<IEmailSenderService, EmailSenderService>();
         serviceCollection.AddTransient<ISmtpClient, SmptClientService>();
         

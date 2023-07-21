@@ -48,6 +48,7 @@ public static class InfrastructureInjection
     {
         serviceCollection.Decorate<ISessionsRepository, CachedSessionsRepository>();
         serviceCollection.AddSingleton(ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS_Host")));
+        serviceCollection.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(provider => provider.GetService<ConnectionMultiplexer>());
         serviceCollection.AddSingleton<ICacheService, RedisCacheService>();
         
         return serviceCollection;

@@ -7,6 +7,7 @@ using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace Infrastructure;
 
@@ -44,10 +45,9 @@ public static class InfrastructureInjection
     public static IServiceCollection AddRedisCaching(this IServiceCollection serviceCollection)
     {
         serviceCollection.Decorate<IVersityProductsRepository, CachedProductsRepository>();
-        serviceCollection.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration = Environment.GetEnvironmentVariable("REDIS_Host");
-        });
+        serviceCollection.AddSingleton(ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS_Host")));
+        serviceCollection.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(provider => provider.GetService<ConnectionMultiplexer>());
+        serviceCollection.AddSingleton<ICacheService, RedisCacheService>();
         
         return serviceCollection;
     }

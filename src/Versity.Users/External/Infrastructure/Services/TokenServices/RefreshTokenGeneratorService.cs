@@ -4,7 +4,7 @@ using Application.Common;
 using Application.Exceptions;
 using Domain.Models;
 
-namespace Infrastructure.Services;
+namespace Infrastructure.Services.TokenServices;
 
 public class RefreshTokenGeneratorService : IRefreshTokenGeneratorService
 {
@@ -36,6 +36,7 @@ public class RefreshTokenGeneratorService : IRefreshTokenGeneratorService
         {
             throw new IdentityExceptionWithStatusCode("The refresh token was not generated.");
         }
+        
         if (refreshToken.IsRevoked || refreshToken.ExpiryTime < DateTime.UtcNow)
         {
             throw new IdentityExceptionWithStatusCode("The refresh token was expired or revoked. Please login again");

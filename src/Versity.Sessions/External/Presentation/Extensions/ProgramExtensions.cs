@@ -100,7 +100,7 @@ public static class ProgramExtensions
             hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(10);
             hubOptions.HandshakeTimeout = TimeSpan.FromSeconds(5);
         });
-        
+
         serviceCollection.AddScoped<ISessionsHubHelper, SessionsHubHelper>();
 
         return serviceCollection;

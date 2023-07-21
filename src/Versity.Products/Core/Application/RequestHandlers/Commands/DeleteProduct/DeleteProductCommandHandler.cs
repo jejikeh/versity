@@ -27,6 +27,6 @@ public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand>
         
         _products.DeleteProduct(product);
         await _products.SaveChangesAsync(cancellationToken);
-        await _productProducerService.DeleteProductProduce(new DeleteProductDto(request.Id), cancellationToken);
+        await _productProducerService.DeleteProductProduce(new DeleteProductDto(product.Id), cancellationToken);
     }
 }
