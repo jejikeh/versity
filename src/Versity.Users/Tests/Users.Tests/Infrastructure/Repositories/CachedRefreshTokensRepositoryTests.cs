@@ -90,12 +90,6 @@ public class CachedRefreshTokensRepositoryTests
     
     private static IEnumerable<RefreshToken> GenerateFakeProductsList()
     {
-        return new Faker<RefreshToken>()
-            .RuleFor(product => product.Id, f => Guid.NewGuid())
-            .RuleFor(product => product.AddedTime, f => f.Date.Past())
-            .RuleFor(product => product.ExpiryTime, f => f.Date.Future())
-            .RuleFor(product => product.IsRevoked, f => f.PickRandom<bool>())
-            .RuleFor(product => product.Token, f => f.Lorem.Word())
-            .Generate(20);
+        return Enumerable.Range(0, 10).Select(_ => new RefreshToken() { Token = "testToken" }).ToList();
     }
 }

@@ -2,6 +2,7 @@
 using Infrastructure;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.OpenApi.Models;
+using Presentation.Configuration;
 using Serilog;
 
 namespace Presentation.Extensions;
@@ -16,7 +17,7 @@ public static class ProgramExtensions
             .AddRedisCaching()
             .AddApplication()
             .AddKafkaFlow()
-            .AddKafkaServices()
+            .AddKafkaServices(new KafkaProducerConfiguration())
             .AddJwtAuthentication(builder.Configuration)
             .AddSwagger()
             .AddCors(options => options.ConfigureAllowAllCors())

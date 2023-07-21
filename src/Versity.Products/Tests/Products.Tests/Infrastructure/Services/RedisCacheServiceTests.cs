@@ -4,7 +4,7 @@ using Infrastructure.Services;
 using Moq;
 using StackExchange.Redis;
 
-namespace Users.Tests.Infrastructure.Services;
+namespace Products.Tests.Infrastructure.Services;
 
 public class RedisCacheServiceTests
 {
@@ -23,7 +23,6 @@ public class RedisCacheServiceTests
     [Fact]
     public async Task GetOrCreateAsync_ShouldReturnValue_WhenValueInCacheKey()
     {
-        // Arrange
         var key = "test";
         var factory = new Func<Task<string?>>(() => Task.Run(() => "test"));
         var redisCacheService = new RedisCacheService(_connectionMultiplexer.Object);
@@ -31,10 +30,8 @@ public class RedisCacheServiceTests
             x.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
             .ReturnsAsync(JsonSerializer.Serialize("test"));
         
-        // Act
         var result = await redisCacheService.GetOrCreateAsync(key, factory);
         
-        // Assert
         result.Should().Be("test");
     }
     

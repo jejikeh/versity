@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Application.Abstractions;
 using Application.Abstractions.Repositories;
+using Infrastructure.Configurations;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services;
@@ -35,8 +36,9 @@ public static class InfrastructureInjection
         return serviceCollection;
     }
 
-    public static IServiceCollection AddKafkaServices(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddKafkaServices(this IServiceCollection serviceCollection, IKafkaProducerConfiguration configuration)
     {
+        serviceCollection.AddSingleton(configuration);
         serviceCollection.AddTransient<IProductProducerService, KafkaProductProducerService>();
 
         return serviceCollection;
