@@ -99,13 +99,13 @@ services:
       - dev
     
   redis-products-cache:
-    image: redis:6.2-alpine
-    restart: always
+    image: redis/redis-stack:latest
     ports:
       - '6379'
-    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    environment:
+      - REDIS_ARGS=--requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
     volumes:
-      - products-cache:/data
+      - users-cache:/data
     networks:
       dev:
         aliases:
