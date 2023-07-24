@@ -3,6 +3,7 @@ using Application.RequestHandlers.Auth.Commands.ConfirmEmail;
 using Application.RequestHandlers.Auth.Commands.RefreshJwtToken;
 using Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
 using Application.RequestHandlers.Auth.Commands.ResendEmailVerificationToken;
+using Bogus;
 using FluentAssertions;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -14,7 +15,7 @@ namespace Users.Tests.Presentation.Controllers;
 
 public class AuthControllerTests
 {
-    private Mock<ISender> _sender;
+    private readonly Mock<ISender> _sender;
 
     public AuthControllerTests()
     {
@@ -24,40 +25,46 @@ public class AuthControllerTests
     [Fact]
     public async Task Register_ShouldReturnOk_WhenCommandIsValid()
     {
+        // Arrange
         _sender.Setup(x =>
                 x.Send(It.IsAny<RegisterVersityUserCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(IdentityResult.Success);
-        var request = new RegisterVersityUserCommand("test", "test", "test", "test", "test");
         var service = new AuthController(_sender.Object);
         
-        var response = await service.Register(request, CancellationToken.None);
+        // Act
+        var response = await service.Register(GenerateFakeRegisterVersityUserCommand(), CancellationToken.None);
         
+        // Assert
         response.Should().BeOfType<OkObjectResult>();
     }
     
     [Fact]
     public async Task ConfirmEmail_ShouldReturnOk_WhenUserExist()
     {
+        // Arrange
         _sender.Setup(x =>
                 x.Send(It.IsAny<ConfirmEmailCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(IdentityResult.Success);
         var service = new AuthController(_sender.Object);
         
-        var response = await service.ConfirmEmail("test", "test", CancellationToken.None);
+        // Act
+        var response = await service.ConfirmEmail(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), CancellationToken.None);
         
+        // Assert
         response.Should().BeOfType<OkObjectResult>();
     }
     
     [Fact]
     public async Task ResendEmailVerificationToken_ShouldReturnOk_WhenUserExist()
     {
+        // Arrange
         _sender.Setup(x =>
                 x.Send(It.IsAny<ResendEmailVerificationTokenCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(IdentityResult.Success);
-        var request = new ResendEmailVerificationTokenCommand("test", "test");
         var service = new AuthController(_sender.Object);
         
-        var response = await service.ResendEmailVerificationToken(request, CancellationToken.None);
+        // Act
+        var response = await service.ResendEmailVerificationToken(GenerateFakeResendEmailVerificationTokenCommand(), CancellationToken.None);
         
         response.Should().BeOfType<OkObjectResult>();
     }
@@ -65,13 +72,35 @@ public class AuthControllerTests
     [Fact]
     public async Task RefreshToken_ShouldReturnOk_WhenUserExist()
     {
+        // Arrange
         _sender.Setup(x =>
                 x.Send(It.IsAny<RefreshTokenCommand>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AuthTokens("test", "test", "test"));
+            .ReturnsAsync(new AuthTokens(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString()));
         var service = new AuthController(_sender.Object);
         
-        var response = await service.RefreshToken("test", "test", CancellationToken.None);
+        // Act
+        var response = await service.RefreshToken(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), CancellationToken.None);
         
+        // Assert
         response.Should().BeOfType<OkObjectResult>();
+    }
+    
+    private static RegisterVersityUserCommand GenerateFakeRegisterVersityUserCommand()
+    {
+        return new Faker<RegisterVersityUserCommand>().CustomInstantiator(faker => new RegisterVersityUserCommand(
+                faker.Name.FirstName(),
+                faker.Name.LastName(),
+                faker.Internet.Email(),
+                faker.Phone.PhoneNumber(),
+                faker.Internet.Password()))
+            .Generate();
+    }
+    
+    private static ResendEmailVerificationTokenCommand GenerateFakeResendEmailVerificationTokenCommand()
+    {
+        return new Faker<ResendEmailVerificationTokenCommand>().CustomInstantiator(faker => new ResendEmailVerificationTokenCommand(
+                faker.Internet.Email(),
+                faker.Internet.Password()))
+            .Generate();
     }
 }

@@ -22,6 +22,7 @@ public class CachedRefreshTokensRepositoryTests
     [Fact]
     public async Task GetAllAsync_ShouldReturnAllRefreshTokens_WhenEmptyValueInCacheKey()
     {
+        // Arrange
         var refreshTokens = GenerateFakeProductsList();
         var cachedRefreshTokensRepository = new CachedRefreshTokensRepository(_refreshTokensRepository.Object, _distributedCache.Object);
 
@@ -31,15 +32,18 @@ public class CachedRefreshTokensRepositoryTests
 
         _refreshTokensRepository.Setup(x => 
             x.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(refreshTokens);
-        
+
+        // Act        
         var result = await cachedRefreshTokensRepository.GetAllAsync(CancellationToken.None);
-        
+       
+        // Assert
         result.Should().BeSameAs(refreshTokens);
     }
 
     [Fact]
     public async Task FindUserTokenAsync_ShouldReturnRefreshToken_WhenValueInCacheKey()
     {
+        // Arrange
         var refreshTokens = GenerateFakeProductsList().ToList();
         var cachedRefreshTokensRepository = new CachedRefreshTokensRepository(_refreshTokensRepository.Object, _distributedCache.Object);
 
@@ -47,18 +51,23 @@ public class CachedRefreshTokensRepositoryTests
                 x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<RefreshToken?>>>()))
             .ReturnsAsync(() => refreshTokens[0]);
 
-        var result = await cachedRefreshTokensRepository.FindUserTokenAsync("testUser", "testToken", CancellationToken.None);
+        // Act
+        var result = await cachedRefreshTokensRepository.FindUserTokenAsync(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), CancellationToken.None);
         
+        // Assert
         result.Should().BeSameAs(refreshTokens[0]);
     }
     
     [Fact]
     public async Task AddAsync_ShouldInvokeRepository_WhenValueIsNotInCache()
     {
+        // Arrange
         var cachedRefreshTokensRepository = new CachedRefreshTokensRepository(_refreshTokensRepository.Object, _distributedCache.Object);
 
+        // Act
         await cachedRefreshTokensRepository.AddAsync(new RefreshToken(), CancellationToken.None);
 
+        // Assert
         _refreshTokensRepository.Verify(x => 
             x.AddAsync(It.IsAny<RefreshToken>(), It.IsAny<CancellationToken>()),
             Times.Once);
@@ -67,10 +76,13 @@ public class CachedRefreshTokensRepositoryTests
     [Fact]
     public void Update_ShouldInvokeRepository_WhenValueIsNotInCache()
     {
+        // Arrange
         var cachedRefreshTokensRepository = new CachedRefreshTokensRepository(_refreshTokensRepository.Object, _distributedCache.Object);
 
+        // Act
         cachedRefreshTokensRepository.Update(new RefreshToken());
 
+        // Assert
         _refreshTokensRepository.Verify(x => 
                 x.Update(It.IsAny<RefreshToken>()),
             Times.Once);
@@ -79,10 +91,13 @@ public class CachedRefreshTokensRepositoryTests
     [Fact]
     public async Task SaveChangesAsync_ShouldInvokeRepository_WhenValueIsNotInCache()
     {
+        // Arrange
         var cachedRefreshTokensRepository = new CachedRefreshTokensRepository(_refreshTokensRepository.Object, _distributedCache.Object);
 
+        // Act
         await cachedRefreshTokensRepository.SaveChangesAsync(CancellationToken.None);
 
+        // Assert
         _refreshTokensRepository.Verify(x => 
                 x.SaveChangesAsync(It.IsAny<CancellationToken>()),
             Times.Once);
@@ -90,6 +105,6 @@ public class CachedRefreshTokensRepositoryTests
     
     private static IEnumerable<RefreshToken> GenerateFakeProductsList()
     {
-        return Enumerable.Range(0, 10).Select(_ => new RefreshToken() { Token = "testToken" }).ToList();
+        return Enumerable.Range(0, 10).Select(_ => new RefreshToken() { Token = new Guid().ToString() }).ToList();
     }
 }

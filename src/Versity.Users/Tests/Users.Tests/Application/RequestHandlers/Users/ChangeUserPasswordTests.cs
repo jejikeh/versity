@@ -2,6 +2,7 @@
 using Application.Abstractions.Repositories;
 using Application.Exceptions;
 using Application.RequestHandlers.Users.Commands.ChangeUserPassword;
+using Bogus;
 using Domain.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -28,45 +29,50 @@ public class ChangeUserPasswordTests
     [Fact]
     public async Task RequestHandler_ShouldThrowException_WhenClaimsIsEmpty()
     {
+        // Arrange
         _httpContextAccessor.Setup(x => x.HttpContext.User.Claims).Returns(new[]
         {
-            new Claim(ClaimTypes.Email, "dd44e461-7217-41ab-8a41-f230381e0ed8")
+            new Claim(ClaimTypes.Email, new Faker().Internet.Email())
         });
         
-        var request = new ChangeUserPasswordCommand("hello@gmail.com", "world", "123456789");
         var handler = new ChangeUserPasswordCommandHandler(
             _versityUsersRepository.Object,
             _httpContextAccessor.Object
         );
         
-        var act = async () => await handler.Handle(request, default);
+        // Act
+        var act = async () => await handler.Handle(GenerateFakeChangeUserPasswordCommand(), default);
         
+        // Assert
         await act.Should().ThrowAsync<InvalidOperationException>();
     }
     
     [Fact]
     public async Task RequestHandler_ShouldThrowException_WhenUserIsNotFound()
     {
+        // Arrange
         _httpContextAccessor.Setup(x => x.HttpContext.User.Claims).Returns(_claims);
         
         _versityUsersRepository.Setup(x => 
                 x.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(null as VersityUser);
         
-        var request = new ChangeUserPasswordCommand("hello@gmail.com", "world", "123456789");
         var handler = new ChangeUserPasswordCommandHandler(
             _versityUsersRepository.Object,
             _httpContextAccessor.Object
         );
         
-        var act = async () => await handler.Handle(request, default);
+        // Act
+        var act = async () => await handler.Handle(GenerateFakeChangeUserPasswordCommand(), default);
         
+        // Assert
         await act.Should().ThrowAsync<NotFoundExceptionWithStatusCode>();
     }
     
     [Fact]
     public async Task RequestHandler_ShouldThrowException_WhenPasswordIsIncorrect()
     {
+        // Arrange
         _httpContextAccessor.Setup(x => x.HttpContext.User.Claims).Returns(_claims);
         
         _versityUsersRepository.Setup(x => 
@@ -77,20 +83,22 @@ public class ChangeUserPasswordTests
                 x.CheckPasswordAsync(It.IsAny<VersityUser>(), It.IsAny<string>()))
             .ReturnsAsync(false);
         
-        var request = new ChangeUserPasswordCommand("hello@gmail.com", "world", "123456789");
         var handler = new ChangeUserPasswordCommandHandler(
             _versityUsersRepository.Object,
             _httpContextAccessor.Object
         );
         
-        var act = async () => await handler.Handle(request, default);
+        // Act
+        var act = async () => await handler.Handle(GenerateFakeChangeUserPasswordCommand(), default);
         
+        // Assert
         await act.Should().ThrowAsync<IncorrectEmailOrPasswordExceptionWithStatusCode>();
     }
     
     [Fact]
     public async Task RequestHandler_ShouldThrowException_WhenUserIsNotAdminTriesToChangePasswordAnotherUser()
     {
+        // Arrange
         _httpContextAccessor.Setup(x => x.HttpContext.User.Claims).Returns(_claims);
         
         _versityUsersRepository.Setup(x => 
@@ -105,20 +113,22 @@ public class ChangeUserPasswordTests
                 x.GetUserRolesAsync(It.IsAny<VersityUser>()))
             .ReturnsAsync(new List<string>() { "Member" });
         
-        var request = new ChangeUserPasswordCommand("hello@gmail.com", "world", "123456789");
         var handler = new ChangeUserPasswordCommandHandler(
             _versityUsersRepository.Object,
             _httpContextAccessor.Object
         );
         
-        var act = async () => await handler.Handle(request, default);
+        // Act
+        var act = async () => await handler.Handle(GenerateFakeChangeUserPasswordCommand(), default);
         
+        // Assert
         await act.Should().ThrowAsync<ExceptionWithStatusCode>();
     }
     
     [Fact]
     public async Task RequestHandler_ShouldReturnSuccessIdentityResult_WhenAdminTriesToChangePassword()
     {
+        // Arrange
         _httpContextAccessor.Setup(x => x.HttpContext.User.Claims).Returns(_claims);
         
         _versityUsersRepository.Setup(x => 
@@ -137,25 +147,37 @@ public class ChangeUserPasswordTests
                 x.ResetPasswordAsync(It.IsAny<VersityUser>(), It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(IdentityResult.Success);
         
-        var request = new ChangeUserPasswordCommand("hello@gmail.com", "world", "123456789");
         var handler = new ChangeUserPasswordCommandHandler(
             _versityUsersRepository.Object,
             _httpContextAccessor.Object
         );
         
-        var result =  await handler.Handle(request, default);
+        // Act
+        var result =  await handler.Handle(GenerateFakeChangeUserPasswordCommand(), default);
         
+        // Assert
         result.Succeeded.Should().BeTrue();
     }
     
     [Fact]
     public async Task Validation_ShouldReturnValidationError_WhenPasswordIsEmpty()
     {
+        // Arrange
         var validator = new ChangeUserPasswordCommandValidator();
-        var command = new ChangeUserPasswordCommand("dd44e461-7217-41ab-8a41-f230381e0ed8", "dd44e461-7217-41ab-8a41-f230381e0ed8", "123456789");
+        var command = new ChangeUserPasswordCommand("weak", "weak", Guid.NewGuid().ToString());
         
+        // Act
         var result = await validator.ValidateAsync(command);
         
+        // Assert
         result.IsValid.Should().BeFalse();
+    }
+
+    private static ChangeUserPasswordCommand GenerateFakeChangeUserPasswordCommand()
+    {
+        return new Faker<ChangeUserPasswordCommand>().CustomInstantiator(faker => new ChangeUserPasswordCommand(
+            faker.Internet.Password(),
+            faker.Internet.Password(),
+            Guid.NewGuid().ToString())).Generate();
     }
 }

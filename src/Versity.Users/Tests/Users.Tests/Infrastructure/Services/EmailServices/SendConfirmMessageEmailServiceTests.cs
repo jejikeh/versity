@@ -24,6 +24,7 @@ public class SendConfirmMessageEmailServiceTests
     [Fact]
     public async Task SendEmailConfirmMessageAsync_ShouldSendMessageWithCorrectData_WhenCalled()
     {
+        // Arrange
         _userManager.Setup(
             x => x.GenerateEmailConfirmationTokenAsync(It.IsAny<VersityUser>()))
             .ReturnsAsync("token");
@@ -36,8 +37,10 @@ public class SendConfirmMessageEmailServiceTests
             Email = "a@a.com"
         };
 
+        // Act
         await emailConfirmMessageService.SendEmailConfirmMessageAsync(user);
         
+        // Assert
         _emailSenderService.Verify(x => x.SendEmailAsync(
             "Versity Identity Server", 
             user.Email,

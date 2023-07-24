@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Repositories;
 using Application.Exceptions;
 using Application.RequestHandlers.Users.Queries.GetVersityUserRoles;
+using Bogus;
 using Domain.Models;
 using FluentAssertions;
 using Moq;
@@ -23,7 +24,7 @@ public class GetVersityUserRolesTests
                 x.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(null as VersityUser);
         
-        var request = new GetVersityUserRolesQuery("hello@gmail.com");
+        var request = new GetVersityUserRolesQuery(new Faker().Internet.Email());
         var handler = new GetVersityUserRolesQueryHandler(_versityUsersRepository.Object);
 
         var act = async () => await handler.Handle(request, default);
@@ -36,13 +37,13 @@ public class GetVersityUserRolesTests
     {
         _versityUsersRepository.Setup(x => 
                 x.GetUserByIdAsync(It.IsAny<string>()))
-            .ReturnsAsync(new VersityUser{ Id = "dd44e461-7217-41ab-8a41-f230381e0ed8" });
+            .ReturnsAsync(new VersityUser{ Id = Guid.NewGuid().ToString() });
         
         _versityUsersRepository.Setup(x => 
                 x.GetUserRolesAsync(It.IsAny<VersityUser>()))
             .ReturnsAsync(new []{VersityRole.Admin.ToString()});
         
-        var request = new GetVersityUserRolesQuery("hello@gmail.com");
+        var request = new GetVersityUserRolesQuery(new Faker().Internet.Email());
         var handler = new GetVersityUserRolesQueryHandler(_versityUsersRepository.Object);
 
         var result = await handler.Handle(request, default);

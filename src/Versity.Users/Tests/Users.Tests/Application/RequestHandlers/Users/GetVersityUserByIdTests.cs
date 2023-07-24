@@ -20,21 +20,25 @@ public class GetVersityUserByIdTests
     [Fact]
     public async Task RequestHandler_ShouldThrowException_WhenUserDoesNotExists()
     {
+        // Arrange
         _versityUsersRepository.Setup(x => 
                 x.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(null as VersityUser);
         
-        var request = new GetVersityUserByIdQuery("419b8912-d18f-411e-b665-11e5978237ad");
+        var request = new GetVersityUserByIdQuery(Guid.NewGuid().ToString());
         var handler = new GetVersityUserByIdQueryHandler(_versityUsersRepository.Object);
 
+        // Act
         var act = async () => await handler.Handle(request, default);
 
+        // Assert
         await act.Should().ThrowAsync<NotFoundExceptionWithStatusCode>();
     }
     
     [Fact]
     public async Task RequestHandler_ShouldReturnUserDto_WhenUserExists()
     {
+        // Arrange
         _versityUsersRepository.Setup(x => 
                 x.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(GetAllVersityUsersTests.VersityUsersPayload[0]);
@@ -43,17 +47,20 @@ public class GetVersityUserByIdTests
                 x.GetUserRolesAsync(It.IsAny<VersityUser>()))
             .ReturnsAsync(new []{VersityRole.Admin.ToString()});
         
-        var request = new GetVersityUserByIdQuery("419b8912-d18f-411e-b665-11e5978237ad");
+        var request = new GetVersityUserByIdQuery(Guid.NewGuid().ToString());
         var handler = new GetVersityUserByIdQueryHandler(_versityUsersRepository.Object);
 
+        // Act
         var result = await handler.Handle(request, default);
 
+        // Assert
         result.Should().BeEquivalentTo(GetAllVersityUsersTests.DtoPayload[0]);
     }
     
     [Fact]
     public async Task Validator_ShouldReturnUserDto_WhenUserExists()
     {
+        // Arrange
         _versityUsersRepository.Setup(x => 
                 x.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(GetAllVersityUsersTests.VersityUsersPayload[0]);
@@ -62,44 +69,55 @@ public class GetVersityUserByIdTests
                 x.GetUserRolesAsync(It.IsAny<VersityUser>()))
             .ReturnsAsync(new []{VersityRole.Admin.ToString()});
         
-        var request = new GetVersityUserByIdQuery("419b8912-d18f-411e-b665-11e5978237ad");
+        var request = new GetVersityUserByIdQuery(Guid.NewGuid().ToString());
         var handler = new GetVersityUserByIdQueryHandler(_versityUsersRepository.Object);
 
+        // Act
         var result = await handler.Handle(request, default);
 
+        // Assert
         result.Should().BeEquivalentTo(GetAllVersityUsersTests.DtoPayload[0]);
     }
     
     [Fact]
     public async Task Validation_ShouldReturnValidationError_WhenIdIsNull()
     {
+        // Arrange
         var validator = new GetVersityUserByIdQueryValidator();
         var command = new GetVersityUserByIdQuery(string.Empty);
         
+        // Act
         var result = await validator.ValidateAsync(command);
         
+        // Assert
         result.IsValid.Should().BeFalse();
     }
     
     [Fact]
     public async Task Validation_ShouldReturnValidationError_WhenIdIsNotGuid()
     {
+        // Arrange
         var validator = new GetVersityUserByIdQueryValidator();
-        var command = new GetVersityUserByIdQuery("dd44e461-7217-41ab-8a41-f230381ed8");
+        var command = new GetVersityUserByIdQuery("not a guid");
         
+        // Act
         var result = await validator.ValidateAsync(command);
         
+        // Assert
         result.IsValid.Should().BeFalse();
     }
     
     [Fact]
     public async Task Validation_ShouldReturnValidationSuccess_WhenIdIsValidGuid()
     {
+        // Arrange
         var validator = new GetVersityUserByIdQueryValidator();
-        var command = new GetVersityUserByIdQuery("f15f9434-248b-4030-9469-75440a2868f0");
+        var command = new GetVersityUserByIdQuery(Guid.NewGuid().ToString());
         
+        // Act
         var result = await validator.ValidateAsync(command);
         
+        // Assert
         result.IsValid.Should().BeTrue();
     }
 }

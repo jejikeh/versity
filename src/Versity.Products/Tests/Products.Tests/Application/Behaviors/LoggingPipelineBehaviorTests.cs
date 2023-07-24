@@ -20,12 +20,15 @@ public class LoggingPipelineBehaviorTests
     [Fact]
     public async Task ValidationPipelineBehavior_ShouldInvokeNextPipeline_WhenDelegateIsValid()
     {
+        // Arrange
         var mockedPipeline = new Mock<IPipelineBehavior<CreateProductCommand, Product>>();
         
+        // Act
         var act = await GenerateLoggingPipelineBehaviorBoilerplate(
             GenerateFakeCreateProductCommand(), 
             () => mockedPipeline.Object.Handle(It.IsAny<CreateProductCommand>(), It.IsAny<RequestHandlerDelegate<Product>>(), It.IsAny<CancellationToken>()));
 
+        // Assert
         mockedPipeline.Verify(x => x.Handle(It.IsAny<CreateProductCommand>(), It.IsAny<RequestHandlerDelegate<Product>>(), It.IsAny<CancellationToken>()), Times.Once);
     }
     

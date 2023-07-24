@@ -28,6 +28,7 @@ public class RefreshJwtTokenTests
     [Fact]
     public async Task RequestHandler_ShouldThrowException_WhenUserDoesNotExist()
     {
+        // Arrange
         _versityUsersRepository.Setup(
                 x => x.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(null as VersityUser);
@@ -38,21 +39,24 @@ public class RefreshJwtTokenTests
                 It.IsAny<string>(), 
                 It.IsAny<CancellationToken>())).ReturnsAsync(new RefreshToken());
         
-        var command = new RefreshTokenCommand("1234-12524-12415-125", "1234-12524-12415-125");
+        var command = new RefreshTokenCommand(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
         var handler = new RefreshTokenCommandHandler(
             _refreshTokensRepository.Object, 
             _versityUsersRepository.Object, 
             _authTokenGeneratorService.Object, 
             _refreshTokenGeneratorService.Object);
         
+        // Act
         var act = async () => await handler.Handle(command, default);
         
+        // Assert
         await act.Should().ThrowAsync<NotFoundExceptionWithStatusCode>();
     }
     
     [Fact]
     public async Task RequestHandler_ShouldReturnAuthToken_WhenUserExists()
     {
+        // Arrange
         _versityUsersRepository.Setup(
                 x => x.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(new VersityUser() { Id = "dd44e461-7217-41ab-8a41-f230381e0ed8" });
@@ -81,8 +85,10 @@ public class RefreshJwtTokenTests
             _authTokenGeneratorService.Object, 
             _refreshTokenGeneratorService.Object);
         
+        // Act
         var result = await handler.Handle(command, default);
         
+        // Assert
         result.Should().NotBeNull();
         result.Should().BeOfType<AuthTokens>();
         result.Token.Should().NotBeNull();

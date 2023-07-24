@@ -1,6 +1,7 @@
 ﻿using Application.Abstractions.Repositories;
 using Application.Exceptions;
 using Application.RequestHandlers.Auth.Commands.ConfirmEmail;
+using Bogus;
 using Domain.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
@@ -25,11 +26,10 @@ public class ConfirmEmailRequestTests
             x => x.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(null as VersityUser);
         
-        var command = new ConfirmEmailCommand("_", "_");
         var handler = new ConfirmEmailCommandHandler(_versityUsersRepository.Object);
 
         // Act
-        var act = async () => await handler.Handle(command, default);
+        var act = async () => await handler.Handle(GenerateFakeConfirmEmailCommand(), default);
 
         // Assert
         await act.Should().ThrowAsync<NotFoundExceptionWithStatusCode>();
@@ -47,11 +47,10 @@ public class ConfirmEmailRequestTests
                 repository => repository.ConfirmUserEmail(It.IsAny<VersityUser>(), It.IsAny<string>()))
             .ReturnsAsync(IdentityResult.Failed());
         
-        var command = new ConfirmEmailCommand("_", "_");
         var handler = new ConfirmEmailCommandHandler(_versityUsersRepository.Object);
 
         // Act
-        var act = async () => await handler.Handle(command, default);
+        var act = async () => await handler.Handle(GenerateFakeConfirmEmailCommand(), default);
 
         // Assert
         await act.Should().ThrowAsync<IdentityExceptionWithStatusCode>();
@@ -69,11 +68,10 @@ public class ConfirmEmailRequestTests
                 usersRepository => usersRepository.ConfirmUserEmail(It.IsAny<VersityUser>(), It.IsAny<string>()))
             .ReturnsAsync(IdentityResult.Success);
         
-        var command = new ConfirmEmailCommand("dd44e461-7217-41ab-8a41-f230381e0ed8", "dd44e461-7217-41ab-8a41-f230381e0ed8");
         var handler = new ConfirmEmailCommandHandler(_versityUsersRepository.Object);
 
         // Act
-        var result = await handler.Handle(command, default);
+        var result = await handler.Handle(GenerateFakeConfirmEmailCommand(), default);
 
         // Assert
         result.Succeeded.Should().BeTrue();
@@ -84,7 +82,7 @@ public class ConfirmEmailRequestTests
     {
         // Arrange
         var validator = new ConfirmEmailCommandValidation();
-        var command = new ConfirmEmailCommand(null, "dd44e461-7217-41ab-8a41-f230381e0ed8");
+        var command = new ConfirmEmailCommand(null, Guid.NewGuid().ToString());
         
         // Act
         var result = await validator.ValidateAsync(command);
@@ -126,12 +124,20 @@ public class ConfirmEmailRequestTests
     {
         // Arrange
         var validator = new ConfirmEmailCommandValidation();
-        var command = new ConfirmEmailCommand("dd44e461-7217-41ab-8a41-f230381e0ed8", "dd44e461-7217-41ab-8a41-f230381e0ed8");
+        var command = GenerateFakeConfirmEmailCommand();
         
         // Act
         var result = await validator.ValidateAsync(command);
         
         // Assert
         result.IsValid.Should().BeTrue();
+    }
+
+    private static ConfirmEmailCommand GenerateFakeConfirmEmailCommand()
+    {
+        return new Faker<ConfirmEmailCommand>().CustomInstantiator(faker => new ConfirmEmailCommand(
+                faker.Random.Guid().ToString(),
+                faker.Random.Guid().ToString()))
+            .Generate();
     }
 }

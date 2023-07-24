@@ -5,7 +5,7 @@ using FluentAssertions;
 using Infrastructure.Services.TokenServices;
 using Moq;
 
-namespace Users.Tests.Infrastructure.TokenServices;
+namespace Users.Tests.Infrastructure.Services.TokenServices;
 
 public class RefreshTokenGeneratorServiceTests
 {
@@ -19,11 +19,14 @@ public class RefreshTokenGeneratorServiceTests
     [Fact]
     public void GenerateToken_ShouldReturnValidToken_WhenCalled()
     {
-        var userId = "testUserId";
+        // Arrange
+        var userId = new Guid().ToString();
         var tokenService = new RefreshTokenGeneratorService(_refreshTokensRepository.Object);
 
+        // Act
         var refreshToken = tokenService.GenerateToken(userId);
 
+        // Assert
         refreshToken.Should().NotBeNull();
         refreshToken.Id.Should().NotBe(Guid.Empty);
         refreshToken.UserId.Should().Be(userId);
@@ -36,8 +39,9 @@ public class RefreshTokenGeneratorServiceTests
     [Fact]
     public async Task ValidateTokenAsync_ShouldThrowException_WhenRefreshTokenNotFound()
     {
-        var userId = "testUserId";
-        var token = "testToken";
+        // Arrange
+        var userId = Guid.NewGuid().ToString();
+        var token = Guid.NewGuid().ToString();
         var tokenService = new RefreshTokenGeneratorService(_refreshTokensRepository.Object);
 
         _refreshTokensRepository.Setup(x =>
@@ -47,16 +51,19 @@ public class RefreshTokenGeneratorServiceTests
                     It.IsAny<CancellationToken>()))!
             .ReturnsAsync(null as RefreshToken);
         
+        // Act
         var act = async () => await tokenService.ValidateTokenAsync(userId, token, CancellationToken.None);
         
+        // Assert
         await act.Should().ThrowAsync<IdentityExceptionWithStatusCode>();
     }
     
     [Fact]
     public async Task ValidateTokenAsync_ShouldThrowException_WhenRefreshTokenIsRevoked()
     {
-        var userId = "testUserId";
-        var token = "testToken";
+        // Arrange
+        var userId = Guid.NewGuid().ToString();
+        var token = Guid.NewGuid().ToString();
         var tokenService = new RefreshTokenGeneratorService(_refreshTokensRepository.Object);
 
         _refreshTokensRepository.Setup(x =>
@@ -65,16 +72,19 @@ public class RefreshTokenGeneratorServiceTests
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>())).ReturnsAsync(new RefreshToken() { IsRevoked = true });
         
+        // Act
         var act = async () => await tokenService.ValidateTokenAsync(userId, token, CancellationToken.None);
         
+        // Assert
         await act.Should().ThrowAsync<IdentityExceptionWithStatusCode>();
     }
     
     [Fact]
     public async Task ValidateTokenAsync_ShouldThrowException_WhenRefreshTokenIsExpired()
     {
-        var userId = "testUserId";
-        var token = "testToken";
+        // Arrange
+        var userId = Guid.NewGuid().ToString();
+        var token = Guid.NewGuid().ToString();
         var tokenService = new RefreshTokenGeneratorService(_refreshTokensRepository.Object);
 
         _refreshTokensRepository.Setup(x =>
@@ -83,16 +93,19 @@ public class RefreshTokenGeneratorServiceTests
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>())).ReturnsAsync(new RefreshToken() { ExpiryTime = DateTime.UtcNow.AddMonths(-1) });
         
+        // Act
         var act = async () => await tokenService.ValidateTokenAsync(userId, token, CancellationToken.None);
         
+        // Assert
         await act.Should().ThrowAsync<IdentityExceptionWithStatusCode>();
     }
     
     [Fact]
     public async Task ValidateTokenAsync_ShouldReturnValidToken_WhenRefreshTokenIsValid()
     {
-        var userId = "testUserId";
-        var token = "testToken";
+        // Arrange
+        var userId = Guid.NewGuid().ToString();
+        var token = Guid.NewGuid().ToString();
         var tokenService = new RefreshTokenGeneratorService(_refreshTokensRepository.Object);
 
         _refreshTokensRepository.Setup(x =>
@@ -106,8 +119,10 @@ public class RefreshTokenGeneratorServiceTests
             Token = "testToken"
         });
         
+        // Act
         var result = await tokenService.ValidateTokenAsync(userId, token, CancellationToken.None);
         
+        // Assert
         result.Token.Should().Be("testToken");
     }
 }

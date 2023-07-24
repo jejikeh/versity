@@ -1,6 +1,7 @@
 ﻿using Application.Behaviors;
 using Application.Exceptions;
 using Application.RequestHandlers.Auth.Commands.ConfirmEmail;
+using Bogus;
 using FluentAssertions;
 using FluentValidation;
 using MediatR;
@@ -44,7 +45,7 @@ public class ValidationPipelineBehaviorTests
     public async Task ValidationPipelineBehavior_ShouldThrowException_WhenValidationFailsInNextPipeline()
     {
         var act = () => GenerateValidationPipelineBehaviorBoilerplate<ConfirmEmailCommand, IdentityResult>(
-            new ConfirmEmailCommand("6163bc73-5c9f-4df0-8db6-feba832d5d47", "2"), 
+            new ConfirmEmailCommand(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()), 
             _validators, 
             () => GenerateValidationPipelineBehaviorBoilerplate<ConfirmEmailCommand, IdentityResult>(
                 new ConfirmEmailCommand("1", "2"), 

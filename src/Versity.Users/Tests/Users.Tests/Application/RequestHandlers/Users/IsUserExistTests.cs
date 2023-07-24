@@ -18,30 +18,36 @@ public class IsUserExistTests
     [Fact]
     public async Task RequestHandler_ShouldReturnTrue_WhenUserExists()
     {
+        // Arrange
         _versityUsersRepository.Setup(x =>
                 x.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(new VersityUser());
         
-        var command = new IsUserExistQuery("f2c79b68-285b-4015-8fd0-b4b806d6b6f0");
+        var command = new IsUserExistQuery(Guid.NewGuid().ToString());
         var handler = new IsUserExistQueryHandler(_versityUsersRepository.Object);
 
+        // Act
         var result = await handler.Handle(command, default);
         
+        // Assert
         result.Should().BeTrue();
     }
     
     [Fact]
     public async Task RequestHandler_ShouldReturnFalse_WhenUserDoesNotExist()
     {
+        // Arrange
         _versityUsersRepository.Setup(x =>
                 x.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(null as VersityUser);
         
-        var command = new IsUserExistQuery("f2c79b68-285b-4015-8fd0-b4b806d6b6f0");
+        var command = new IsUserExistQuery(Guid.NewGuid().ToString());
         var handler = new IsUserExistQueryHandler(_versityUsersRepository.Object);
 
+        // Act
         var result = await handler.Handle(command, default);
         
+        // Assert
         result.Should().BeFalse();
     }
 }

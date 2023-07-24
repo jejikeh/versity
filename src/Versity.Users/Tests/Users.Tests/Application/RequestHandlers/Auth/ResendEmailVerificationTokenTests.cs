@@ -2,6 +2,7 @@
 using Application.Abstractions.Repositories;
 using Application.Exceptions;
 using Application.RequestHandlers.Auth.Commands.ResendEmailVerificationToken;
+using Bogus;
 using Domain.Models;
 using FluentAssertions;
 using Moq;
@@ -22,24 +23,27 @@ public class ResendEmailVerificationTokenTests
     [Fact]
     public async Task RequestHandler_ShouldThrowException_WhenUserWithEmailDoesNotExists()
     {
+        // Arrange
         _versityUsersRepository.Setup(x =>
                 x.GetUserByEmailAsync(It.IsAny<string>()))
             .ReturnsAsync(null as VersityUser);
         
-        var command = new ResendEmailVerificationTokenCommand("hello@gmail.com", "world");
         var handler = new ResendEmailVerificationTokenCommandHandler(
             _versityUsersRepository.Object,
             _emailConfirmMessageService.Object
         );
         
-        var act = async () => await handler.Handle(command, default);
+        // Act
+        var act = async () => await handler.Handle(GenerateFakeResendEmailVerificationTokenCommand(), default);
         
+        // Assert
         await act.Should().ThrowAsync<IncorrectEmailOrPasswordExceptionWithStatusCode>();
     }
     
     [Fact]
     public async Task RequestHandler_ShouldThrowException_WhenPasswordIsIncorrect()
     {
+        // Arrange
         _versityUsersRepository.Setup(x =>
                 x.GetUserByEmailAsync(It.IsAny<string>()))
             .ReturnsAsync(new VersityUser());
@@ -48,20 +52,22 @@ public class ResendEmailVerificationTokenTests
                 x.CheckPasswordAsync(It.IsAny<VersityUser>(), It.IsAny<string>()))
             .ReturnsAsync(false);
         
-        var command = new ResendEmailVerificationTokenCommand("hello@gmail.com", "world");
         var handler = new ResendEmailVerificationTokenCommandHandler(
             _versityUsersRepository.Object,
             _emailConfirmMessageService.Object
         );
         
-        var act = async () => await handler.Handle(command, default);
+        // Act
+        var act = async () => await handler.Handle(GenerateFakeResendEmailVerificationTokenCommand(), default);
         
+        // Assert
         await act.Should().ThrowAsync<IncorrectEmailOrPasswordExceptionWithStatusCode>();
     }
     
     [Fact]
     public async Task RequestHandler_ShouldThrowException_WhenEmailIsConfirmed()
     {
+        // Arrange
         _versityUsersRepository.Setup(x =>
                 x.GetUserByEmailAsync(It.IsAny<string>()))
             .ReturnsAsync(new VersityUser() { EmailConfirmed = true });
@@ -70,14 +76,15 @@ public class ResendEmailVerificationTokenTests
                 x.CheckPasswordAsync(It.IsAny<VersityUser>(), It.IsAny<string>()))
             .ReturnsAsync(true);
         
-        var command = new ResendEmailVerificationTokenCommand("hello@gmail.com", "world");
         var handler = new ResendEmailVerificationTokenCommandHandler(
             _versityUsersRepository.Object,
             _emailConfirmMessageService.Object
         );
         
-        var act = async () => await handler.Handle(command, default);
+        // Act
+        var act = async () => await handler.Handle(GenerateFakeResendEmailVerificationTokenCommand(), default);
         
+        // Assert
         await act.Should().ThrowAsync<IdentityExceptionWithStatusCode>();
     }
     
@@ -145,5 +152,13 @@ public class ResendEmailVerificationTokenTests
         var result = await validator.ValidateAsync(command);
         
         result.IsValid.Should().BeTrue();
+    }
+
+    private static ResendEmailVerificationTokenCommand GenerateFakeResendEmailVerificationTokenCommand()
+    {
+        return new Faker<ResendEmailVerificationTokenCommand>().CustomInstantiator(faker => new ResendEmailVerificationTokenCommand(
+            faker.Internet.Email(),
+            faker.Internet.Password()))
+            .Generate();
     }
 }

@@ -21,40 +21,52 @@ public class ValidationPipelineBehaviorTests
     [Fact]
     public async Task ValidationPipelineBehavior_ShouldThrowException_WhenValidationFails()
     {
+        // Arrange
         var pipeline = new ValidationPipelineBehavior<CreateProductCommand, Product>(_validators);
         
+        // Act
         var act = () => pipeline.Handle(GenerateFakeInvalidCreateProductCommand(), default , CancellationToken.None);
 
+        // Assert
         await act.Should().ThrowAsync<ValidationExceptionWithStatusCode>();
     }
     
     [Fact]
     public async Task ValidationPipelineBehavior_ShouldInvokeNextPipeline_WhenValidationSucceeds()
     {
+        // Arrange
         var mockedPipeline = new Mock<IPipelineBehavior<CreateProductCommand, Product>>();
         
+        // Act
         var act = await GenerateValidationPipelineBehaviorBoilerplate(
             GenerateFakeCreateProductCommand(), 
             _validators, 
             () => mockedPipeline.Object.Handle(It.IsAny<CreateProductCommand>(), It.IsAny<RequestHandlerDelegate<Product>>(), It.IsAny<CancellationToken>()));
 
+        // Assert
         mockedPipeline.Verify(x => x.Handle(It.IsAny<CreateProductCommand>(), It.IsAny<RequestHandlerDelegate<Product>>(), It.IsAny<CancellationToken>()), Times.Once);
     }
     
     [Fact]
     public async Task ValidationPipelineBehavior_ShouldThrowException_WhenValidationFailsInNextPipeline()
     {
-        var act = () => GenerateValidationPipelineBehaviorBoilerplate<CreateProductCommand, Product>(
-            GenerateFakeCreateProductCommand(), 
+        // Arrange
+        var fakeInvalidCreateProductCommand = GenerateFakeInvalidCreateProductCommand();
+        var fakeInvalidCreateProductCommand1 = GenerateFakeInvalidCreateProductCommand();
+        
+        // Act
+        var act = () => GenerateValidationPipelineBehaviorBoilerplate(
+            fakeInvalidCreateProductCommand, 
             _validators, 
             () => GenerateValidationPipelineBehaviorBoilerplate<CreateProductCommand, Product>(
-                GenerateFakeInvalidCreateProductCommand(), 
+                fakeInvalidCreateProductCommand1, 
                 _validators));
 
+        // Assert
         await act.Should().ThrowAsync<ValidationExceptionWithStatusCode>();
     }
 
-    private Task<TResponse> GenerateValidationPipelineBehaviorBoilerplate<TRequest, TResponse>(
+    private static Task<TResponse> GenerateValidationPipelineBehaviorBoilerplate<TRequest, TResponse>(
         TRequest command,
         IEnumerable<IValidator<TRequest>> validators,
         RequestHandlerDelegate<TResponse> next = default) where TRequest : IRequest<TResponse>
