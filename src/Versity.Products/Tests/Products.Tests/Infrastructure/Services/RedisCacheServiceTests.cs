@@ -23,46 +23,55 @@ public class RedisCacheServiceTests
     [Fact]
     public async Task GetOrCreateAsync_ShouldReturnValue_WhenValueInCacheKey()
     {
-        var key = "test";
-        var factory = new Func<Task<string?>>(() => Task.Run(() => "test"));
+        // Arrange
+        var key = Guid.NewGuid().ToString();
+        var factory = new Func<Task<string?>>(() => Task.Run(() => key));
         var redisCacheService = new RedisCacheService(_connectionMultiplexer.Object);
         _database.Setup(x => 
             x.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
-            .ReturnsAsync(JsonSerializer.Serialize("test"));
+            .ReturnsAsync(JsonSerializer.Serialize(key));
         
+        // Act
         var result = await redisCacheService.GetOrCreateAsync(key, factory);
         
-        result.Should().Be("test");
+        // Assert
+        result.Should().Be(key);
     }
     
     [Fact]
     public async Task GetOrCreateAsync_ShouldCacheAndReturnValue_WhenValueNotInCacheKey()
     {
-        var key = "test";
+        // Arrange
+        var key = Guid.NewGuid().ToString();
         var factory = new Mock<Func<Task<string?>>>();
-        factory.Setup(x=>x.Invoke()).ReturnsAsync("test");
+        factory.Setup(x=>x.Invoke()).ReturnsAsync(key);
         var redisCacheService = new RedisCacheService(_connectionMultiplexer.Object);
         _database.Setup(x => 
                 x.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
             .ReturnsAsync(string.Empty);
         
+        // Act
         var result = await redisCacheService.GetOrCreateAsync(key, factory.Object);
         
-        result.Should().Be("test");
+        // Assert
+        result.Should().Be(key);
     }
     
     [Fact]
     public async Task GetOrCreateAsync_ShouldReturnNull_WhenValueNotInCacheKeyAndFactoryIsNull()
     {
-        var key = "test";
+        // Arrange
+        var key = Guid.NewGuid().ToString();
         var factory = new Func<Task<string?>>(() => Task.Run(() => null as string));
         var redisCacheService = new RedisCacheService(_connectionMultiplexer.Object);
         _database.Setup(x => 
                 x.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
             .ReturnsAsync(string.Empty);
         
+        // Act
         var result = await redisCacheService.GetOrCreateAsync(key, factory);
         
+        // Assert
         result.Should().BeNull();
     }
 }
