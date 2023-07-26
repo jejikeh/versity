@@ -79,7 +79,7 @@ public class RedisCacheService : ICacheService
             }
         }
         
-        foreach (var member in  await _database.SetMembersAsync(key))
+        foreach (var member in await _database.SetMembersAsync(key))
         {
             yield return JsonSerializer.Deserialize<T>(member);
         }

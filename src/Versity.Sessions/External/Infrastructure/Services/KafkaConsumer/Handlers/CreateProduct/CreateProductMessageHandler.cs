@@ -10,15 +10,17 @@ namespace Infrastructure.Services.KafkaConsumer.Handlers.CreateProduct;
 public class CreateProductMessageHandler : IKafkaMessageHandler
 {
     private readonly IProductsRepository _productsRepository;
+    private readonly IKafkaConsumerConfiguration _configuration;
 
-    public CreateProductMessageHandler(IProductsRepository productsRepository)
+    public CreateProductMessageHandler(IProductsRepository productsRepository, IKafkaConsumerConfiguration configuration)
     {
         _productsRepository = productsRepository;
+        _configuration = configuration;
     }
 
     public async Task Handle(string key, string message, CancellationToken cancellationToken)
     {
-        if (key != "CreateProduct")
+        if (key != _configuration.CreateProductTopic)
         {
             return;
         }
@@ -30,15 +32,9 @@ public class CreateProductMessageHandler : IKafkaMessageHandler
             throw new ExceptionWithStatusCode(StatusCodes.Status409Conflict, "Product with specified Id external already exist!");
         }
         
-        var productId = Guid.NewGuid();
-        while (await _productsRepository.GetProductByIdAsync(productId, cancellationToken) is not null)
-        {
-            productId = Guid.NewGuid();
-        }
-        
         var product = new Product()
         {
-            Id = productId,
+            Id = Guid.NewGuid(),
             ExternalId = request.Id,
             Title = request.Title
         };

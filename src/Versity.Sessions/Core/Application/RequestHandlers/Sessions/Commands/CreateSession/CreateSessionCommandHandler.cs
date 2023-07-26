@@ -59,9 +59,9 @@ public class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand,
             Logs = sessionLogs
         };
         
-        sessionLogs.SessionId = session.Id;
-        
         var result = await _sessions.CreateSessionAsync(session, cancellationToken);
+        
+        sessionLogs.SessionId = result.Id;
         await _sessionLogsRepository.CreateSessionLogsAsync(sessionLogs, cancellationToken);
         
         await _sessionLogsRepository.SaveChangesAsync(cancellationToken);
