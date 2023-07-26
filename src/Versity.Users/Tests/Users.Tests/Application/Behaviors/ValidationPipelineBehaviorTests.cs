@@ -12,45 +12,57 @@ namespace Users.Tests.Application.Behaviors;
 
 public class ValidationPipelineBehaviorTests
 {
-    private readonly IEnumerable<IValidator<ConfirmEmailCommand>> _validators =
-        new List<IValidator<ConfirmEmailCommand>>()
-        {
-            new ConfirmEmailCommandValidation()
-        };
+    private readonly IEnumerable<IValidator<ConfirmEmailCommand>> _validators = new List<IValidator<ConfirmEmailCommand>>() 
+    { 
+        new ConfirmEmailCommandValidation() 
+    };
     
     [Fact]
     public async Task ValidationPipelineBehavior_ShouldThrowException_WhenValidationFails()
     {
+        // Arrange
         var pipeline = new ValidationPipelineBehavior<ConfirmEmailCommand, IdentityResult>(_validators);
         
-        var act = () => pipeline.Handle(new ConfirmEmailCommand("1", "2"), default , CancellationToken.None);
+        // Act
+        var act = () => pipeline.Handle(
+            new ConfirmEmailCommand(new Random().Next(100).ToString(), Guid.NewGuid().ToString()), default!, CancellationToken.None);
 
+        // Assert
         await act.Should().ThrowAsync<ValidationExceptionWithStatusCode>();
     }
     
     [Fact]
     public async Task ValidationPipelineBehavior_ShouldInvokeNextPipeline_WhenValidationSucceeds()
     {
+        // Arrange
         var mockedPipeline = new Mock<IPipelineBehavior<ConfirmEmailCommand, IdentityResult>>();
         
+        // Act
         var act = await GenerateValidationPipelineBehaviorBoilerplate(
-            new ConfirmEmailCommand("6163bc73-5c9f-4df0-8db6-feba832d5d47", "2"), 
+            new ConfirmEmailCommand(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()), 
             _validators, 
             () => mockedPipeline.Object.Handle(It.IsAny<ConfirmEmailCommand>(), It.IsAny<RequestHandlerDelegate<IdentityResult>>(), It.IsAny<CancellationToken>()));
 
+        // Assert
         mockedPipeline.Verify(x => x.Handle(It.IsAny<ConfirmEmailCommand>(), It.IsAny<RequestHandlerDelegate<IdentityResult>>(), It.IsAny<CancellationToken>()), Times.Once);
     }
     
     [Fact]
     public async Task ValidationPipelineBehavior_ShouldThrowException_WhenValidationFailsInNextPipeline()
     {
+        // Arrange
+        var validCommand = new ConfirmEmailCommand(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+        var invalidCommand = new ConfirmEmailCommand(new Random().Next(100).ToString(), Guid.NewGuid().ToString());
+        
+        // Act
         var act = () => GenerateValidationPipelineBehaviorBoilerplate<ConfirmEmailCommand, IdentityResult>(
-            new ConfirmEmailCommand(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()), 
+            validCommand, 
             _validators, 
             () => GenerateValidationPipelineBehaviorBoilerplate<ConfirmEmailCommand, IdentityResult>(
-                new ConfirmEmailCommand("1", "2"), 
+                invalidCommand, 
                 _validators));
 
+        // Assert
         await act.Should().ThrowAsync<ValidationExceptionWithStatusCode>();
     }
 

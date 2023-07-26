@@ -22,13 +22,20 @@ public class LoggingPipelineBehaviorTests
     [Fact]
     public async Task ValidationPipelineBehavior_ShouldInvokeNextPipeline_WhenDelegateIsValid()
     {
+        // Arrange
         var mockedPipeline = new Mock<IPipelineBehavior<ConfirmEmailCommand, IdentityResult>>();
         
+        // Act
         var act = await GenerateLoggingPipelineBehaviorBoilerplate(
-            new ConfirmEmailCommand("6163bc73-5c9f-4df0-8db6-feba832d5d47", "2"), 
+            new ConfirmEmailCommand(Guid.NewGuid().ToString(), Guid.NewGuid().ToString()), 
             () => mockedPipeline.Object.Handle(It.IsAny<ConfirmEmailCommand>(), It.IsAny<RequestHandlerDelegate<IdentityResult>>(), It.IsAny<CancellationToken>()));
 
-        mockedPipeline.Verify(x => x.Handle(It.IsAny<ConfirmEmailCommand>(), It.IsAny<RequestHandlerDelegate<IdentityResult>>(), It.IsAny<CancellationToken>()), Times.Once);
+        // Assert
+        mockedPipeline.Verify(pipelineBehavior => pipelineBehavior.Handle(
+            It.IsAny<ConfirmEmailCommand>(), 
+            It.IsAny<RequestHandlerDelegate<IdentityResult>>(), 
+            It.IsAny<CancellationToken>()), 
+            Times.Once);
     }
     
     private Task<IdentityResult> GenerateLoggingPipelineBehaviorBoilerplate(
