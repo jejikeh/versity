@@ -13,7 +13,7 @@ public class AdminSeederConfiguration : IEntityTypeConfiguration<VersityUser>
         {
             Id = "4e274126-1d8a-4dfd-a025-806987095809",
             UserName = "Versity Admin",
-            Email = Environment.GetEnvironmentVariable("ADMIN__Email"),
+            Email = Environment.GetEnvironmentVariable("ADMIN__Email") ?? "none@mail.com",
             NormalizedEmail = "versity.identity.dev@gmail.com".ToUpper(),
             EmailConfirmed = true,
             FirstName = "Versity",
@@ -23,7 +23,7 @@ public class AdminSeederConfiguration : IEntityTypeConfiguration<VersityUser>
         };
         
         var passwordHasher = new PasswordHasher<VersityUser>();
-        user.PasswordHash = passwordHasher.HashPassword(user, Environment.GetEnvironmentVariable("ADMIN__Password"));
+        user.PasswordHash = passwordHasher.HashPassword(user, Environment.GetEnvironmentVariable("ADMIN__Password") ?? Guid.NewGuid().ToString());
         builder.HasData(user);
     }
 }

@@ -28,7 +28,7 @@ public sealed class AuthController : ApiController
         var result = await Sender.Send(command, cancellationToken);
         
         return result.Succeeded ? Ok("The confirmation message was send to your email!") : BadRequest(result.Errors);
-    }
+        }
 
     [HttpPost]
     public async Task<IActionResult> Login(LoginVersityUserCommand command, CancellationToken cancellationToken)

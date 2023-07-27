@@ -52,10 +52,10 @@ public static class InfrastructureInjection
     public static IServiceCollection AddRedisCaching(this IServiceCollection serviceCollection)
     {
         serviceCollection.Decorate<IVersityRefreshTokensRepository, CachedRefreshTokensRepository>();
-        serviceCollection.AddSingleton(ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS_Host")));
+        serviceCollection.AddSingleton(ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS_Host") ?? "none"));
         serviceCollection.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(provider => provider.GetService<ConnectionMultiplexer>());
         serviceCollection.AddSingleton<ICacheService, RedisCacheService>();
-
+    
         return serviceCollection;
     }
 }
