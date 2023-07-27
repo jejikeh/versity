@@ -20,8 +20,8 @@ public class GetVersityUserRolesTests
     [Fact]
     public async Task RequestHandler_ShouldThrowException_WhenUserDoesNotExists()
     {
-        _versityUsersRepository.Setup(x => 
-                x.GetUserByIdAsync(It.IsAny<string>()))
+        _versityUsersRepository.Setup(versityUsersRepository => 
+                versityUsersRepository.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(null as VersityUser);
         
         var request = new GetVersityUserRolesQuery(new Faker().Internet.Email());
@@ -35,12 +35,12 @@ public class GetVersityUserRolesTests
     [Fact]
     public async Task RequestHandler_ShouldReturnRoles_WhenUserExists()
     {
-        _versityUsersRepository.Setup(x => 
-                x.GetUserByIdAsync(It.IsAny<string>()))
+        _versityUsersRepository.Setup(versityUsersRepository => 
+                versityUsersRepository.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(new VersityUser{ Id = Guid.NewGuid().ToString() });
         
-        _versityUsersRepository.Setup(x => 
-                x.GetUserRolesAsync(It.IsAny<VersityUser>()))
+        _versityUsersRepository.Setup(versityUsersRepository => 
+                versityUsersRepository.GetUserRolesAsync(It.IsAny<VersityUser>()))
             .ReturnsAsync(new []{VersityRole.Admin.ToString()});
         
         var request = new GetVersityUserRolesQuery(new Faker().Internet.Email());

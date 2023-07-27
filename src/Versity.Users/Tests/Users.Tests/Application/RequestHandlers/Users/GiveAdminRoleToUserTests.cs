@@ -6,6 +6,7 @@ using Bogus;
 using Domain.Models;
 using FluentAssertions;
 using Moq;
+using Utils = Application.Common.Utils;
 
 namespace Users.Tests.Application.RequestHandlers.Users;
 
@@ -13,29 +14,26 @@ public class GiveAdminRoleToUserTests
 {
     private readonly Mock<IVersityUsersRepository> _versityUsersRepository;
     private readonly Mock<IAuthTokenGeneratorService> _tokenGeneratorService;
+    private readonly GiveAdminRoleToUserCommandHandler _giveAdminRoleToUserCommandHandler;
 
     public GiveAdminRoleToUserTests()
     {
         _versityUsersRepository = new Mock<IVersityUsersRepository>();
         _tokenGeneratorService = new Mock<IAuthTokenGeneratorService>();
+        _giveAdminRoleToUserCommandHandler = new GiveAdminRoleToUserCommandHandler(_versityUsersRepository.Object, _tokenGeneratorService.Object);
     }
 
     [Fact]
     public async Task RequestHandler_ShouldThrowException_WhenUserDoesNotExists()
     {
         // Arrange
-        _versityUsersRepository.Setup(x => 
-                x.GetUserByIdAsync(It.IsAny<string>()))
+        var request = new GiveAdminRoleToUserCommand(new Faker().Internet.Email());
+        _versityUsersRepository.Setup(versityUsersRepository => 
+                versityUsersRepository.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(null as VersityUser);
         
-        var request = new GiveAdminRoleToUserCommand(new Faker().Internet.Email());
-        var handler = new GiveAdminRoleToUserCommandHandler(
-            _versityUsersRepository.Object,
-            _tokenGeneratorService.Object
-        );
-        
         // Act
-        var act = async () => await handler.Handle(request, default);
+        var act = async () => await _giveAdminRoleToUserCommandHandler.Handle(request, default);
         
         // Assert
         await act.Should().ThrowAsync<NotFoundExceptionWithStatusCode>();
@@ -45,28 +43,25 @@ public class GiveAdminRoleToUserTests
     public async Task RequestHandler_ShouldReturnString_WhenUserExists()
     {
         // Arrange
-        _versityUsersRepository.Setup(x => 
-                x.GetUserByIdAsync(It.IsAny<string>()))
+        var token = Utils.GenerateRandomString(10);
+        _versityUsersRepository.Setup(versityUsersRepository => 
+                versityUsersRepository.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(new VersityUser());
 
-        _versityUsersRepository.Setup(x =>
-                x.GetUserRolesAsync(It.IsAny<VersityUser>()))
+        _versityUsersRepository.Setup(versityUsersRepository =>
+                versityUsersRepository.GetUserRolesAsync(It.IsAny<VersityUser>()))
             .ReturnsAsync(new []{VersityRole.Admin.ToString()});
 
-        _tokenGeneratorService.Setup(x =>
-                x.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()))
-            .Returns("token");
+        _tokenGeneratorService.Setup(authTokenGeneratorService =>
+                authTokenGeneratorService.GenerateToken(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IEnumerable<string>>()))
+            .Returns(token);
 
         var request = new GiveAdminRoleToUserCommand(new Faker().Internet.Email());
-        var handler = new GiveAdminRoleToUserCommandHandler(
-            _versityUsersRepository.Object,
-            _tokenGeneratorService.Object
-        );
         
         // Act
-        var result =  await handler.Handle(request, default);
+        var result =  await _giveAdminRoleToUserCommandHandler.Handle(request, default);
 
         // Assert
-        result.Should().BeSameAs("token");
+        result.Should().BeSameAs(token);
     }
 }

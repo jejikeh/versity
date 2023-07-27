@@ -14,26 +14,28 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Presentation.Controllers;
+using Utils = Application.Common.Utils;
 
 namespace Users.Tests.Presentation.Controllers;
 
 public class UsersControllerTests
 {
-    private Mock<ISender> _sender;
+    private readonly Mock<ISender> _sender;
+    private UsersController service;
 
     public UsersControllerTests()
     {
         _sender = new Mock<ISender>();
+        service = new UsersController(_sender.Object);
     }
     
     [Fact]
     public async Task GetUserById_ShouldReturnOk_WhenCommandIsValid()
     {
         // Arrange
-        _sender.Setup(x =>
-                x.Send(It.IsAny<GetVersityUserByIdQuery>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender =>
+                sender.Send(It.IsAny<GetVersityUserByIdQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(GenerateFakeUser());
-        var service = new UsersController(_sender.Object);
         
         // Act
         var response = await service.GetUserById(Guid.NewGuid(), CancellationToken.None);
@@ -46,10 +48,9 @@ public class UsersControllerTests
     public async Task GetAllUsers_ShouldReturnOk_WhenUserExist()
     {
         // Arrange
-        _sender.Setup(x =>
-                x.Send(It.IsAny<GetAllVersityUsersQuery>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender =>
+                sender.Send(It.IsAny<GetAllVersityUsersQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(GenerateFakeUserList());
-        var service = new UsersController(_sender.Object);
         
         // Act
         var response = await service.GetAllUsers(1, CancellationToken.None);
@@ -62,11 +63,10 @@ public class UsersControllerTests
     public async Task ChangeUserPassword_ShouldReturnOk_WhenUserExist()
     {
         // Arrange
-        _sender.Setup(x =>
-                x.Send(It.IsAny<ChangeUserPasswordCommand>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender =>
+                sender.Send(It.IsAny<ChangeUserPasswordCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(IdentityResult.Success);
-        var request = new ChangeUserPasswordDto("test", "test");
-        var service = new UsersController(_sender.Object);
+        var request = new ChangeUserPasswordDto(Utils.GenerateRandomString(10), Utils.GenerateRandomString(10));
         
         // Act
         var response = await service.ChangeUserPassword(Guid.NewGuid(), request, CancellationToken.None);
@@ -82,7 +82,6 @@ public class UsersControllerTests
         _sender.Setup(x =>
                 x.Send(It.IsAny<GiveAdminRoleToUserCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(Guid.NewGuid().ToString());
-        var service = new UsersController(_sender.Object);
         
         // Act
         var response = await service.SetAdmin(Guid.NewGuid(),CancellationToken.None);
