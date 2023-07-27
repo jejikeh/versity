@@ -16,23 +16,24 @@ namespace Products.Tests.Presentation.Controllers;
 public class ProductsControllerTests
 {
     private readonly Mock<ISender> _sender;
+    private readonly ProductsController _productsController;
 
     public ProductsControllerTests()
     {
         _sender = new Mock<ISender>();
+        _productsController = new ProductsController(_sender.Object);
     }
 
     [Fact]
     public async Task GetAllProducts_ShouldReturnOk_WhenModelIsValid()
     {
         // Arrange
-        var service = new ProductsController(_sender.Object);
         _sender.Setup(x =>
                 x.Send(It.IsAny<GetAllProductsQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(GenerateFakeProductsList());
         
         // Act
-        var response = await service.GetAllProducts(1, CancellationToken.None);
+        var response = await _productsController.GetAllProducts(1, CancellationToken.None);
         
         // Assert
         response.Should().BeOfType<OkObjectResult>();
@@ -42,13 +43,12 @@ public class ProductsControllerTests
     public async Task GetProductById_ShouldReturnOk_WhenModelIsValid()
     {
         // Arrange
-        var service = new ProductsController(_sender.Object);
         _sender.Setup(x =>
                 x.Send(It.IsAny<GetProductByIdQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(GenerateFakeProduct());
         
         // Act
-        var response = await service.GetProductById(Guid.NewGuid(), CancellationToken.None);
+        var response = await _productsController.GetProductById(Guid.NewGuid(), CancellationToken.None);
         
         // Assert
         response.Should().BeOfType<OkObjectResult>();
@@ -57,11 +57,8 @@ public class ProductsControllerTests
     [Fact]
     public async Task DeleteProductById_ShouldReturnOk_WhenModelIsValid()
     {
-        // Arrange
-        var service = new ProductsController(_sender.Object);
-        
         // Act
-        var response = await service.DeleteProductById(Guid.NewGuid(), CancellationToken.None);
+        var response = await _productsController.DeleteProductById(Guid.NewGuid(), CancellationToken.None);
         
         // Assert
         response.Should().BeOfType<OkResult>();
@@ -71,13 +68,12 @@ public class ProductsControllerTests
     public async Task CreateProduct_ShouldReturnOk_WhenModelIsValid()
     {
         // Arrange
-        var service = new ProductsController(_sender.Object);
         _sender.Setup(x =>
                 x.Send(It.IsAny<GetProductByIdQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(GenerateFakeProduct());
         
         // Act
-        var response = await service.CreateProduct(GenerateFakeCreateProductCommand(), CancellationToken.None);
+        var response = await _productsController.CreateProduct(GenerateFakeCreateProductCommand(), CancellationToken.None);
         
         // Assert
         response.Should().BeOfType<OkObjectResult>();
@@ -87,13 +83,12 @@ public class ProductsControllerTests
     public async Task UpdateProduct_ShouldReturnOk_WhenModelIsValid()
     {
         // Arrange
-        var service = new ProductsController(_sender.Object);
         _sender.Setup(x =>
                 x.Send(It.IsAny<UpdateProductCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(GenerateFakeProduct());
         
         // Act
-        var response = await service.UpdateProduct(Guid.NewGuid(), GenerateFakeUpdateProductCommand(), CancellationToken.None);
+        var response = await _productsController.UpdateProduct(Guid.NewGuid(), GenerateFakeUpdateProductCommand(), CancellationToken.None);
         
         // Assert
         response.Should().BeOfType<OkObjectResult>();

@@ -10,35 +10,41 @@ namespace Products.Tests.Application.RequestHandlers.Queries;
 
 public class GetProductByIdTests
 {
-    private readonly Mock<IVersityProductsRepository> _products;
+    private readonly Mock<IVersityProductsRepository> _productsRepository;
 
     public GetProductByIdTests()
     {
-        _products = new Mock<IVersityProductsRepository>();
+        _productsRepository = new Mock<IVersityProductsRepository>();
     }
 
     [Fact]
     public async Task Handle_ShouldThrowException_WhenProductDoesNotExist()
     {
-        var handler = new GetProductByIdQueryHandler(_products.Object);
+        // Arrange
+        var handler = new GetProductByIdQueryHandler(_productsRepository.Object);
         var request = new GetProductByIdQuery(Guid.NewGuid());
         
+        // Act
         var act = async () => await handler.Handle(request, CancellationToken.None);
         
+        // Assert
         await act.Should().ThrowAsync<NotFoundExceptionWithStatusCode>();
     }
     
     [Fact]
     public async Task Handle_ShouldReturnProduct_WhenProductDoesExist()
     {
-        var handler = new GetProductByIdQueryHandler(_products.Object);
+        // Arrange
+        var handler = new GetProductByIdQueryHandler(_productsRepository.Object);
         var request = new GetProductByIdQuery(Guid.NewGuid());
-        _products.Setup(repository =>
+        _productsRepository.Setup(repository =>
                 repository.GetProductByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(GenerateFakeProduct);
         
+        // Act
         var product = await handler.Handle(request, CancellationToken.None);
         
+        // Assert
         product.Should().NotBeNull();
     }
     
