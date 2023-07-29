@@ -25,7 +25,7 @@ public class LogDataControllerTests
     public async Task GetAllLogsData_ShouldReturnOk_WhenCommandIsValid()
     {
         // Arrange
-        _sender.Setup(x => x.Send(It.IsAny<GetAllLogsDataQuery>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender => sender.Send(It.IsAny<GetAllLogsDataQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeLogsData(new Random().Next(1, 10)));
         
         // Act
@@ -39,7 +39,7 @@ public class LogDataControllerTests
     public async Task GetLogDataById_ShouldReturnOk_WhenCommandIsValid()
     {
         // Arrange
-        _sender.Setup(x => x.Send(It.IsAny<GetLogDataByIdQuery>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender => sender.Send(It.IsAny<GetLogDataByIdQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeLogData());
         
         // Act
@@ -53,7 +53,7 @@ public class LogDataControllerTests
     public async Task CreateLogsData_ShouldReturnOk_WhenCommandIsValid()
     {
         // Arrange
-        _sender.Setup(x => x.Send(It.IsAny<CreateLogsDataCommand>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender => sender.Send(It.IsAny<CreateLogsDataCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeLogsData(new Random().Next(1, 10)));
         
         // Act

@@ -11,20 +11,19 @@ namespace Sessions.Tests.Infrastructure.Services;
 public class RedisCacheServiceTests
 {
     private readonly Mock<IDatabase> _database;
-    private readonly Mock<IConnectionMultiplexer> _connectionMultiplexer;
     private readonly Faker _faker = new Faker();
     private readonly RedisCacheService _redisCacheService;
 
     public RedisCacheServiceTests()
     {
         _database = new Mock<IDatabase>();
-        _connectionMultiplexer = new Mock<IConnectionMultiplexer>();
+        var connectionMultiplexer = new Mock<IConnectionMultiplexer>();
         
-        _connectionMultiplexer.Setup(
-                x => x.GetDatabase(It.IsAny<int>(), It.IsAny<object>()))
+        connectionMultiplexer.Setup(multiplexer => 
+                multiplexer.GetDatabase(It.IsAny<int>(), It.IsAny<object>()))
             .Returns(_database.Object);
         
-        _redisCacheService = new RedisCacheService(_connectionMultiplexer.Object);
+        _redisCacheService = new RedisCacheService(connectionMultiplexer.Object);
     }
 
     [Fact]
@@ -151,6 +150,7 @@ public class RedisCacheServiceTests
             .Returns(0);
 
         // Act
+        // This is because GetSetOrAddRangeAsync is IAsyncEnumerable
         await foreach(var _ in _redisCacheService.GetSetOrAddRangeAsync(key, factory)) {
         }
         

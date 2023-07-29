@@ -6,30 +6,33 @@ using Domain.Models;
 using FluentAssertions;
 using Microsoft.AspNetCore.Identity;
 using Moq;
+using Utils = Application.Common.Utils;
 
 namespace Users.Tests.Application.RequestHandlers.Auth;
 
 public class ConfirmEmailRequestTests
 {
     private readonly Mock<IVersityUsersRepository> _versityUsersRepository;
+    private readonly ConfirmEmailCommandHandler _confirmEmailCommandHandler;
+    private readonly ConfirmEmailCommandValidation _confirmEmailCommandValidation;
 
     public ConfirmEmailRequestTests()
     {
         _versityUsersRepository = new Mock<IVersityUsersRepository>();
+        _confirmEmailCommandHandler = new ConfirmEmailCommandHandler(_versityUsersRepository.Object);
+        _confirmEmailCommandValidation = new ConfirmEmailCommandValidation();
     }
 
     [Fact]
     public async Task RequestHandler_ShouldThrowException_WhenUserDoesNotExist()
     {
         // Arrange
-        _versityUsersRepository.Setup(
-            x => x.GetUserByIdAsync(It.IsAny<string>()))
+        _versityUsersRepository.Setup(versityUsersRepository => 
+                versityUsersRepository.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(null as VersityUser);
         
-        var handler = new ConfirmEmailCommandHandler(_versityUsersRepository.Object);
-
         // Act
-        var act = async () => await handler.Handle(GenerateFakeConfirmEmailCommand(), default);
+        var act = async () => await _confirmEmailCommandHandler.Handle(GenerateFakeConfirmEmailCommand(), default);
 
         // Assert
         await act.Should().ThrowAsync<NotFoundExceptionWithStatusCode>();
@@ -39,18 +42,16 @@ public class ConfirmEmailRequestTests
     public async Task RequestHandler_ShouldThrowException_WhenTokenIsInvalidAndUserExists()
     {
         // Arrange
-        _versityUsersRepository.Setup(
-                repository =>  repository.GetUserByIdAsync(It.IsAny<string>()))
+        _versityUsersRepository.Setup(repository =>  
+                repository.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(new VersityUser());
         
-        _versityUsersRepository.Setup(
-                repository => repository.ConfirmUserEmail(It.IsAny<VersityUser>(), It.IsAny<string>()))
+        _versityUsersRepository.Setup(repository => 
+                repository.ConfirmUserEmail(It.IsAny<VersityUser>(), It.IsAny<string>()))
             .ReturnsAsync(IdentityResult.Failed());
         
-        var handler = new ConfirmEmailCommandHandler(_versityUsersRepository.Object);
-
         // Act
-        var act = async () => await handler.Handle(GenerateFakeConfirmEmailCommand(), default);
+        var act = async () => await _confirmEmailCommandHandler.Handle(GenerateFakeConfirmEmailCommand(), default);
 
         // Assert
         await act.Should().ThrowAsync<IdentityExceptionWithStatusCode>();
@@ -60,18 +61,16 @@ public class ConfirmEmailRequestTests
     public async Task RequestHandler_ShouldReturnSuccessIdentityResult_WhenTokenIsValidAndUserExists()
     {
         // Arrange
-        _versityUsersRepository.Setup(
-                usersRepository => usersRepository.GetUserByIdAsync(It.IsAny<string>()))
+        _versityUsersRepository.Setup(usersRepository => 
+                usersRepository.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(new VersityUser());
         
-        _versityUsersRepository.Setup(
-                usersRepository => usersRepository.ConfirmUserEmail(It.IsAny<VersityUser>(), It.IsAny<string>()))
+        _versityUsersRepository.Setup(usersRepository => 
+                usersRepository.ConfirmUserEmail(It.IsAny<VersityUser>(), It.IsAny<string>()))
             .ReturnsAsync(IdentityResult.Success);
         
-        var handler = new ConfirmEmailCommandHandler(_versityUsersRepository.Object);
-
         // Act
-        var result = await handler.Handle(GenerateFakeConfirmEmailCommand(), default);
+        var result = await _confirmEmailCommandHandler.Handle(GenerateFakeConfirmEmailCommand(), default);
 
         // Assert
         result.Succeeded.Should().BeTrue();
@@ -81,11 +80,10 @@ public class ConfirmEmailRequestTests
     public async Task Validation_ShouldReturnValidationError_WhenIdIsNull()
     {
         // Arrange
-        var validator = new ConfirmEmailCommandValidation();
-        var command = new ConfirmEmailCommand(null, Guid.NewGuid().ToString());
+        var command = new ConfirmEmailCommand(string.Empty, Guid.NewGuid().ToString());
         
         // Act
-        var result = await validator.ValidateAsync(command);
+        var result = await _confirmEmailCommandValidation.ValidateAsync(command);
         
         // Assert
         result.IsValid.Should().BeFalse();
@@ -95,11 +93,10 @@ public class ConfirmEmailRequestTests
     public async Task Validation_ShouldReturnValidationError_WhenIdIsNotGuid()
     {
         // Arrange
-        var validator = new ConfirmEmailCommandValidation();
-        var command = new ConfirmEmailCommand("dd44e461-7217-41ab-8a41-f230381ed8", "dd44e461-7217-41ab-8a41-f230381e0ed8");
+        var command = new ConfirmEmailCommand(Utils.GenerateRandomString(7), Guid.NewGuid().ToString());
         
         // Act
-        var result = await validator.ValidateAsync(command);
+        var result = await _confirmEmailCommandValidation.ValidateAsync(command);
         
         // Assert
         result.IsValid.Should().BeFalse();
@@ -109,11 +106,10 @@ public class ConfirmEmailRequestTests
     public async Task Validation_ShouldReturnValidationError_WhenTokenIsEmpty()
     {
         // Arrange
-        var validator = new ConfirmEmailCommandValidation();
-        var command = new ConfirmEmailCommand("dd44e461-7217-41ab-8a41-f230381e0ed8", string.Empty);
+        var command = new ConfirmEmailCommand(Guid.NewGuid().ToString(), string.Empty);
         
         // Act
-        var result = await validator.ValidateAsync(command);
+        var result = await _confirmEmailCommandValidation.ValidateAsync(command);
         
         // Assert
         result.IsValid.Should().BeFalse();
@@ -123,11 +119,10 @@ public class ConfirmEmailRequestTests
     public async Task Validation_ShouldReturnValidationSuccess_WhenTokenIsValidAndUserIsGuid()
     {
         // Arrange
-        var validator = new ConfirmEmailCommandValidation();
         var command = GenerateFakeConfirmEmailCommand();
         
         // Act
-        var result = await validator.ValidateAsync(command);
+        var result = await _confirmEmailCommandValidation.ValidateAsync(command);
         
         // Assert
         result.IsValid.Should().BeTrue();

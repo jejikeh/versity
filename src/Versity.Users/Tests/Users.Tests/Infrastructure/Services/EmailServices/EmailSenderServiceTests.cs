@@ -43,7 +43,7 @@ public class EmailSenderServiceTests
     }
 
     [Fact]
-    public async Task SendEmailAsync_ShouldDisconnectSmtpClient_WhenDisposed()
+    public void SendEmailAsync_ShouldDisconnectSmtpClient_WhenDisposed()
     {
         // Arrange
         using var emailSender = new EmailSenderService(_smtpClient.Object, _emailServicesConfiguration.Object);

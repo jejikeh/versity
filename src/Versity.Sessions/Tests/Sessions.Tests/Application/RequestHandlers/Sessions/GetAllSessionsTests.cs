@@ -9,11 +9,13 @@ namespace Sessions.Tests.Application.RequestHandlers.Sessions;
 
 public class GetAllSessionsTests
 {
-    private readonly Mock<ISessionsRepository> _sessions;
+    private readonly Mock<ISessionsRepository> _sessionsRepository;
+    private readonly GetAllSessionsQueryHandler _getAllSessionsQueryHandler;
 
     public GetAllSessionsTests()
     {
-        _sessions = new Mock<ISessionsRepository>();
+        _sessionsRepository = new Mock<ISessionsRepository>();
+        _getAllSessionsQueryHandler = new GetAllSessionsQueryHandler(_sessionsRepository.Object);
     }
 
     [Fact]
@@ -22,18 +24,17 @@ public class GetAllSessionsTests
         // Arrange
         const int entriesCount = PageFetchSettings.ItemsOnPage + 5;
         var sessionLogs = FakeDataGenerator.GenerateFakeSessions(entriesCount, 10);
-        var handler = new GetAllSessionsQueryHandler(_sessions.Object);
-        _sessions.Setup(repository => repository.GetAllSessions())
+        _sessionsRepository.Setup(repository => repository.GetAllSessions())
             .Returns(sessionLogs.AsQueryable());
 
-        _sessions.Setup(repository => repository.ToListAsync(It.IsAny<IQueryable<Session>>()))
+        _sessionsRepository.Setup(repository => repository.ToListAsync(It.IsAny<IQueryable<Session>>()))
             .ReturnsAsync(sessionLogs);
         
         // Act
-        await handler.Handle(new GetAllSessionsQuery(2), CancellationToken.None);
+        await _getAllSessionsQueryHandler.Handle(new GetAllSessionsQuery(2), CancellationToken.None);
         
         // Assert
-        _sessions.Verify(repository => 
+        _sessionsRepository.Verify(repository => 
                 repository.ToListAsync(
                     It.Is<IQueryable<Session>>(queryable => queryable.Count() == entriesCount - PageFetchSettings.ItemsOnPage)), 
             Times.Once()); 
@@ -44,18 +45,17 @@ public class GetAllSessionsTests
     {
         // Arrange
         var sessionLogs = FakeDataGenerator.GenerateFakeSessions(PageFetchSettings.ItemsOnPage + 5, 10);
-        var handler = new GetAllSessionsQueryHandler(_sessions.Object);
-        _sessions.Setup(repository => repository.GetAllSessions())
+        _sessionsRepository.Setup(repository => repository.GetAllSessions())
             .Returns(sessionLogs.AsQueryable());
 
-        _sessions.Setup(repository => repository.ToListAsync(It.IsAny<IQueryable<Session>>()))
+        _sessionsRepository.Setup(repository => repository.ToListAsync(It.IsAny<IQueryable<Session>>()))
             .ReturnsAsync(sessionLogs);
         
         // Act
-        await handler.Handle(new GetAllSessionsQuery(1), CancellationToken.None);
+        await _getAllSessionsQueryHandler.Handle(new GetAllSessionsQuery(1), CancellationToken.None);
         
         // Assert
-        _sessions.Verify(repository => 
+        _sessionsRepository.Verify(repository => 
                 repository.ToListAsync(
                     It.Is<IQueryable<Session>>(queryable => queryable.Count() == PageFetchSettings.ItemsOnPage)), 
             Times.Once()); 

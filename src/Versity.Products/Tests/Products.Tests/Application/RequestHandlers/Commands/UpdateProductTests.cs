@@ -10,11 +10,13 @@ namespace Products.Tests.Application.RequestHandlers.Commands;
 
 public class UpdateProductTests
 {
-    private readonly Mock<IVersityProductsRepository> _products;
+    private readonly Mock<IVersityProductsRepository> _productsRepository;
+    private readonly UpdateProductCommandHandler _updateProductCommandHandler;
 
     public UpdateProductTests()
     {
-        _products = new Mock<IVersityProductsRepository>();
+        _productsRepository = new Mock<IVersityProductsRepository>();
+        _updateProductCommandHandler = new UpdateProductCommandHandler(_productsRepository.Object);
     }
 
     [Fact]
@@ -22,16 +24,15 @@ public class UpdateProductTests
     {
         // Arrange
         var command = GenerateFakeUpdateProductCommand();
-        var handler = new UpdateProductCommandHandler(_products.Object);
-        _products.Setup(productsRepository =>
+        _productsRepository.Setup(productsRepository =>
                 productsRepository.GetProductByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(GenerateFakeProduct);
         
         // Act
-        var product = await handler.Handle(command, CancellationToken.None);
+        var product = await _updateProductCommandHandler.Handle(command, CancellationToken.None);
 
         // Assert
-        _products.Verify(productsRepository => 
+        _productsRepository.Verify(productsRepository => 
             productsRepository.UpdateProduct(It.Is<Product>(
                 productParameter => 
                     productParameter.Author == command.Author &&
@@ -43,14 +44,16 @@ public class UpdateProductTests
     [Fact]
     public async Task RequestHandler_ShouldThrowException_WhenProductDoesNotExist()
     {
+        // Arrange
         var command = GenerateFakeUpdateProductCommand();
-        var handler = new UpdateProductCommandHandler(_products.Object);
-        _products.Setup(x =>
+        _productsRepository.Setup(x =>
                 x.GetProductByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(null as Product);
         
-        var act = async () => await handler.Handle(command, CancellationToken.None);
+        // Act
+        var act = async () => await _updateProductCommandHandler.Handle(command, CancellationToken.None);
         
+        // Assert
         await act.Should().ThrowAsync<NotFoundExceptionWithStatusCode>();
     }
 

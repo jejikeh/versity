@@ -13,16 +13,15 @@ namespace Sessions.Tests.Infrastructure.Services;
 public class UpdateSessionStatusServiceTests
 {
     private readonly Mock<ISessionsRepository> _sessionsRepository;
-    private readonly Mock<ILogger<UpdateSessionStatusService>> _logger;
     private readonly Mock<INotificationSender> _notificationSender;
     private readonly UpdateSessionStatusService _updateSessionStatusService;
     
     public UpdateSessionStatusServiceTests()
     {
+        var logger = new Mock<ILogger<UpdateSessionStatusService>>();
         _sessionsRepository = new Mock<ISessionsRepository>();
-        _logger = new Mock<ILogger<UpdateSessionStatusService>>();
         _notificationSender = new Mock<INotificationSender>();
-        _updateSessionStatusService = new UpdateSessionStatusService(_sessionsRepository.Object, _logger.Object, _notificationSender.Object);
+        _updateSessionStatusService = new UpdateSessionStatusService(_sessionsRepository.Object, logger.Object, _notificationSender.Object);
     }
 
     [Fact]
@@ -32,8 +31,8 @@ public class UpdateSessionStatusServiceTests
         var count = new Random().Next(10, 100);
         var sessions = GenerateFakeExpiredOrNotExpiredSessions(count, new Random().Next(1, 10));
         var expectedCount = sessions
-            .Where(x => x.Expiry < DateTime.UtcNow)
-            .Count(x => x.Status != SessionStatus.Closed && x.Status != SessionStatus.Expired);
+            .Where(session => session.Expiry < DateTime.UtcNow)
+            .Count(session => session.Status != SessionStatus.Closed && session.Status != SessionStatus.Expired);
         
         _sessionsRepository.Setup(repository => repository.GetAllSessions()).Returns(sessions.AsQueryable());
         
@@ -53,8 +52,8 @@ public class UpdateSessionStatusServiceTests
         var count = new Random().Next(10, 100);
         var sessions = GenerateFakeExpiredOrNotExpiredSessions(count, new Random().Next(1, 10));
         var expectedCount = sessions
-            .Where(x => x.Expiry < DateTime.UtcNow)
-            .Count(x => x.Status != SessionStatus.Closed && x.Status != SessionStatus.Expired);
+            .Where(session => session.Expiry < DateTime.UtcNow)
+            .Count(session => session.Status != SessionStatus.Closed && session.Status != SessionStatus.Expired);
         
         _sessionsRepository.Setup(repository => repository.GetAllSessions()).Returns(sessions.AsQueryable());
         
@@ -76,8 +75,8 @@ public class UpdateSessionStatusServiceTests
         var count = new Random().Next(10, 100);
         var sessions = GenerateFakeInactiveOrNotInactiveSessions(count, new Random().Next(1, 10));
         var expectedCount = sessions
-            .Where(x => x.Start <= DateTime.Now && x.Expiry > DateTime.UtcNow)
-            .Count(x => x.Status == SessionStatus.Inactive);
+            .Where(session => session.Start <= DateTime.Now && session.Expiry > DateTime.UtcNow)
+            .Count(session => session.Status == SessionStatus.Inactive);
         
         _sessionsRepository.Setup(repository => repository.GetAllSessions()).Returns(sessions.AsQueryable());
         
@@ -85,8 +84,8 @@ public class UpdateSessionStatusServiceTests
         _updateSessionStatusService.OpenInactiveSessions();
         
         // Assert
-        _sessionsRepository.Verify(
-            repository => repository.UpdateSession(It.IsAny<Session>()), 
+        _sessionsRepository.Verify(repository => 
+                repository.UpdateSession(It.IsAny<Session>()), 
             Times.Exactly(expectedCount));
     }
     
@@ -97,8 +96,8 @@ public class UpdateSessionStatusServiceTests
         var count = new Random().Next(10, 100);
         var sessions = GenerateFakeInactiveOrNotInactiveSessions(count, new Random().Next(1, 10));
         var expectedCount = sessions
-            .Where(x => x.Start <= DateTime.Now && x.Expiry > DateTime.UtcNow)
-            .Count(x => x.Status == SessionStatus.Inactive);
+            .Where(session => session.Start <= DateTime.Now && session.Expiry > DateTime.UtcNow)
+            .Count(session => session.Status == SessionStatus.Inactive);
         
         _sessionsRepository.Setup(repository => repository.GetAllSessions()).Returns(sessions.AsQueryable());
         
@@ -106,10 +105,10 @@ public class UpdateSessionStatusServiceTests
         _updateSessionStatusService.OpenInactiveSessions();
         
         // Assert
-        _notificationSender.Verify(
-            repository => repository.PushCreatedNewSession(
-                It.IsAny<string>(), 
-                It.IsAny<UserSessionsViewModel>()), 
+        _notificationSender.Verify(repository => 
+                repository.PushCreatedNewSession(
+                    It.IsAny<string>(), 
+                    It.IsAny<UserSessionsViewModel>()), 
             Times.Exactly(expectedCount));
     }
     

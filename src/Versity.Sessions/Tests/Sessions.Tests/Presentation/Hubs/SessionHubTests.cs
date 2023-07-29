@@ -27,6 +27,6 @@ public class SessionHubTests
         await hub.UploadStream(commands);
         
         // Assert
-        _sender.Verify(x => x.Send(It.IsAny<CacheLogDataCommand>(), It.IsAny<CancellationToken>()), Times.Exactly(count));
+        _sender.Verify(sender => sender.Send(It.IsAny<CacheLogDataCommand>(), It.IsAny<CancellationToken>()), Times.Exactly(count));
     }
 }

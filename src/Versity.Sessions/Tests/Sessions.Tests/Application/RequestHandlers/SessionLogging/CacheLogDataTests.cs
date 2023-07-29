@@ -25,8 +25,10 @@ public class CacheLogDataTests
         await handler.Handle(command, CancellationToken.None);
         
         // Assert
-        _cacheService.Verify(x => x.SetAddAsync(
-            CachingKeys.SessionLogs, 
-            It.Is<CacheLogDataCommand>(x => x.Equals(command))), Times.Once);
+        _cacheService.Verify(cacheService => 
+            cacheService.SetAddAsync(
+                CachingKeys.SessionLogs, 
+                It.Is<CacheLogDataCommand>(cacheLogDataCommand => cacheLogDataCommand.Equals(command))), 
+            Times.Once);
     }
 }
