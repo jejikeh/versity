@@ -26,9 +26,10 @@ public class JwtTokenGeneratorServiceTests
         var roles = new[] { "role1", "role2" };
         var issuer = faker.Name.FullName();
         var audience = faker.Internet.Email();
-        _tokenGenerationConfiguration.Setup(x => x.Issuer).Returns(issuer);
-        _tokenGenerationConfiguration.Setup(x => x.Audience).Returns(audience);
-        _tokenGenerationConfiguration.Setup(x => x.Key).Returns(Guid.NewGuid().ToString());
+        
+        _tokenGenerationConfiguration.Setup(tokenGenerationConfiguration => tokenGenerationConfiguration.Issuer).Returns(issuer);
+        _tokenGenerationConfiguration.Setup(tokenGenerationConfiguration => tokenGenerationConfiguration.Audience).Returns(audience);
+        _tokenGenerationConfiguration.Setup(tokenGenerationConfiguration => tokenGenerationConfiguration.Key).Returns(Guid.NewGuid().ToString());
         
         // Act
         var token = handler.ReadJwtToken(new JwtTokenGeneratorService(_tokenGenerationConfiguration.Object)
@@ -37,7 +38,7 @@ public class JwtTokenGeneratorServiceTests
         // Assert
         token.Issuer.Should().Be(issuer);
         token.Audiences.Should().Contain(audience);
-        token.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)?.Value.Should().Be(userId);
-        token.Claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Email)?.Value.Should().Be(userEmail);
+        token.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value.Should().Be(userId);
+        token.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Email)?.Value.Should().Be(userEmail);
     }
 }

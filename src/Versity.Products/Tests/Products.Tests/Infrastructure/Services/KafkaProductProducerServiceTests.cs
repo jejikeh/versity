@@ -52,7 +52,6 @@ public class KafkaProductProducerServiceTests
     public async Task DeleteProductProduce_ShouldInvokeProducer_WhenIsCalled()
     {
         // Arrange
-        var createProductProduceDto = GenerateCreateProductProduceDto();
         var producer = new KafkaProductProducerService(_producerAccessor.Object, _logger.Object, _kafkaProducerConfiguration.Object);
         _producerAccessor.Setup(x => 
                 x.GetProducer(It.IsAny<string>()))

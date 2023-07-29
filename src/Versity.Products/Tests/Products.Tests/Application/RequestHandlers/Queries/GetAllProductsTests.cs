@@ -9,26 +9,29 @@ namespace Products.Tests.Application.RequestHandlers.Queries;
 
 public class GetAllProductsTests
 {
-    private readonly Mock<IVersityProductsRepository> _products;
+    private readonly Mock<IVersityProductsRepository> _productsRepository;
 
     public GetAllProductsTests()
     {
-        _products = new Mock<IVersityProductsRepository>();
+        _productsRepository = new Mock<IVersityProductsRepository>();
     }
 
     [Fact]
     public async Task Handle_ShouldReturnAllProducts_WhenCalled()
     {
+        // Arrange
         var products = GenerateFakeProductsList();
-        _products.Setup(productsRepository => 
+        _productsRepository.Setup(productsRepository => 
                 productsRepository.GetAllProducts())
             .Returns(products.AsQueryable);
-
-        var handler = new GetAllProductsQueryHandler(_products.Object);
         
+        var handler = new GetAllProductsQueryHandler(_productsRepository.Object);
+        
+        // Act
         await handler.Handle(new GetAllProductsQuery(1), CancellationToken.None);
 
-        _products.Verify(productsRepository =>
+        // Assert
+        _productsRepository.Verify(productsRepository =>
             productsRepository.ToListAsync(It.Is<IQueryable<Product>>(q => q.Count() == 10)), Times.Once);
     }
     

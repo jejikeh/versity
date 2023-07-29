@@ -21,19 +21,10 @@ public class GetAllVersityUsersTests
             PhoneNumber = faker.Phone.PhoneNumber(),
         }).Generate(10);
 
-    public static readonly List<ViewVersityUserDto> DtoPayload = new List<ViewVersityUserDto>()
-    {
-        ViewVersityUserDto.MapFromModel(VersityUsersPayload[0], new List<string>() { "Admin" }),
-        ViewVersityUserDto.MapFromModel(VersityUsersPayload[1], new List<string>() { "Admin" }),
-        ViewVersityUserDto.MapFromModel(VersityUsersPayload[2], new List<string>() { "Admin" }),
-        ViewVersityUserDto.MapFromModel(VersityUsersPayload[3], new List<string>() { "Admin" }),
-        ViewVersityUserDto.MapFromModel(VersityUsersPayload[4], new List<string>() { "Admin" }),
-        ViewVersityUserDto.MapFromModel(VersityUsersPayload[5], new List<string>() { "Admin" }),
-        ViewVersityUserDto.MapFromModel(VersityUsersPayload[6], new List<string>() { "Admin" }),
-        ViewVersityUserDto.MapFromModel(VersityUsersPayload[7], new List<string>() { "Admin" }),
-        ViewVersityUserDto.MapFromModel(VersityUsersPayload[8], new List<string>() { "Admin" }),
-        ViewVersityUserDto.MapFromModel(VersityUsersPayload[9], new List<string>() { "Admin" }),
-    };
+    public static readonly List<ViewVersityUserDto> DtoPayload = VersityUsersPayload
+        .Take(10)
+        .Select(userPayload => ViewVersityUserDto.MapFromModel(userPayload, new List<string>() { "Admin" }))
+        .ToList();
     
     private readonly Mock<IVersityUsersRepository> _versityUsersRepository;
 
@@ -46,14 +37,14 @@ public class GetAllVersityUsersTests
     public async Task RequestHandler_ShouldReturnListOfDtos_InAllCases()
     {
         // Arrange
-        _versityUsersRepository.Setup(x =>
-            x.GetAllUsers()).Returns(VersityUsersPayload.AsQueryable());
+        _versityUsersRepository.Setup(versityUsersRepository =>
+            versityUsersRepository.GetAllUsers()).Returns(VersityUsersPayload.AsQueryable());
         
-        _versityUsersRepository.Setup(x => 
-            x.ToListAsync(It.IsAny<IQueryable<VersityUser>>())).ReturnsAsync(VersityUsersPayload.GetRange(0, 10));
+        _versityUsersRepository.Setup(versityUsersRepository => 
+            versityUsersRepository.ToListAsync(It.IsAny<IQueryable<VersityUser>>())).ReturnsAsync(VersityUsersPayload.GetRange(0, 10));
 
-        _versityUsersRepository.Setup(x =>
-            x.GetUserRolesAsync(It.IsAny<VersityUser>())).ReturnsAsync(new[] { "Admin" });
+        _versityUsersRepository.Setup(versityUsersRepository =>
+            versityUsersRepository.GetUserRolesAsync(It.IsAny<VersityUser>())).ReturnsAsync(new[] { "Admin" });
         
         var request = new GetAllVersityUsersQuery(new Random().Next(0, 10));
         var handler = new GetAllVersityUsersQueryHandler(_versityUsersRepository.Object);

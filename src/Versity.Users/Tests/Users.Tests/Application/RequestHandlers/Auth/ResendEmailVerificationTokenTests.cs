@@ -12,29 +12,33 @@ namespace Users.Tests.Application.RequestHandlers.Auth;
 public class ResendEmailVerificationTokenTests
 {
     private readonly Mock<IVersityUsersRepository> _versityUsersRepository;
-    private readonly Mock<IEmailConfirmMessageService> _emailConfirmMessageService;
+    private readonly ResendEmailVerificationTokenCommandHandler _resendEmailVerificationTokenCommandHandler;
+    private readonly ResendEmailVerificationTokenCommandValidator _resendEmailVerificationTokenCommandValidator;
+    private readonly Faker _faker = new Faker();
 
     public ResendEmailVerificationTokenTests()
     {
         _versityUsersRepository = new Mock<IVersityUsersRepository>();
-        _emailConfirmMessageService = new Mock<IEmailConfirmMessageService>();
+        
+        var emailConfirmMessageService = new Mock<IEmailConfirmMessageService>();
+        
+        _resendEmailVerificationTokenCommandValidator = new ResendEmailVerificationTokenCommandValidator();
+        _resendEmailVerificationTokenCommandHandler = new ResendEmailVerificationTokenCommandHandler(
+            _versityUsersRepository.Object,
+            emailConfirmMessageService.Object
+        );
     }
 
     [Fact]
     public async Task RequestHandler_ShouldThrowException_WhenUserWithEmailDoesNotExists()
     {
         // Arrange
-        _versityUsersRepository.Setup(x =>
-                x.GetUserByEmailAsync(It.IsAny<string>()))
+        _versityUsersRepository.Setup(versityUsersRepository =>
+                versityUsersRepository.GetUserByEmailAsync(It.IsAny<string>()))
             .ReturnsAsync(null as VersityUser);
         
-        var handler = new ResendEmailVerificationTokenCommandHandler(
-            _versityUsersRepository.Object,
-            _emailConfirmMessageService.Object
-        );
-        
         // Act
-        var act = async () => await handler.Handle(GenerateFakeResendEmailVerificationTokenCommand(), default);
+        var act = async () => await _resendEmailVerificationTokenCommandHandler.Handle(GenerateFakeResendEmailVerificationTokenCommand(), default);
         
         // Assert
         await act.Should().ThrowAsync<IncorrectEmailOrPasswordExceptionWithStatusCode>();
@@ -44,21 +48,16 @@ public class ResendEmailVerificationTokenTests
     public async Task RequestHandler_ShouldThrowException_WhenPasswordIsIncorrect()
     {
         // Arrange
-        _versityUsersRepository.Setup(x =>
-                x.GetUserByEmailAsync(It.IsAny<string>()))
+        _versityUsersRepository.Setup(versityUsersRepository =>
+                versityUsersRepository.GetUserByEmailAsync(It.IsAny<string>()))
             .ReturnsAsync(new VersityUser());
         
-        _versityUsersRepository.Setup(x =>
-                x.CheckPasswordAsync(It.IsAny<VersityUser>(), It.IsAny<string>()))
+        _versityUsersRepository.Setup(versityUsersRepository =>
+                versityUsersRepository.CheckPasswordAsync(It.IsAny<VersityUser>(), It.IsAny<string>()))
             .ReturnsAsync(false);
-        
-        var handler = new ResendEmailVerificationTokenCommandHandler(
-            _versityUsersRepository.Object,
-            _emailConfirmMessageService.Object
-        );
-        
+
         // Act
-        var act = async () => await handler.Handle(GenerateFakeResendEmailVerificationTokenCommand(), default);
+        var act = async () => await _resendEmailVerificationTokenCommandHandler.Handle(GenerateFakeResendEmailVerificationTokenCommand(), default);
         
         // Assert
         await act.Should().ThrowAsync<IncorrectEmailOrPasswordExceptionWithStatusCode>();
@@ -68,21 +67,16 @@ public class ResendEmailVerificationTokenTests
     public async Task RequestHandler_ShouldThrowException_WhenEmailIsConfirmed()
     {
         // Arrange
-        _versityUsersRepository.Setup(x =>
-                x.GetUserByEmailAsync(It.IsAny<string>()))
+        _versityUsersRepository.Setup(versityUsersRepository =>
+                versityUsersRepository.GetUserByEmailAsync(It.IsAny<string>()))
             .ReturnsAsync(new VersityUser() { EmailConfirmed = true });
         
-        _versityUsersRepository.Setup(x =>
-                x.CheckPasswordAsync(It.IsAny<VersityUser>(), It.IsAny<string>()))
+        _versityUsersRepository.Setup(versityUsersRepository =>
+                versityUsersRepository.CheckPasswordAsync(It.IsAny<VersityUser>(), It.IsAny<string>()))
             .ReturnsAsync(true);
         
-        var handler = new ResendEmailVerificationTokenCommandHandler(
-            _versityUsersRepository.Object,
-            _emailConfirmMessageService.Object
-        );
-        
         // Act
-        var act = async () => await handler.Handle(GenerateFakeResendEmailVerificationTokenCommand(), default);
+        var act = async () => await _resendEmailVerificationTokenCommandHandler.Handle(GenerateFakeResendEmailVerificationTokenCommand(), default);
         
         // Assert
         await act.Should().ThrowAsync<IdentityExceptionWithStatusCode>();
@@ -91,66 +85,71 @@ public class ResendEmailVerificationTokenTests
     [Fact]
     public async Task RequestHandler_ShouldReturnSuccessIdentityResult_WhenEmailIsConfirmed()
     {
-        _versityUsersRepository.Setup(x =>
-                x.GetUserByEmailAsync(It.IsAny<string>()))
+        // Arrange
+        _versityUsersRepository.Setup(versityUsersRepository =>
+                versityUsersRepository.GetUserByEmailAsync(It.IsAny<string>()))
             .ReturnsAsync(new VersityUser());
         
-        _versityUsersRepository.Setup(x =>
-                x.CheckPasswordAsync(It.IsAny<VersityUser>(), It.IsAny<string>()))
+        _versityUsersRepository.Setup(versityUsersRepository =>
+                versityUsersRepository.CheckPasswordAsync(It.IsAny<VersityUser>(), It.IsAny<string>()))
             .ReturnsAsync(true);
         
-        var command = new ResendEmailVerificationTokenCommand("hello@gmail.com", "world");
-        var handler = new ResendEmailVerificationTokenCommandHandler(
-            _versityUsersRepository.Object,
-            _emailConfirmMessageService.Object
-        );
+        // Act
+        var result = await _resendEmailVerificationTokenCommandHandler.Handle(GenerateFakeResendEmailVerificationTokenCommand(), default);
         
-        var result = await handler.Handle(command, default);
-        
+        // Assert
         result.Succeeded.Should().BeTrue();
     }
     
     [Fact]
     public async Task Validation_ShouldReturnValidationError_WhenEmailIsEmpty()
     {
-        var validator = new ResendEmailVerificationTokenCommandValidator();
-        var command = new ResendEmailVerificationTokenCommand(string.Empty, "world");
+        // Arrange
+        var command = new ResendEmailVerificationTokenCommand(string.Empty, _faker.Internet.Password() + "$#E0d");
         
-        var result = await validator.ValidateAsync(command);
+        // Act
+        var result = await _resendEmailVerificationTokenCommandValidator.ValidateAsync(command);
         
+        // Assert
         result.IsValid.Should().BeFalse();
     }
     
     [Fact]
     public async Task Validation_ShouldReturnValidationError_WhenPasswordIsEmpty()
     {
-        var validator = new ResendEmailVerificationTokenCommandValidator();
-        var command = new ResendEmailVerificationTokenCommand("email@gmail.com", string.Empty);
+        // Arrange
+        var command = new ResendEmailVerificationTokenCommand(_faker.Internet.Email(), string.Empty);
         
-        var result = await validator.ValidateAsync(command);
+        // Act
+        var result = await _resendEmailVerificationTokenCommandValidator.ValidateAsync(command);
         
+        // Assert
         result.IsValid.Should().BeFalse();
     }
     
     [Fact]
     public async Task Validation_ShouldReturnValidationError_WhenEmailIsNotValid()
     {
-        var validator = new ResendEmailVerificationTokenCommandValidator();
-        var command = new ResendEmailVerificationTokenCommand("email@", "world");
+        // Arrange
+        var command = new ResendEmailVerificationTokenCommand(_faker.Lorem.Word(), Guid.NewGuid().ToString());
         
-        var result = await validator.ValidateAsync(command);
+        // Act
+        var result = await _resendEmailVerificationTokenCommandValidator.ValidateAsync(command);
         
+        // Assert
         result.IsValid.Should().BeFalse();
     }
     
     [Fact]
     public async Task Validation_ShouldReturnValidationSuccess_WhenEmailIsValidAndPasswordIsNotEmpty()
     {
-        var validator = new ResendEmailVerificationTokenCommandValidator();
-        var command = new ResendEmailVerificationTokenCommand("email@gmail.com", "world");
+        // Arrange
+        var command = new ResendEmailVerificationTokenCommand(_faker.Internet.Email(), Guid.NewGuid().ToString());
         
-        var result = await validator.ValidateAsync(command);
+        // Act
+        var result = await _resendEmailVerificationTokenCommandValidator.ValidateAsync(command);
         
+        // Assert
         result.IsValid.Should().BeTrue();
     }
 

@@ -9,15 +9,18 @@ namespace Users.Tests.Infrastructure.Services;
 public class RedisCacheServiceTests
 {
     private readonly Mock<IDatabase> _database;
-    private readonly Mock<IConnectionMultiplexer> _connectionMultiplexer;
+    private readonly RedisCacheService _redisCacheService;
 
     public RedisCacheServiceTests()
     {
         _database = new Mock<IDatabase>();
-        _connectionMultiplexer = new Mock<IConnectionMultiplexer>();
-        _connectionMultiplexer.Setup(
+        
+        var connectionMultiplexer = new Mock<IConnectionMultiplexer>();
+        connectionMultiplexer.Setup(
             x => x.GetDatabase(It.IsAny<int>(), It.IsAny<object>()))
             .Returns(_database.Object);
+        
+        _redisCacheService = new RedisCacheService(connectionMultiplexer.Object);
     }
 
     [Fact]
@@ -26,13 +29,13 @@ public class RedisCacheServiceTests
         // Arrange
         var key = Guid.NewGuid().ToString();
         var factory = new Func<Task<string?>>(() => Task.Run(() => key));
-        var redisCacheService = new RedisCacheService(_connectionMultiplexer.Object);
+        
         _database.Setup(x => 
             x.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
             .ReturnsAsync(JsonSerializer.Serialize(key));
         
         // Act
-        var result = await redisCacheService.GetOrCreateAsync(key, factory);
+        var result = await _redisCacheService.GetOrCreateAsync(key, factory);
         
         // Assert
         result.Should().Be(key);
@@ -45,13 +48,13 @@ public class RedisCacheServiceTests
         var key = Guid.NewGuid().ToString();
         var factory = new Mock<Func<Task<string?>>>();
         factory.Setup(x=>x.Invoke()).ReturnsAsync(key);
-        var redisCacheService = new RedisCacheService(_connectionMultiplexer.Object);
+       
         _database.Setup(x => 
                 x.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
             .ReturnsAsync(string.Empty);
         
         // Act
-        var result = await redisCacheService.GetOrCreateAsync(key, factory.Object);
+        var result = await _redisCacheService.GetOrCreateAsync(key, factory.Object);
         
         // Assert
         result.Should().Be(key);
@@ -63,13 +66,13 @@ public class RedisCacheServiceTests
         // Arrange
         var key = Guid.NewGuid().ToString();
         var factory = new Func<Task<string?>>(() => Task.Run(() => null as string));
-        var redisCacheService = new RedisCacheService(_connectionMultiplexer.Object);
+        
         _database.Setup(x => 
                 x.StringGetAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
             .ReturnsAsync(string.Empty);
         
         // Act
-        var result = await redisCacheService.GetOrCreateAsync(key, factory);
+        var result = await _redisCacheService.GetOrCreateAsync(key, factory);
         
         // Assert
         result.Should().BeNull();
