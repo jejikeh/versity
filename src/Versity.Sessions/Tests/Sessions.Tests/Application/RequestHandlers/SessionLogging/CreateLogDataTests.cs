@@ -11,11 +11,13 @@ public class CreateLogDataTests
 {
     private readonly Mock<ILogsDataRepository> _logsDataRepository;
     private readonly Mock<ISessionLogsRepository> _sessionsRepository;
+    private readonly CreateLogDataCommandHandler _createLogDataCommandHandler;
 
     public CreateLogDataTests()
     {
         _logsDataRepository = new Mock<ILogsDataRepository>();
         _sessionsRepository = new Mock<ISessionLogsRepository>();
+        _createLogDataCommandHandler = new CreateLogDataCommandHandler(_logsDataRepository.Object, _sessionsRepository.Object);
     }
 
     [Fact]
@@ -26,10 +28,8 @@ public class CreateLogDataTests
                 repository.GetSessionLogsByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(null as SessionLogs);
         
-        var handler = new CreateLogDataCommandHandler(_logsDataRepository.Object, _sessionsRepository.Object);
-        
         // Act
-        var act = async () => await handler.Handle(
+        var act = async () => await _createLogDataCommandHandler.Handle(
             FakeDataGenerator.GenerateFakeCreateLogDataCommand(), 
             CancellationToken.None);
         
@@ -43,17 +43,16 @@ public class CreateLogDataTests
         // Arrange
         _sessionsRepository.Setup(repository => 
                 repository.GetSessionLogsByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(FakeDataGenerator.GenerateFakeSessionLogs(20));
+            .ReturnsAsync(FakeDataGenerator.GenerateFakeSessionLogs(new Random().Next(1,20)));
         
         _logsDataRepository.Setup(repository =>
                 repository.CreateLogDataAsync(It.IsAny<LogData>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeLogData);
         
-        var handler = new CreateLogDataCommandHandler(_logsDataRepository.Object, _sessionsRepository.Object);
         var command = FakeDataGenerator.GenerateFakeCreateLogDataCommand();
         
         // Act
-        var result = await handler.Handle(command, CancellationToken.None);
+        var result = await _createLogDataCommandHandler.Handle(command, CancellationToken.None);
         
         // Assert
         result.Should().NotBeNull();

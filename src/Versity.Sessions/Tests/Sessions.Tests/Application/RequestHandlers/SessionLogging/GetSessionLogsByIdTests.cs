@@ -21,8 +21,8 @@ public class GetSessionLogsByIdTests
     {
         // Arrange
         var handler = new GetSessionLogsByIdQueryHandler(_sessionLogsRepository.Object);
-        _sessionLogsRepository.Setup(x =>
-                x.GetSessionLogsByIdAsync(
+        _sessionLogsRepository.Setup(sessionLogsRepository =>
+                sessionLogsRepository.GetSessionLogsByIdAsync(
                     It.IsAny<Guid>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(null as SessionLogs);
@@ -42,8 +42,8 @@ public class GetSessionLogsByIdTests
         // Arrange
         var sessionLogs = FakeDataGenerator.GenerateFakeSessionLogs(10);
         var handler = new GetSessionLogsByIdQueryHandler(_sessionLogsRepository.Object);
-        _sessionLogsRepository.Setup(x =>
-                x.GetSessionLogsByIdAsync(
+        _sessionLogsRepository.Setup(sessionLogsRepository =>
+                sessionLogsRepository.GetSessionLogsByIdAsync(
                     It.IsAny<Guid>(),
                     It.IsAny<CancellationToken>()))
             .ReturnsAsync(sessionLogs);

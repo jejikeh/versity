@@ -113,8 +113,8 @@ public class ChangeUserPasswordTests
                 versityUsersRepository.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(new VersityUser());
 
-        _versityUsersRepository.Setup(x =>
-                x.CheckPasswordAsync(It.IsAny<VersityUser>(), It.IsAny<string>()))
+        _versityUsersRepository.Setup(versityUsersRepository =>
+                versityUsersRepository.CheckPasswordAsync(It.IsAny<VersityUser>(), It.IsAny<string>()))
             .ReturnsAsync(true);
         
         _versityUsersRepository.Setup(versityUsersRepository => 

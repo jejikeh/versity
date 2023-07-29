@@ -21,7 +21,7 @@ public class GetLogDataByIdTests
     {
         // Arrange
         var handler = new GetLogDataByIdQueryHandler(_logsDataRepository.Object);
-        _logsDataRepository.Setup(x => x.GetLogDataByIdAsync(
+        _logsDataRepository.Setup(logsDataRepository => logsDataRepository.GetLogDataByIdAsync(
                 It.IsAny<Guid>(), 
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(null as LogData);
@@ -41,7 +41,7 @@ public class GetLogDataByIdTests
         // Arrange
         var log = FakeDataGenerator.GenerateFakeLogData();
         var handler = new GetLogDataByIdQueryHandler(_logsDataRepository.Object);
-        _logsDataRepository.Setup(x => x.GetLogDataByIdAsync(
+        _logsDataRepository.Setup(logsDataRepository => logsDataRepository.GetLogDataByIdAsync(
                 It.IsAny<Guid>(), 
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(log);

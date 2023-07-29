@@ -41,17 +41,18 @@ public class CreateLogsDataTests
     public async Task Handle_ShouldAddLogToSessionLogs_WhenSessionExist()
     {
         // Arrange
+        var entriesCount = new Random().Next(1, 20);
         _sessionsRepository.Setup(repository => 
                 repository.GetSessionLogsByIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(FakeDataGenerator.GenerateFakeSessionLogs(20));
+            .ReturnsAsync(FakeDataGenerator.GenerateFakeSessionLogs(entriesCount));
 
         var handler = new CreateLogsDataCommandHandler(_logsDataRepository.Object, _sessionsRepository.Object);
-        var command = FakeDataGenerator.GenerateFakeCreateLogsDataCommand(20);
+        var command = FakeDataGenerator.GenerateFakeCreateLogsDataCommand(entriesCount);
         
         // Act
         var result = await handler.Handle(command, CancellationToken.None);
         
         // Assert
-        result.ToList().Count.Should().Be(20);
+        result.ToList().Count.Should().Be(entriesCount);
     }
 }
