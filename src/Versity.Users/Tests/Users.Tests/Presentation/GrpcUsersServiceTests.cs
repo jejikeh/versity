@@ -63,7 +63,7 @@ public class GrpcUsersServiceTests
         _sender.Setup(x => 
                 x.Send(It.IsAny<GetVersityUserRolesQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<string> { "role1", "role2" });
-        var request = new GetUserRolesRequest() { UserId = "test" };
+        var request = new GetUserRolesRequest() { UserId = Guid.NewGuid().ToString() };
         var service = new GrpcUsersService(_sender.Object);
         
         // Act

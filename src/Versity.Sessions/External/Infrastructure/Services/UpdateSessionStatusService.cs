@@ -12,7 +12,10 @@ public class UpdateSessionStatusService
     private readonly ILogger<UpdateSessionStatusService> _logger;
     private readonly INotificationSender _notificationSender;
 
-    public UpdateSessionStatusService(ISessionsRepository sessionsRepository, ILogger<UpdateSessionStatusService> logger, INotificationSender notificationSender, ICacheService cacheService, ISessionLogsRepository sessionLogsRepository, ILogsDataRepository logsDataRepository)
+    public UpdateSessionStatusService(
+        ISessionsRepository sessionsRepository, 
+        ILogger<UpdateSessionStatusService> logger, 
+        INotificationSender notificationSender)
     {
         _sessionsRepository = sessionsRepository;
         _logger = logger;
@@ -25,7 +28,7 @@ public class UpdateSessionStatusService
 
         var expiredSessions = _sessionsRepository
             .GetAllSessions()
-            .Where(x => x.Expiry < DateTime.Now)
+            .Where(x => x.Expiry < DateTime.UtcNow)
             .Where(x => x.Status != SessionStatus.Closed && x.Status != SessionStatus.Expired)
             .ToList();
     
@@ -46,7 +49,7 @@ public class UpdateSessionStatusService
 
         var expiredSessions = _sessionsRepository
             .GetAllSessions()
-            .Where(x => x.Start <= DateTime.Now)
+            .Where(x => x.Start <= DateTime.UtcNow && x.Expiry > DateTime.UtcNow)
             .Where(x => x.Status == SessionStatus.Inactive)
             .ToList();
     

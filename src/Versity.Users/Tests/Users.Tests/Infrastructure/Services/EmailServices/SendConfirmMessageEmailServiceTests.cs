@@ -1,12 +1,11 @@
-﻿using System.Text;
-using Application.Abstractions;
+﻿using Application.Abstractions;
+using Bogus;
 using Domain.Models;
 using Infrastructure.Services.EmailServices;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.WebUtilities;
 using Moq;
 
-namespace Users.Tests.Infrastructure.EmailServices;
+namespace Users.Tests.Infrastructure.Services.EmailServices;
 
 public class SendConfirmMessageEmailServiceTests
 {
@@ -25,27 +24,32 @@ public class SendConfirmMessageEmailServiceTests
     public async Task SendEmailConfirmMessageAsync_ShouldSendMessageWithCorrectData_WhenCalled()
     {
         // Arrange
-        _userManager.Setup(
-            x => x.GenerateEmailConfirmationTokenAsync(It.IsAny<VersityUser>()))
-            .ReturnsAsync("token");
+        var faker = new Faker();
+        var firstName = faker.Name.FirstName();
+        var email = faker.Internet.Email();
+        
+        _userManager.Setup(userManager => 
+                userManager.GenerateEmailConfirmationTokenAsync(It.IsAny<VersityUser>()))
+            .ReturnsAsync(Guid.NewGuid().ToString());
         
         var emailConfirmMessageService = new SendConfirmMessageEmailService(_userManager.Object, _emailSenderService.Object, _configuration.Object);
         var user = new VersityUser()
         {
             Id = Guid.NewGuid().ToString(),
-            FirstName = "Ivan",
-            Email = "a@a.com"
+            FirstName = firstName,
+            Email = email
         };
 
         // Act
         await emailConfirmMessageService.SendEmailConfirmMessageAsync(user);
         
         // Assert
-        _emailSenderService.Verify(x => x.SendEmailAsync(
-            "Versity Identity Server", 
-            user.Email,
-            "Confirm Email", 
-            It.IsAny<string>()), 
+        _emailSenderService.Verify(emailSenderService => 
+                emailSenderService.SendEmailAsync(
+                    "Versity Identity Server", 
+                    user.Email, 
+                    "Confirm Email", 
+                    It.IsAny<string>()), 
             Times.Once);
     }
 }

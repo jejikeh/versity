@@ -11,23 +11,24 @@ namespace Users.Tests.Application.RequestHandlers.Users;
 public class GetVersityUserRolesTests
 {
     private readonly Mock<IVersityUsersRepository> _versityUsersRepository;
-
+    private readonly GetVersityUserRolesQueryHandler _getVersityUserRolesQueryHandler;
+    
     public GetVersityUserRolesTests()
     {
         _versityUsersRepository = new Mock<IVersityUsersRepository>();
+        _getVersityUserRolesQueryHandler = new GetVersityUserRolesQueryHandler(_versityUsersRepository.Object);
     }
 
     [Fact]
     public async Task RequestHandler_ShouldThrowException_WhenUserDoesNotExists()
     {
-        _versityUsersRepository.Setup(x => 
-                x.GetUserByIdAsync(It.IsAny<string>()))
+        _versityUsersRepository.Setup(versityUsersRepository => 
+                versityUsersRepository.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(null as VersityUser);
         
         var request = new GetVersityUserRolesQuery(new Faker().Internet.Email());
-        var handler = new GetVersityUserRolesQueryHandler(_versityUsersRepository.Object);
 
-        var act = async () => await handler.Handle(request, default);
+        var act = async () => await _getVersityUserRolesQueryHandler.Handle(request, default);
 
         await act.Should().ThrowAsync<NotFoundExceptionWithStatusCode>();
     }
@@ -35,18 +36,17 @@ public class GetVersityUserRolesTests
     [Fact]
     public async Task RequestHandler_ShouldReturnRoles_WhenUserExists()
     {
-        _versityUsersRepository.Setup(x => 
-                x.GetUserByIdAsync(It.IsAny<string>()))
+        _versityUsersRepository.Setup(versityUsersRepository => 
+                versityUsersRepository.GetUserByIdAsync(It.IsAny<string>()))
             .ReturnsAsync(new VersityUser{ Id = Guid.NewGuid().ToString() });
         
-        _versityUsersRepository.Setup(x => 
-                x.GetUserRolesAsync(It.IsAny<VersityUser>()))
+        _versityUsersRepository.Setup(versityUsersRepository => 
+                versityUsersRepository.GetUserRolesAsync(It.IsAny<VersityUser>()))
             .ReturnsAsync(new []{VersityRole.Admin.ToString()});
         
         var request = new GetVersityUserRolesQuery(new Faker().Internet.Email());
-        var handler = new GetVersityUserRolesQueryHandler(_versityUsersRepository.Object);
 
-        var result = await handler.Handle(request, default);
+        var result = await _getVersityUserRolesQueryHandler.Handle(request, default);
 
         result.Should().BeEquivalentTo(new []{"Admin"});
     }
