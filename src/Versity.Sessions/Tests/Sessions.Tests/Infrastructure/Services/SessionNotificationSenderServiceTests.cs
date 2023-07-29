@@ -12,15 +12,14 @@ namespace Sessions.Tests.Infrastructure.Services;
 
 public class SessionNotificationSenderServiceTests
 {
-    private readonly Mock<ILogger<SessionNotificationsSenderService>> _logger;
     private readonly Mock<IBackgroundJobClient> _backgroundJobClient;
     private readonly SessionNotificationsSenderService _sessionNotificationsSenderService;
 
     public SessionNotificationSenderServiceTests()
     {
-        _logger = new Mock<ILogger<SessionNotificationsSenderService>>();
+        var logger = new Mock<ILogger<SessionNotificationsSenderService>>();
         _backgroundJobClient = new Mock<IBackgroundJobClient>();
-        _sessionNotificationsSenderService = new SessionNotificationsSenderService(_logger.Object, _backgroundJobClient.Object);
+        _sessionNotificationsSenderService = new SessionNotificationsSenderService(logger.Object, _backgroundJobClient.Object);
     }
 
     [Fact]
@@ -34,7 +33,9 @@ public class SessionNotificationSenderServiceTests
         _sessionNotificationsSenderService.PushClosedSession(userId, userViewModel);
         
         // Assert
-        _backgroundJobClient.Verify(x => x.Create(It.Is<Job>(job => job.Type == typeof(ISessionsHubHelper)), It.IsAny<IState>()), Times.Once());
+        _backgroundJobClient.Verify(backgroundJobClient => 
+            backgroundJobClient.Create(It.Is<Job>(job => job.Type == typeof(ISessionsHubHelper)), It.IsAny<IState>()), 
+            Times.Once());
     }
     
     [Fact]
@@ -48,6 +49,8 @@ public class SessionNotificationSenderServiceTests
         _sessionNotificationsSenderService.PushCreatedNewSession(userId, userViewModel);
         
         // Assert
-        _backgroundJobClient.Verify(x => x.Create(It.Is<Job>(job => job.Type == typeof(ISessionsHubHelper)), It.IsAny<IState>()), Times.Once());
+        _backgroundJobClient.Verify(backgroundJobClient => 
+            backgroundJobClient.Create(It.Is<Job>(job => job.Type == typeof(ISessionsHubHelper)), It.IsAny<IState>()), 
+            Times.Once());
     }
 }

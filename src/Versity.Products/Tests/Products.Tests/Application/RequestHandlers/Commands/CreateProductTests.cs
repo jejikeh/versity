@@ -11,12 +11,12 @@ namespace Products.Tests.Application.RequestHandlers.Commands;
 
 public class CreateProductTests
 {
-    private readonly Mock<IVersityProductsRepository> _products;
+    private readonly Mock<IVersityProductsRepository> _productsRepository;
     private readonly Mock<IProductProducerService> _productProducerService;
 
     public CreateProductTests()
     {
-        _products = new Mock<IVersityProductsRepository>();
+        _productsRepository = new Mock<IVersityProductsRepository>();
         _productProducerService = new Mock<IProductProducerService>();
     }
     
@@ -25,7 +25,7 @@ public class CreateProductTests
     {
         // Arrange
         var command = GenerateFakeCreateProductCommand();
-        var handler = new CreateProductCommandHandler(_products.Object, _productProducerService.Object);
+        var handler = new CreateProductCommandHandler(_productsRepository.Object, _productProducerService.Object);
         var product = new Product()
         {
             Id = Guid.NewGuid(),
@@ -35,7 +35,7 @@ public class CreateProductTests
             Release = command.Release
         };
         
-        _products.Setup(service => 
+        _productsRepository.Setup(service => 
                 service.CreateProductAsync(
                     It.IsAny<Product>(), 
                     It.IsAny<CancellationToken>()))

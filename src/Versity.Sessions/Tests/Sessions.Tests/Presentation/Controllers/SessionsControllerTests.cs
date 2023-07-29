@@ -28,7 +28,7 @@ public class SessionsControllerTests
     public async Task GetAllSessions_ShouldReturnOk_WhenCommandIsValid()
     {
         // Arrange
-        _sender.Setup(x => x.Send(It.IsAny<GetAllSessionsQuery>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender => sender.Send(It.IsAny<GetAllSessionsQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeSessionViewModels(new Random().Next(1, 10)));
         
         // Act
@@ -42,7 +42,7 @@ public class SessionsControllerTests
     public async Task GetAllProducts_ShouldReturnOk_WhenCommandIsValid()
     {
         // Arrange
-        _sender.Setup(x => x.Send(It.IsAny<GetAllProductsQuery>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender => sender.Send(It.IsAny<GetAllProductsQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeProducts(new Random().Next(1, 10)));
         
         // Act
@@ -70,7 +70,7 @@ public class SessionsControllerTests
     public async Task GetUserSessionsByUserId_ShouldReturnOk_WhenCommandIsValid()
     {
         // Arrange
-        _sender.Setup(x => x.Send(It.IsAny<GetUserSessionsByUserIdQuery>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender => sender.Send(It.IsAny<GetUserSessionsByUserIdQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeUsersSessionsViewModel(new Random().Next(1, 10)));
         
         // Act
@@ -84,7 +84,7 @@ public class SessionsControllerTests
     public async Task GetAllProductSessions_ShouldReturnOk_WhenCommandIsValid()
     {
         // Arrange
-        _sender.Setup(x => x.Send(It.IsAny<GetAllProductSessionsQuery>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender => sender.Send(It.IsAny<GetAllProductSessionsQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeSessionViewModels(new Random().Next(1, 10)));
         
         // Act
@@ -98,7 +98,7 @@ public class SessionsControllerTests
     public async Task CreateSession_ShouldReturnOk_WhenCommandIsValid()
     {
         // Arrange
-        _sender.Setup(x => x.Send(It.IsAny<CreateSessionCommand>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender => sender.Send(It.IsAny<CreateSessionCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeSessionViewModel());
         
         // Act

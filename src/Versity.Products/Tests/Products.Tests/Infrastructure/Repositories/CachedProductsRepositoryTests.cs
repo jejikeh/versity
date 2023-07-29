@@ -12,21 +12,20 @@ public class CachedProductsRepositoryTests
 {
     private readonly Mock<IVersityProductsRepository> _productsRepository;
     private readonly Mock<ICacheService> _distributedCache;
+    private readonly CachedProductsRepository _cachedProductsRepository;
 
     public CachedProductsRepositoryTests()
     {
         _productsRepository = new Mock<IVersityProductsRepository>();
         _distributedCache = new Mock<ICacheService>();
+        _cachedProductsRepository = new CachedProductsRepository(_productsRepository.Object, _distributedCache.Object);
     }
 
     [Fact]
     public void GetAllProducts_ShouldInvokeRepository_WhenValueIsNotInCache()
     {
-        // Arrange
-        var cachedProductsRepository = new CachedProductsRepository(_productsRepository.Object, _distributedCache.Object);
-
         // Act
-        cachedProductsRepository.GetAllProducts();
+        _cachedProductsRepository.GetAllProducts();
 
         // Assert
         _productsRepository.Verify(x => x.GetAllProducts(), Times.Once);
@@ -37,7 +36,6 @@ public class CachedProductsRepositoryTests
     {
         // Arrange
         var product = GenerateFakeProduct();
-        var cachedProductsRepository = new CachedProductsRepository(_productsRepository.Object, _distributedCache.Object);
 
         _distributedCache.Setup(x =>
                 x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Product>?>>()))
@@ -48,7 +46,7 @@ public class CachedProductsRepositoryTests
             .ReturnsAsync(product);
         
         // Act
-        var result = await cachedProductsRepository.GetProductByIdAsync(Guid.NewGuid(), CancellationToken.None);
+        var result = await _cachedProductsRepository.GetProductByIdAsync(Guid.NewGuid(), CancellationToken.None);
         
         // Assert
         result.Should().BeSameAs(product);
@@ -57,11 +55,8 @@ public class CachedProductsRepositoryTests
     [Fact]
     public async Task CreateProductAsync_ShouldInvokeRepository_WhenValueIsNotInCache()
     {
-        // Arrange
-        var cachedProductsRepository = new CachedProductsRepository(_productsRepository.Object, _distributedCache.Object);
-
         // Act
-        await cachedProductsRepository.CreateProductAsync(GenerateFakeProduct(), CancellationToken.None);
+        await _cachedProductsRepository.CreateProductAsync(GenerateFakeProduct(), CancellationToken.None);
 
         // Assert
         _productsRepository.Verify(x => 
@@ -72,11 +67,8 @@ public class CachedProductsRepositoryTests
     [Fact]
     public void UpdateProduct_ShouldInvokeRepository_WhenValueIsNotInCache()
     {
-        // Arrange
-        var cachedProductsRepository = new CachedProductsRepository(_productsRepository.Object, _distributedCache.Object);
-
         // Act
-        cachedProductsRepository.UpdateProduct(GenerateFakeProduct());
+        _cachedProductsRepository.UpdateProduct(GenerateFakeProduct());
 
         // Assert
         _productsRepository.Verify(x => 
@@ -87,11 +79,8 @@ public class CachedProductsRepositoryTests
     [Fact]
     public async Task SaveChangesAsync_ShouldInvokeRepository_WhenValueIsNotInCache()
     {
-        // Arrange
-        var cachedProductsRepository = new CachedProductsRepository(_productsRepository.Object, _distributedCache.Object);
-
         // Act
-        await cachedProductsRepository.SaveChangesAsync(CancellationToken.None);
+        await _cachedProductsRepository.SaveChangesAsync(CancellationToken.None);
 
         // Assert
         _productsRepository.Verify(x => 

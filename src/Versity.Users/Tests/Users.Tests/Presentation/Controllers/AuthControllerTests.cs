@@ -16,23 +16,24 @@ namespace Users.Tests.Presentation.Controllers;
 public class AuthControllerTests
 {
     private readonly Mock<ISender> _sender;
+    private readonly AuthController _authController;
 
     public AuthControllerTests()
     {
         _sender = new Mock<ISender>();
+        _authController = new AuthController(_sender.Object);
     }
     
     [Fact]
     public async Task Register_ShouldReturnOk_WhenCommandIsValid()
     {
         // Arrange
-        _sender.Setup(x =>
-                x.Send(It.IsAny<RegisterVersityUserCommand>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender =>
+                sender.Send(It.IsAny<RegisterVersityUserCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(IdentityResult.Success);
-        var service = new AuthController(_sender.Object);
         
         // Act
-        var response = await service.Register(GenerateFakeRegisterVersityUserCommand(), CancellationToken.None);
+        var response = await _authController.Register(GenerateFakeRegisterVersityUserCommand(), CancellationToken.None);
         
         // Assert
         response.Should().BeOfType<OkObjectResult>();
@@ -42,13 +43,12 @@ public class AuthControllerTests
     public async Task ConfirmEmail_ShouldReturnOk_WhenUserExist()
     {
         // Arrange
-        _sender.Setup(x =>
-                x.Send(It.IsAny<ConfirmEmailCommand>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender =>
+                sender.Send(It.IsAny<ConfirmEmailCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(IdentityResult.Success);
-        var service = new AuthController(_sender.Object);
         
         // Act
-        var response = await service.ConfirmEmail(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), CancellationToken.None);
+        var response = await _authController.ConfirmEmail(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), CancellationToken.None);
         
         // Assert
         response.Should().BeOfType<OkObjectResult>();
@@ -58,13 +58,12 @@ public class AuthControllerTests
     public async Task ResendEmailVerificationToken_ShouldReturnOk_WhenUserExist()
     {
         // Arrange
-        _sender.Setup(x =>
-                x.Send(It.IsAny<ResendEmailVerificationTokenCommand>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender =>
+                sender.Send(It.IsAny<ResendEmailVerificationTokenCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(IdentityResult.Success);
-        var service = new AuthController(_sender.Object);
         
         // Act
-        var response = await service.ResendEmailVerificationToken(GenerateFakeResendEmailVerificationTokenCommand(), CancellationToken.None);
+        var response = await _authController.ResendEmailVerificationToken(GenerateFakeResendEmailVerificationTokenCommand(), CancellationToken.None);
         
         response.Should().BeOfType<OkObjectResult>();
     }
@@ -73,13 +72,12 @@ public class AuthControllerTests
     public async Task RefreshToken_ShouldReturnOk_WhenUserExist()
     {
         // Arrange
-        _sender.Setup(x =>
-                x.Send(It.IsAny<RefreshTokenCommand>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender =>
+                sender.Send(It.IsAny<RefreshTokenCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AuthTokens(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), Guid.NewGuid().ToString()));
-        var service = new AuthController(_sender.Object);
         
         // Act
-        var response = await service.RefreshToken(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), CancellationToken.None);
+        var response = await _authController.RefreshToken(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), CancellationToken.None);
         
         // Assert
         response.Should().BeOfType<OkObjectResult>();

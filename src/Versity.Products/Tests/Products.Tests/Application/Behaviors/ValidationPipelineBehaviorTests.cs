@@ -12,11 +12,10 @@ namespace Products.Tests.Application.Behaviors;
 
 public class ValidationPipelineBehaviorTests
 {
-    private readonly IEnumerable<IValidator<CreateProductCommand>> _validators =
-        new List<IValidator<CreateProductCommand>>()
-        {
-            new CreateProductCommandValidator()
-        };
+    private readonly IEnumerable<IValidator<CreateProductCommand>> _validators = new List<IValidator<CreateProductCommand>>() 
+    { 
+        new CreateProductCommandValidator() 
+    };
     
     [Fact]
     public async Task ValidationPipelineBehavior_ShouldThrowException_WhenValidationFails()

@@ -24,7 +24,7 @@ public class SessionLogsControllerTests
     public async Task GetAllSessionLogs_ShouldReturnOk_WhenCommandIsValid()
     {
         // Arrange
-        _sender.Setup(x => x.Send(It.IsAny<GetAllSessionsLogsQuery>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender => sender.Send(It.IsAny<GetAllSessionsLogsQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeSessionsLogs(new Random().Next(1, 10), new Random().Next(1, 10)));
         
         // Act
@@ -38,7 +38,7 @@ public class SessionLogsControllerTests
     public async Task GetSessionLogsById_ShouldReturnOk_WhenCommandIsValid()
     {
         // Arrange
-        _sender.Setup(x => x.Send(It.IsAny<GetSessionLogsByIdQuery>(), It.IsAny<CancellationToken>()))
+        _sender.Setup(sender => sender.Send(It.IsAny<GetSessionLogsByIdQuery>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeSessionLogs(new Random().Next(1, 10)));
         
         // Act

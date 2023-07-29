@@ -33,7 +33,11 @@ public class KafkaHandlerContainerTests
         await handlersContainer.ProcessMessage(key, message, CancellationToken.None);
         
         // Assert
-        createProductMessageHandler.Verify(x => x.Handle(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
-        deleteProductMessageHandler.Verify(x => x.Handle(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+        createProductMessageHandler.Verify(kafkaMessageHandler => 
+            kafkaMessageHandler.Handle(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), 
+            Times.Once);
+        deleteProductMessageHandler.Verify(kafkaMessageHandler => 
+            kafkaMessageHandler.Handle(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), 
+            Times.Once);
     }
 }

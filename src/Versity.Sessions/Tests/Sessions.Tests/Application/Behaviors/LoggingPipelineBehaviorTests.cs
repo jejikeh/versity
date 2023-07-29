@@ -19,7 +19,7 @@ public class LoggingPipelineBehaviorTests
     }
     
     [Fact]
-    public async Task ValidationPipelineBehavior_ShouldInvokeNextPipeline_WhenDelegateIsValid()
+    public async Task LoggingPipelineBehavior_ShouldInvokeNextPipeline_WhenDelegateIsValid()
     {
         // Arrange
         var mockedPipeline = new Mock<IPipelineBehavior<CreateSessionCommand, SessionViewModel>>();

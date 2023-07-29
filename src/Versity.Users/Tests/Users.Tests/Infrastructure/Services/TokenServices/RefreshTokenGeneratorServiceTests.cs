@@ -10,10 +10,12 @@ namespace Users.Tests.Infrastructure.Services.TokenServices;
 public class RefreshTokenGeneratorServiceTests
 {
     private readonly Mock<IVersityRefreshTokensRepository> _refreshTokensRepository;
+    private readonly RefreshTokenGeneratorService _refreshTokenGeneratorService;
 
     public RefreshTokenGeneratorServiceTests()
     {
         _refreshTokensRepository = new Mock<IVersityRefreshTokensRepository>();
+        _refreshTokenGeneratorService = new RefreshTokenGeneratorService(_refreshTokensRepository.Object);
     }
 
     [Fact]
@@ -21,10 +23,9 @@ public class RefreshTokenGeneratorServiceTests
     {
         // Arrange
         var userId = new Guid().ToString();
-        var tokenService = new RefreshTokenGeneratorService(_refreshTokensRepository.Object);
 
         // Act
-        var refreshToken = tokenService.GenerateToken(userId);
+        var refreshToken = _refreshTokenGeneratorService.GenerateToken(userId);
 
         // Assert
         refreshToken.Should().NotBeNull();
@@ -42,17 +43,16 @@ public class RefreshTokenGeneratorServiceTests
         // Arrange
         var userId = Guid.NewGuid().ToString();
         var token = Guid.NewGuid().ToString();
-        var tokenService = new RefreshTokenGeneratorService(_refreshTokensRepository.Object);
 
-        _refreshTokensRepository.Setup(x =>
-                x.FindUserTokenAsync(
+        _refreshTokensRepository.Setup(versityRefreshTokensRepository => 
+                versityRefreshTokensRepository.FindUserTokenAsync(
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<CancellationToken>()))!
             .ReturnsAsync(null as RefreshToken);
         
         // Act
-        var act = async () => await tokenService.ValidateTokenAsync(userId, token, CancellationToken.None);
+        var act = async () => await _refreshTokenGeneratorService.ValidateTokenAsync(userId, token, CancellationToken.None);
         
         // Assert
         await act.Should().ThrowAsync<IdentityExceptionWithStatusCode>();
@@ -64,16 +64,15 @@ public class RefreshTokenGeneratorServiceTests
         // Arrange
         var userId = Guid.NewGuid().ToString();
         var token = Guid.NewGuid().ToString();
-        var tokenService = new RefreshTokenGeneratorService(_refreshTokensRepository.Object);
 
-        _refreshTokensRepository.Setup(x =>
-            x.FindUserTokenAsync(
+        _refreshTokensRepository.Setup(versityRefreshTokensRepository =>
+            versityRefreshTokensRepository.FindUserTokenAsync(
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>())).ReturnsAsync(new RefreshToken() { IsRevoked = true });
         
         // Act
-        var act = async () => await tokenService.ValidateTokenAsync(userId, token, CancellationToken.None);
+        var act = async () => await _refreshTokenGeneratorService.ValidateTokenAsync(userId, token, CancellationToken.None);
         
         // Assert
         await act.Should().ThrowAsync<IdentityExceptionWithStatusCode>();
@@ -85,16 +84,15 @@ public class RefreshTokenGeneratorServiceTests
         // Arrange
         var userId = Guid.NewGuid().ToString();
         var token = Guid.NewGuid().ToString();
-        var tokenService = new RefreshTokenGeneratorService(_refreshTokensRepository.Object);
 
-        _refreshTokensRepository.Setup(x =>
-            x.FindUserTokenAsync(
+        _refreshTokensRepository.Setup(versityRefreshTokensRepository =>
+            versityRefreshTokensRepository.FindUserTokenAsync(
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>())).ReturnsAsync(new RefreshToken() { ExpiryTime = DateTime.UtcNow.AddMonths(-1) });
         
         // Act
-        var act = async () => await tokenService.ValidateTokenAsync(userId, token, CancellationToken.None);
+        var act = async () => await _refreshTokenGeneratorService.ValidateTokenAsync(userId, token, CancellationToken.None);
         
         // Assert
         await act.Should().ThrowAsync<IdentityExceptionWithStatusCode>();
@@ -106,23 +104,24 @@ public class RefreshTokenGeneratorServiceTests
         // Arrange
         var userId = Guid.NewGuid().ToString();
         var token = Guid.NewGuid().ToString();
-        var tokenService = new RefreshTokenGeneratorService(_refreshTokensRepository.Object);
+        var newToken = Guid.NewGuid().ToString();
 
-        _refreshTokensRepository.Setup(x =>
-            x.FindUserTokenAsync(
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<CancellationToken>())).ReturnsAsync(new RefreshToken()
-        {
-            ExpiryTime = DateTime.UtcNow.AddMonths(2), 
-            IsRevoked = false,
-            Token = "testToken"
-        });
+        _refreshTokensRepository
+            .Setup(versityRefreshTokensRepository => versityRefreshTokensRepository.FindUserTokenAsync(
+                It.IsAny<string>(), 
+                It.IsAny<string>(), 
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new RefreshToken() 
+            { 
+                ExpiryTime = DateTime.UtcNow.AddMonths(2), 
+                IsRevoked = false, 
+                Token = newToken 
+            });
         
         // Act
-        var result = await tokenService.ValidateTokenAsync(userId, token, CancellationToken.None);
+        var result = await _refreshTokenGeneratorService.ValidateTokenAsync(userId, token, CancellationToken.None);
         
         // Assert
-        result.Token.Should().Be("testToken");
+        result.Token.Should().Be(newToken);
     }
 }

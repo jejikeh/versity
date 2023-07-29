@@ -13,32 +13,33 @@ namespace Sessions.Tests.Application.RequestHandlers.Sessions;
 
 public class CreateSessionTests
 {
-    private readonly Mock<ISessionsRepository> _sessions;
-    private readonly Mock<IVersityUsersDataService> _users;
+    private readonly Mock<ISessionsRepository> _sessionsRepository;
+    private readonly Mock<IVersityUsersDataService> _usersDataService;
     private readonly Mock<IProductsRepository> _productsRepository;
     private readonly Mock<ISessionLogsRepository> _sessionLogsRepository;
     private readonly Mock<INotificationSender> _notificationSender;
-    private readonly CreateSessionCommandHandler _handler;
+    private readonly CreateSessionCommandHandler _createSessionCommandHandler;
 
     public CreateSessionTests()
     {
-        _sessions = new Mock<ISessionsRepository>();
-        _users = new Mock<IVersityUsersDataService>();
+        _sessionsRepository = new Mock<ISessionsRepository>();
+        _usersDataService = new Mock<IVersityUsersDataService>();
         _productsRepository = new Mock<IProductsRepository>();
         _sessionLogsRepository = new Mock<ISessionLogsRepository>();
         _notificationSender = new Mock<INotificationSender>();
-        _handler = new CreateSessionCommandHandler(_sessions.Object, _users.Object, _productsRepository.Object, _sessionLogsRepository.Object, _notificationSender.Object);
+        
+        _createSessionCommandHandler = new CreateSessionCommandHandler(_sessionsRepository.Object, _usersDataService.Object, _productsRepository.Object, _sessionLogsRepository.Object, _notificationSender.Object);
     }
 
     [Fact]
     public async Task Handle_ShouldThrowNotFoundException_WhenUserIsNotFound()
     {
         // Arrange
-        _users.Setup(x => x.IsUserExistAsync(It.IsAny<string>()))
+        _usersDataService.Setup(versityUsersDataService => versityUsersDataService.IsUserExistAsync(It.IsAny<string>()))
             .ReturnsAsync(false);
         
         // Act
-        var act = async () => await _handler.Handle(FakeDataGenerator.GenerateFakeCreateSessionCommand(), CancellationToken.None);
+        var act = async () => await _createSessionCommandHandler.Handle(FakeDataGenerator.GenerateFakeCreateSessionCommand(), CancellationToken.None);
         
         // Assert
         await act.Should().ThrowAsync<NotFoundExceptionWithStatusCode>();
@@ -48,14 +49,14 @@ public class CreateSessionTests
     public async Task Handle_ShouldThrowNotFoundException_WhenProductIsNotFound()
     {
         // Arrange
-        _users.Setup(versityUsersDataService => versityUsersDataService.IsUserExistAsync(It.IsAny<string>()))
+        _usersDataService.Setup(versityUsersDataService => versityUsersDataService.IsUserExistAsync(It.IsAny<string>()))
             .ReturnsAsync(true);
         
-        _productsRepository.Setup(x => x.GetProductByExternalIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+        _productsRepository.Setup(productsRepository => productsRepository.GetProductByExternalIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(null as Product);
         
         // Act
-        var act = async () => await _handler.Handle(FakeDataGenerator.GenerateFakeCreateSessionCommand(), CancellationToken.None);
+        var act = async () => await _createSessionCommandHandler.Handle(FakeDataGenerator.GenerateFakeCreateSessionCommand(), CancellationToken.None);
         
         // Assert
         await act.Should().ThrowAsync<NotFoundExceptionWithStatusCode>();
@@ -65,20 +66,20 @@ public class CreateSessionTests
     public async Task Handle_ShouldSetIdInSessionLogs_WhenUserAndProductIsFound()
     {
         // Arrange
-        _users.Setup(versityUsersDataService => versityUsersDataService.IsUserExistAsync(It.IsAny<string>()))
+        _usersDataService.Setup(versityUsersDataService => versityUsersDataService.IsUserExistAsync(It.IsAny<string>()))
             .ReturnsAsync(true);
         
-        _productsRepository.Setup(x => x.GetProductByExternalIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+        _productsRepository.Setup(productsRepository => productsRepository.GetProductByExternalIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeProduct());
 
-        _sessions.Setup(x => x.CreateSessionAsync(It.IsAny<Session>(), It.IsAny<CancellationToken>()))
+        _sessionsRepository.Setup(sessionsRepository => sessionsRepository.CreateSessionAsync(It.IsAny<Session>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeSession(new Random().Next(10)));
         
         // Act
-        var result = await _handler.Handle(FakeDataGenerator.GenerateFakeCreateSessionCommand(), CancellationToken.None);
+        var result = await _createSessionCommandHandler.Handle(FakeDataGenerator.GenerateFakeCreateSessionCommand(), CancellationToken.None);
         
         // Assert
-        _sessionLogsRepository.Verify(x => x.CreateSessionLogsAsync(
+        _sessionLogsRepository.Verify(sessionLogsRepository => sessionLogsRepository.CreateSessionLogsAsync(
             It.Is<SessionLogs>(logs => logs.SessionId == result.Id),
             It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -87,23 +88,23 @@ public class CreateSessionTests
     public async Task Handle_ShouldSaveChanges_WhenSessionIsCreated()
     {
         // Arrange
-        _users.Setup(versityUsersDataService => versityUsersDataService.IsUserExistAsync(It.IsAny<string>()))
+        _usersDataService.Setup(versityUsersDataService => versityUsersDataService.IsUserExistAsync(It.IsAny<string>()))
             .ReturnsAsync(true);
         
-        _productsRepository.Setup(x => x.GetProductByExternalIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+        _productsRepository.Setup(productsRepository => productsRepository.GetProductByExternalIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeProduct());
 
-        _sessions.Setup(x => x.CreateSessionAsync(It.IsAny<Session>(), It.IsAny<CancellationToken>()))
+        _sessionsRepository.Setup(sessionsRepository => sessionsRepository.CreateSessionAsync(It.IsAny<Session>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeSession(new Random().Next(10)));
         
         // Act
-        var result = await _handler.Handle(FakeDataGenerator.GenerateFakeCreateSessionCommand(), CancellationToken.None);
+        var result = await _createSessionCommandHandler.Handle(FakeDataGenerator.GenerateFakeCreateSessionCommand(), CancellationToken.None);
         
         // Assert
-        _sessionLogsRepository.Verify(x => x.SaveChangesAsync(
+        _sessionLogsRepository.Verify(sessionLogsRepository => sessionLogsRepository.SaveChangesAsync(
             It.IsAny<CancellationToken>()), Times.Once);
         
-        _sessions.Verify(x => x.SaveChangesAsync(
+        _sessionsRepository.Verify(sessionsRepository => sessionsRepository.SaveChangesAsync(
             It.IsAny<CancellationToken>()), Times.Once);
     }
     
@@ -111,20 +112,20 @@ public class CreateSessionTests
     public async Task Handle_ShouldSendNotification_WhenChangesSaved()
     {
         // Arrange
-        _users.Setup(versityUsersDataService => versityUsersDataService.IsUserExistAsync(It.IsAny<string>()))
+        _usersDataService.Setup(versityUsersDataService => versityUsersDataService.IsUserExistAsync(It.IsAny<string>()))
             .ReturnsAsync(true);
         
-        _productsRepository.Setup(x => x.GetProductByExternalIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+        _productsRepository.Setup(productsRepository => productsRepository.GetProductByExternalIdAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeProduct());
 
-        _sessions.Setup(x => x.CreateSessionAsync(It.IsAny<Session>(), It.IsAny<CancellationToken>()))
+        _sessionsRepository.Setup(sessionsRepository => sessionsRepository.CreateSessionAsync(It.IsAny<Session>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(FakeDataGenerator.GenerateFakeSession(new Random().Next(10)));
         
         // Act
-        var result = await _handler.Handle(FakeDataGenerator.GenerateFakeCreateSessionCommand(), CancellationToken.None);
+        var result = await _createSessionCommandHandler.Handle(FakeDataGenerator.GenerateFakeCreateSessionCommand(), CancellationToken.None);
         
         // Assert
-        _notificationSender.Verify(x => x.PushCreatedNewSession(
+        _notificationSender.Verify(notificationSender => notificationSender.PushCreatedNewSession(
                 It.IsAny<string>(), It.Is<UserSessionsViewModel>(
                     model => model.Status == SessionStatus.Inactive)), 
             Times.Once);

@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions.Repositories;
+using Application.Common;
 using Application.RequestHandlers.Products.Queries.GetAllProducts;
 using Domain.Models;
 using Moq;
@@ -18,7 +19,8 @@ public class GetAllProductQueryTests
     public async Task Handle_ShouldReturnsProducts_WhenCalled()
     {
         // Arrange
-        var products = FakeDataGenerator.GenerateFakeProducts(15);
+        const int entriesCount = PageFetchSettings.ItemsOnPage + 5;
+        var products = FakeDataGenerator.GenerateFakeProducts(entriesCount);
         _mockProductsRepository.Setup(repository => repository.GetAllProducts()).Returns(products.AsQueryable());
         var handler = new GetAllProductQueryHandler(_mockProductsRepository.Object);
         
@@ -28,7 +30,7 @@ public class GetAllProductQueryTests
         // Assert
         _mockProductsRepository.Verify(repository => 
             repository.ToListAsync(
-                It.Is<IQueryable<Product>>(queryable => queryable.Count() == 5)), 
+                It.Is<IQueryable<Product>>(queryable => queryable.Count() == entriesCount - PageFetchSettings.ItemsOnPage)), 
             Times.Once());
     }
     
@@ -36,7 +38,8 @@ public class GetAllProductQueryTests
     public async Task Handle_ShouldReturnsCorrectCountOfProducts_WhenCalledWithPage()
     {
         // Arrange
-        var products = FakeDataGenerator.GenerateFakeProducts(15);
+        const int entriesCount = PageFetchSettings.ItemsOnPage + 5;
+        var products = FakeDataGenerator.GenerateFakeProducts(entriesCount);
         _mockProductsRepository.Setup(repository => repository.GetAllProducts()).Returns(products.AsQueryable());
         var handler = new GetAllProductQueryHandler(_mockProductsRepository.Object);
         
@@ -46,7 +49,7 @@ public class GetAllProductQueryTests
         // Assert
         _mockProductsRepository.Verify(repository => 
                 repository.ToListAsync(
-                    It.Is<IQueryable<Product>>(queryable => queryable.Count() == 10)), 
+                    It.Is<IQueryable<Product>>(queryable => queryable.Count() == PageFetchSettings.ItemsOnPage)), 
             Times.Once());
     }
 }
