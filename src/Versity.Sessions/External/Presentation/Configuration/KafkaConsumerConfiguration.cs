@@ -9,6 +9,8 @@ public class KafkaConsumerConfiguration : IKafkaConsumerConfiguration
     public string Host { get; set; }
     public string Topic { get; set; }
     public ConsumerConfig Config { get; set; }
+    public string CreateProductTopic { get; } = "CreateProduct";
+    public string DeleteProductTopic { get; } = "DeleteProduct";
 
     public KafkaConsumerConfiguration()
     {

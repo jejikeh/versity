@@ -1,11 +1,13 @@
 ﻿using Application;
 using Application.Abstractions;
+using Application.Abstractions.Hubs;
 using Hangfire;
 using Infrastructure;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.OpenApi.Models;
 using Presentation.Configuration;
+using Presentation.Hubs;
 using Serilog;
 
 namespace Presentation.Extensions;
@@ -19,17 +21,18 @@ public static class ProgramExtensions
             .AddRepositories()
             .AddRedisCaching()
             .AddApplication()
+            .InjectSignalR()
             .AddHttpContextAccessor()
+            .AddNotificationServices()
             .AddJwtAuthentication(builder.Configuration)
             .AddSwagger()
-            .AddCors(options => options.ConfigureAllowAllCors())
+            .AddCors(options => options.ConfigureApiGatewayCors())
             .AddKafka(new KafkaConsumerConfiguration())
             .AddHangfireService()
             .AddEndpointsApiExplorer()
             .AddControllers();
         
         builder.Services.AddScoped<IVersityUsersDataService, GrpcUsersDataService>();
-        builder.Services.AddSignalR();
         
         return builder;
     }
@@ -55,17 +58,20 @@ public static class ProgramExtensions
         app.UseHangfireDashboard();
         app.MapControllers();
         InfrastructureInjection.AddHangfireProcesses();
+        app.MapHub<SessionsHub>("sessions-hub");
         
         return app;
     }
     
-    private static CorsOptions ConfigureAllowAllCors(this CorsOptions options)
+    private static CorsOptions ConfigureApiGatewayCors(this CorsOptions options)
     {
         options.AddPolicy("AllowAll", policy =>
         {
-            policy.AllowAnyHeader();
-            policy.AllowAnyMethod();
-            policy.AllowAnyOrigin();
+            policy
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
+                .WithOrigins("http://localhost:3000");
         });
         
         return options;
@@ -82,6 +88,20 @@ public static class ProgramExtensions
                 Type = SecuritySchemeType.ApiKey
             });
         });
+
+        return serviceCollection;
+    }
+
+    private static IServiceCollection InjectSignalR(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddSignalR(hubOptions =>
+        {
+            hubOptions.EnableDetailedErrors = true;
+            hubOptions.KeepAliveInterval = TimeSpan.FromSeconds(10);
+            hubOptions.HandshakeTimeout = TimeSpan.FromSeconds(5);
+        });
+
+        serviceCollection.AddScoped<ISessionsHubHelper, SessionsHubHelper>();
 
         return serviceCollection;
     }

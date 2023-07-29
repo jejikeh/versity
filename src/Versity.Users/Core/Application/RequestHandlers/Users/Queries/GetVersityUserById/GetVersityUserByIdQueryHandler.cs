@@ -24,6 +24,6 @@ public class GetVersityUserByIdQueryHandler : IRequestHandler<GetVersityUserById
         
         return ViewVersityUserDto.MapFromModel(
             versityUser, 
-            await _versityUsersRepository.GetRolesAsync(versityUser));
+            await _versityUsersRepository.GetUserRolesAsync(versityUser));
     }
 }

@@ -27,7 +27,7 @@ public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand,
         product.Title = request.Title ?? product.Title;
         product.Description = request.Description ?? product.Description;
         product.Release = request.Release ?? product.Release;
-        product.Author = request.Author ?? product.Author;
+        
         var updatedProduct = _products.UpdateProduct(product);
         await _products.SaveChangesAsync(cancellationToken);
         

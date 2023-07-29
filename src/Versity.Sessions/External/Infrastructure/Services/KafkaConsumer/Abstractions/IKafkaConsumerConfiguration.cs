@@ -8,4 +8,6 @@ public interface IKafkaConsumerConfiguration
     public string Host { get; set; }
     public string Topic { get; set; }
     public ConsumerConfig Config { get; set; }
+    public string CreateProductTopic { get; }
+    public string DeleteProductTopic { get; }
 }

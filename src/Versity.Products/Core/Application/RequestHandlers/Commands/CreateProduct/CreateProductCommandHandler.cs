@@ -31,7 +31,7 @@ public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand,
           
         var result = await _products.CreateProductAsync(product, cancellationToken);
         await _products.SaveChangesAsync(cancellationToken);
-        await _productProducerService.CreateProductProduce(CreateProductProduceDto.CreateFromModel(product), cancellationToken);
+        await _productProducerService.CreateProductProduce(CreateProductProduceDto.CreateFromModel(result), cancellationToken);
         
         return result;
     }

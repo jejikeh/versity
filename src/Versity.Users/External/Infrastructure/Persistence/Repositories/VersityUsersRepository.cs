@@ -58,12 +58,7 @@ public class VersityUsersRepository : IVersityUsersRepository
     {
         return await _userManager.CheckPasswordAsync(user, requestPassword);
     }
-
-    public async Task<IEnumerable<string>> GetRolesAsync(VersityUser user)
-    {
-        return await _userManager.GetRolesAsync(user);
-    }
-
+    
     public async Task<List<VersityUser>> ToListAsync(IQueryable<VersityUser> users)
     {
         return await users.ToListAsync();

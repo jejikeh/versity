@@ -19,14 +19,8 @@ public class GrpcUsersService : GrpcUsers.GrpcUsersBase
     {
         var response = new GrpcIsUserExistResponse();
         var command = new IsUserExistQuery(request.UserId);
-        try
-        {
-            response.Exist = await _sender.Send(command);
-        }
-        catch (NotFoundExceptionWithStatusCode ex)
-        {
-            throw new RpcException(new Status(StatusCode.NotFound, ex.Message));
-        }
+        
+        response.Exist = await _sender.Send(command);
 
         return response;
     }
@@ -35,17 +29,11 @@ public class GrpcUsersService : GrpcUsers.GrpcUsersBase
     {
         var response = new GrpcUserRoles();
         var command = new GetVersityUserRolesQuery(request.UserId);
-        try
+        
+        var roles = await _sender.Send(command);
+        foreach (var role in roles)
         {
-            var roles = await _sender.Send(command);
-            foreach (var role in roles)
-            {
-                response.Roles.Add(role);
-            }
-        }
-        catch (NotFoundExceptionWithStatusCode ex)
-        {
-            throw new RpcException(new Status(StatusCode.NotFound, ex.Message));
+            response.Roles.Add(role);
         }
         
         return response;
