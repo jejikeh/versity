@@ -8,12 +8,10 @@ namespace Application.RequestHandlers.SessionLogging.Commands.CacheLogData;
 public class CacheLogDataCommandHandler : IRequestHandler<CacheLogDataCommand>
 {
     private readonly ICacheService _cacheService;
-    private readonly ILogger<CacheLogDataCommandHandler> _logger;
 
-    public CacheLogDataCommandHandler(ICacheService cacheService, ILogger<CacheLogDataCommandHandler> logger)
+    public CacheLogDataCommandHandler(ICacheService cacheService)
     {
         _cacheService = cacheService;
-        _logger = logger;
     }
 
     public async Task Handle(CacheLogDataCommand request, CancellationToken cancellationToken)

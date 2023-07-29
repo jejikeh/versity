@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions.Repositories;
+using Application.Common;
 using Domain.Models;
 using MediatR;
 
@@ -18,8 +19,8 @@ public class GetAllProductQueryHandler : IRequestHandler<GetAllProductsQuery, IE
         var products = _productsRepository
             .GetAllProducts()
             .OrderBy(x => x.Id)
-            .Skip(10 * (request.Page - 1))
-            .Take(10);
+            .Skip(PageFetchSettings.ItemsOnPage * (request.Page - 1))
+            .Take(PageFetchSettings.ItemsOnPage);
 
         return await _productsRepository.ToListAsync(products);
     }

@@ -1,30 +1,27 @@
-﻿using Application.Abstractions.Repositories;
+﻿using Application.Abstractions;
+using Application.Abstractions.Repositories;
+using Application.Common;
 using Domain.Models;
-using Microsoft.Extensions.Caching.Distributed;
-using Infrastructure.Extensions;
 
 namespace Infrastructure.Persistence.Repositories;
 
 public class CachedRefreshTokensRepository : IVersityRefreshTokensRepository
 {
     private readonly IVersityRefreshTokensRepository _refreshTokensRepository;
-    private readonly IDistributedCache _distributedCache;
-    private readonly VersityUsersDbContext _context;
+    private readonly ICacheService _distributedCache;
 
-    public CachedRefreshTokensRepository(IVersityRefreshTokensRepository refreshTokensRepository, IDistributedCache distributedCache, VersityUsersDbContext context)
+    public CachedRefreshTokensRepository(IVersityRefreshTokensRepository refreshTokensRepository, ICacheService distributedCache)
     {
         _refreshTokensRepository = refreshTokensRepository;
         _distributedCache = distributedCache;
-        _context = context;
     }
 
     public async Task<IEnumerable<RefreshToken>> GetAllAsync(CancellationToken cancellationToken)
     {
         return await _distributedCache.GetOrCreateAsync(
-            _context,
-            "tokens",
-            cancellationToken,
-            async () => await _refreshTokensRepository.GetAllAsync(cancellationToken));
+            CachingKeys.Tokens,
+            async () => await _refreshTokensRepository.GetAllAsync(cancellationToken)) ?? 
+               await _refreshTokensRepository.GetAllAsync(cancellationToken);
     }
 
     public Task AddAsync(RefreshToken token, CancellationToken cancellationToken)
@@ -40,10 +37,9 @@ public class CachedRefreshTokensRepository : IVersityRefreshTokensRepository
     public async Task<RefreshToken> FindUserTokenAsync(string userId, string token, CancellationToken cancellationToken)
     {
         return await _distributedCache.GetOrCreateAsync(
-            _context,
-            $"token-{token}-user-{userId}",
-            cancellationToken,
-            async () => await _refreshTokensRepository.FindUserTokenAsync(userId, token, cancellationToken));
+            CachingKeys.UserToken(token, userId),
+            async () => await _refreshTokensRepository.FindUserTokenAsync(userId, token, cancellationToken)) ?? 
+               await _refreshTokensRepository.FindUserTokenAsync(userId, token, cancellationToken);
     }
 
     public Task SaveChangesAsync(CancellationToken cancellationToken)

@@ -27,7 +27,7 @@ public class GetAllVersityUsersQueryHandler : IRequestHandler<GetAllVersityUsers
         var viewVersityUserDtos = new List<ViewVersityUserDto>();
         foreach (var user in users) 
         {
-            viewVersityUserDtos.Add(ViewVersityUserDto.MapFromModel(user, await _versityUsersRepository.GetRolesAsync(user)));
+            viewVersityUserDtos.Add(ViewVersityUserDto.MapFromModel(user, await _versityUsersRepository.GetUserRolesAsync(user)));
         }
         
         return viewVersityUserDtos;

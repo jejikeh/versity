@@ -1,4 +1,5 @@
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Presentation.Extensions;
 
 var builder = WebApplication

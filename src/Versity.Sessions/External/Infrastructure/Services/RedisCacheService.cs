@@ -9,7 +9,7 @@ public class RedisCacheService : ICacheService
 {
     private readonly IDatabase _database;
     
-    public RedisCacheService(ConnectionMultiplexer connectionMultiplexer)
+    public RedisCacheService(IConnectionMultiplexer connectionMultiplexer)
     {
         _database = connectionMultiplexer.GetDatabase();
     }
@@ -79,7 +79,7 @@ public class RedisCacheService : ICacheService
             }
         }
         
-        foreach (var member in  await _database.SetMembersAsync(key))
+        foreach (var member in await _database.SetMembersAsync(key))
         {
             yield return JsonSerializer.Deserialize<T>(member);
         }
