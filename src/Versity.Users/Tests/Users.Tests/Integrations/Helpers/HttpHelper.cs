@@ -8,4 +8,6 @@ public static class HttpHelper
     public static string GiveAdminRoleToUser(string guid) => "/api/users/" + guid + "/set-admin";
     
     public static string Register() => "/api/auth/register";
+    public static string Login() => "/api/auth/login";
+    public static string ConfirmEmail(string userId, string code) => $"/api/auth/confirmemail/{userId}/{code}";
 }

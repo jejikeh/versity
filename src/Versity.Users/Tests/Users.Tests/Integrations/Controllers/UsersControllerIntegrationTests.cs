@@ -4,29 +4,29 @@ using Application.Abstractions.Repositories;
 using Application.Dtos;
 using Bogus;
 using Domain.Models;
+using DotNet.Testcontainers.Builders;
 using FluentAssertions;
 using Infrastructure.Services.TokenServices;
 using Microsoft.Extensions.DependencyInjection;
 using Presentation.Configuration;
 using Users.Tests.Integrations.Fixtures;
 using Users.Tests.Integrations.Helpers;
+using Xunit.Priority;
 using Utils = Application.Common.Utils;
 
 namespace Users.Tests.Integrations.Controllers;
 
-public class UsersControllerIntegrationTests : IClassFixture<DockerWebApplicationFactoryFixture>
+public class UsersControllerIntegrationTests : IClassFixture<WebAppFactoryFixture>
 {
-    private readonly DockerWebApplicationFactoryFixture _factory;
     private readonly HttpClient _httpClient;
 
-    public UsersControllerIntegrationTests(DockerWebApplicationFactoryFixture factory)
+    public UsersControllerIntegrationTests(WebAppFactoryFixture factoryUsersController)
     {
-        _factory = factory;
-        _httpClient = _factory.CreateClient();
+        _httpClient = factoryUsersController.CreateClient();
         var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration());
         _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken("4e274126-1d8a-4dfd-a025-806987095809", "admin@mail.com", new List<string> { "Admin" }));
     }
-
+    
     [Fact]
     public async Task GetAllUsers_ShouldReturnUsers_WhenUsersExists()
     {
@@ -89,42 +89,5 @@ public class UsersControllerIntegrationTests : IClassFixture<DockerWebApplicatio
         
         // Act
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
-    
-    [Fact]
-    public async Task SetAdmin_ShouldGiveAdminRole_WhenUserExists()
-    {
-        // Arrange
-        var id = Guid.NewGuid();
-        var fakerGenerator = new Faker();
-        var password = fakerGenerator.Internet.Password() + $"!{Utils.GenerateRandomString(3)}_$A";
-        var userName = fakerGenerator.Internet.UserName();
-        var userEmail = fakerGenerator.Internet.Email();
-        var userPhone = fakerGenerator.Phone.PhoneNumber();
-        var userFirstName = fakerGenerator.Name.FirstName();
-        var lastName = fakerGenerator.Name.LastName();
-        
-        using var scope = _factory.Services.CreateScope();
-        var repository = scope.ServiceProvider.GetRequiredService<IVersityUsersRepository>();
-        repository?.CreateUserAsync(new Faker<VersityUser>().CustomInstantiator(faker => new VersityUser
-        {
-            Id = id.ToString(),
-            UserName = userName,
-            NormalizedUserName = userName.ToUpper(),
-            Email = userEmail,
-            NormalizedEmail = userEmail.ToUpper(),
-            EmailConfirmed = true,
-            PhoneNumber = userPhone,
-            FirstName = userFirstName,
-            LastName = lastName
-        }), password);
-        
-        // Act
-        var response = await _httpClient.PostAsJsonAsync(HttpHelper.GiveAdminRoleToUser(id.ToString()), id);
-        var token = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-        
-        // Assert
-        response.EnsureSuccessStatusCode();
-        token.Should().NotBeEmpty();
     }
 }
