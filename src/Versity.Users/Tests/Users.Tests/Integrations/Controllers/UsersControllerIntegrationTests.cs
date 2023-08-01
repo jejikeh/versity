@@ -6,6 +6,8 @@ using Bogus;
 using Domain.Models;
 using DotNet.Testcontainers.Builders;
 using FluentAssertions;
+using Infrastructure.Persistence;
+using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services.TokenServices;
 using Microsoft.Extensions.DependencyInjection;
 using Presentation.Configuration;
@@ -16,12 +18,15 @@ using Utils = Application.Common.Utils;
 
 namespace Users.Tests.Integrations.Controllers;
 
+[TestCaseOrderer(PriorityOrderer.Name, PriorityOrderer.Assembly)]
 public class UsersControllerIntegrationTests : IClassFixture<WebAppFactoryFixture>
 {
     private readonly HttpClient _httpClient;
+    private readonly WebAppFactoryFixture _webAppFactory;
 
     public UsersControllerIntegrationTests(WebAppFactoryFixture factoryUsersController)
     {
+        _webAppFactory = factoryUsersController;
         _httpClient = factoryUsersController.CreateClient();
         var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration());
         _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken("4e274126-1d8a-4dfd-a025-806987095809", "admin@mail.com", new List<string> { "Admin" }));
@@ -38,7 +43,7 @@ public class UsersControllerIntegrationTests : IClassFixture<WebAppFactoryFixtur
         response.EnsureSuccessStatusCode();
     }
 
-    [Fact]
+    [Fact, Priority(-10)]
     public async Task GetUserById_ShouldReturnUser_WhenUserExists()
     {
         // Act
@@ -89,5 +94,20 @@ public class UsersControllerIntegrationTests : IClassFixture<WebAppFactoryFixtur
         
         // Act
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+    
+    [Fact]
+    public async Task SetAdmin_ShouldReturnOk_WhenUserExists()
+    {
+        // Arrange
+        using var scope = _webAppFactory.Services.CreateScope();
+        var versityUsersRepository = scope.ServiceProvider.GetService<IVersityUsersRepository>();
+        var (user, password) = await VersityUserSeeder.SeedUserDataAsync(versityUsersRepository);
+     
+        // Act
+        var response = await _httpClient.PostAsJsonAsync(HttpHelper.GiveAdminRoleToUser(user.Id), password);
+        
+        // Act
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }

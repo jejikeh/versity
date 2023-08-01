@@ -1,13 +1,17 @@
 ﻿using System.Reflection;
+using Application.Abstractions.Repositories;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using Infrastructure.Persistence;
+using Infrastructure.Services.EmailServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
+using Presentation.bin;
 using Testcontainers.Elasticsearch;
 using Testcontainers.PostgreSql;
 using Testcontainers.Redis;
@@ -34,6 +38,12 @@ public class WebAppFactoryFixture : WebApplicationFactory<Program>, IAsyncLifeti
             _dbContainer.GetConnectionString(),
             _redisContainer.GetConnectionString(),
             _elasticsearchContainer.GetConnectionString());
+
+        builder.ConfigureTestServices(services =>
+        {
+            services.RemoveAll<ISmtpClientService>();
+            services.AddTransient<ISmtpClientService, SmtpClientServiceMock>();
+        });
     }
 
     public async Task InitializeAsync()

@@ -1,20 +1,28 @@
-﻿using MailKit.Net.Smtp;
+﻿using Application.Abstractions.Repositories;
+using MailKit.Net.Smtp;
 
 namespace Infrastructure.Services.EmailServices;
 
-public sealed class SmptClientService : SmtpClient
+public class SmptClientService : SmtpClient, ISmtpClientService
 {
+    private readonly IEmailServicesConfiguration _configuration;
+    
     public SmptClientService(IEmailServicesConfiguration configuration)
     {
+        _configuration = configuration;
+    }
+
+    public void Connect()
+    {
         Connect(
-            configuration.SmtpServer, 
-            configuration.Port, 
+            _configuration.SmtpServer, 
+            _configuration.Port, 
             true);
 
         AuthenticationMechanisms.Remove("XOAUTH2");
         
         Authenticate(
-            configuration.Username,
-            configuration.Password);
+            _configuration.Username,
+            _configuration.Password);
     }
 }

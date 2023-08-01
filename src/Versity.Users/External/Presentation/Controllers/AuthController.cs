@@ -16,11 +16,8 @@ namespace Presentation.Controllers;
 [Route("api/[controller]/[action]")]
 public sealed class AuthController : ApiController
 {
-    private ConfirmEmailCommandHandler _commandHandler;
-    
-    public AuthController(ISender sender, ConfirmEmailCommandHandler commandHandler) : base(sender)
+    public AuthController(ISender sender) : base(sender)
     {
-        _commandHandler = commandHandler;
     }
 
     [HttpPost]
@@ -43,7 +40,7 @@ public sealed class AuthController : ApiController
     public async Task<IActionResult> ConfirmEmail(string userId, string code, CancellationToken cancellationToken)
     {
         var command = new ConfirmEmailCommand(userId, Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code)));
-        var token = await _commandHandler.Handle(command, cancellationToken);
+        var token = await Sender.Send(command, cancellationToken);
         
         return Ok(token.Succeeded ? "Thank you for confirming your mail." : "Your Email is not confirmed");
     }

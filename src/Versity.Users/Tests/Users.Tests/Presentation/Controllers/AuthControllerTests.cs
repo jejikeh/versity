@@ -21,7 +21,7 @@ public class AuthControllerTests
     public AuthControllerTests()
     {
         _sender = new Mock<ISender>();
-        _authController = new AuthController(_sender.Object, default);
+        _authController = new AuthController(_sender.Object);
     }
     
     [Fact]

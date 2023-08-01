@@ -1,7 +1,7 @@
-﻿using Bogus;
+﻿using Application.Abstractions.Repositories;
+using Bogus;
 using Infrastructure.Services.EmailServices;
 using MailKit;
-using MailKit.Net.Smtp;
 using MimeKit;
 using Moq;
 
@@ -9,13 +9,13 @@ namespace Users.Tests.Infrastructure.Services.EmailServices;
 
 public class EmailSenderServiceTests
 {
-    private readonly Mock<ISmtpClient> _smtpClient;
+    private readonly Mock<ISmtpClientService> _smtpClient;
     private readonly Mock<IEmailServicesConfiguration> _emailServicesConfiguration;
 
     public EmailSenderServiceTests()
     {
         _emailServicesConfiguration = new Mock<IEmailServicesConfiguration>();
-        _smtpClient = new Mock<ISmtpClient>();
+        _smtpClient = new Mock<ISmtpClientService>();
     }
 
     [Fact]

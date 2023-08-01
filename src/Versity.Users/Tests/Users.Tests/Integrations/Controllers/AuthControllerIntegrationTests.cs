@@ -1,12 +1,17 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
+using Application.Abstractions.Repositories;
 using Application.RequestHandlers.Auth.Commands.ConfirmEmail;
 using Application.RequestHandlers.Auth.Commands.LoginVersityUser;
 using Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
+using Application.RequestHandlers.Auth.Commands.ResendEmailVerificationToken;
 using Bogus;
 using FluentAssertions;
+using Infrastructure.Persistence;
+using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services.TokenServices;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using Presentation.Configuration;
 using Users.Tests.Integrations.Fixtures;
 using Users.Tests.Integrations.Helpers;
@@ -17,9 +22,11 @@ namespace Users.Tests.Integrations.Controllers;
 public class AuthControllerIntegrationTests : IClassFixture<WebAppFactoryFixture>
 {
     private readonly HttpClient _httpClient;
+    private readonly WebAppFactoryFixture _webAppFactory;
 
     public AuthControllerIntegrationTests(WebAppFactoryFixture factoryUsersController)
     {
+        _webAppFactory = factoryUsersController;
         _httpClient = factoryUsersController.CreateClient();
         
         var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration());
@@ -41,10 +48,26 @@ public class AuthControllerIntegrationTests : IClassFixture<WebAppFactoryFixture
     }
     
     [Fact]
+    public async Task Login_ShouldReturnOk_WhenModelIsValid()
+    {
+        // Arrange
+        using var scope = _webAppFactory.Services.CreateScope();
+        var repository = scope.ServiceProvider.GetService<IVersityUsersRepository>();
+        var (user, password) = await VersityUserSeeder.SeedUserDataAsync(repository);
+        var command = new LoginVersityUserCommand(user.Email, password);
+        
+        // Act
+        var response = await _httpClient.PostAsJsonAsync(HttpHelper.Login(), command);
+        
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+    
+    [Fact]
     public async Task Login_ShouldReturnUnauthorized_WhenModelIsValid()
     {
         // Arrange
-        var command = GenerateFakeLoginVersityUserCommand();
+        var command = new LoginVersityUserCommand(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
         
         // Act
         var response = await _httpClient.PostAsJsonAsync(HttpHelper.Login(), command);
@@ -54,14 +77,30 @@ public class AuthControllerIntegrationTests : IClassFixture<WebAppFactoryFixture
     }
     
     [Fact]
-    public async Task Login_ShouldReturnOk_WhenModelIsValid()
+    public async Task Register_ShouldReturnOk_WhenModelIsValid()
     {
         // Arrange
-        var command = new LoginVersityUserCommand(TestUtils.UserEmail, TestUtils.UserPassword);
+        var command = GenerateRegisterVersityUserCommand();
         
         // Act
-        var response = await _httpClient.PostAsJsonAsync(HttpHelper.Login(), command);
+        var response = await _httpClient.PostAsJsonAsync(HttpHelper.Register(), command);
         
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+    
+    [Fact]
+    public async Task ResendEmailVerificationToken_ShouldReturnError_WhenEmailIsAlreadyVerified()
+    {
+        // Arrange
+        using var scope = _webAppFactory.Services.CreateScope();
+        var repository = scope.ServiceProvider.GetService<IVersityUsersRepository>();
+        var (user, password) = await VersityUserSeeder.SeedUserDataAsync(repository);
+        var command = new ResendEmailVerificationTokenCommand(user.Email, password);
+        
+        // Act
+        var response = await _httpClient.PostAsJsonAsync(HttpHelper.ResendEmailVerificationToken(), command);
+
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
