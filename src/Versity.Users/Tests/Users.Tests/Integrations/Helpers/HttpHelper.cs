@@ -11,4 +11,5 @@ public static class HttpHelper
     public static string Login() => "/api/auth/login";
     public static string ConfirmEmail(string userId, string code) => $"/api/auth/confirmemail/{userId}/{code}";
     public static string ResendEmailVerificationToken() => "/api/auth/resendemailverificationtoken/";
+    public static string RefreshJwtToken(string userId, string token) => $"/api/auth/refreshtoken/{userId}/{token}";
 }
