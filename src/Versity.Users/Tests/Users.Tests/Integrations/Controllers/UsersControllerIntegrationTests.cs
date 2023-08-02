@@ -19,17 +19,17 @@ using Utils = Application.Common.Utils;
 namespace Users.Tests.Integrations.Controllers;
 
 [TestCaseOrderer(PriorityOrderer.Name, PriorityOrderer.Assembly)]
-public class UsersControllerIntegrationTests : IClassFixture<WebAppFactoryFixture>
+public class UsersControllerIntegrationTests : IClassFixture<ControllersAppFactoryFixture>
 {
     private readonly HttpClient _httpClient;
-    private readonly WebAppFactoryFixture _webAppFactory;
+    private readonly ControllersAppFactoryFixture _controllersAppFactory;
 
-    public UsersControllerIntegrationTests(WebAppFactoryFixture factoryUsersController)
+    public UsersControllerIntegrationTests(ControllersAppFactoryFixture factoryUsersController)
     {
-        _webAppFactory = factoryUsersController;
+        _controllersAppFactory = factoryUsersController;
         _httpClient = factoryUsersController.CreateClient();
         var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration());
-        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken("4e274126-1d8a-4dfd-a025-806987095809", "admin@mail.com", new List<string> { "Admin" }));
+        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
     }
     
     [Fact]
@@ -47,7 +47,7 @@ public class UsersControllerIntegrationTests : IClassFixture<WebAppFactoryFixtur
     public async Task GetUserById_ShouldReturnUser_WhenUserExists()
     {
         // Act
-        var response = await _httpClient.GetAsync(HttpHelper.GetUserById("4e274126-1d8a-4dfd-a025-806987095809"));
+        var response = await _httpClient.GetAsync(HttpHelper.GetUserById(TestUtils.AdminId));
         var result  = await response.Content.ReadFromJsonAsync<ViewVersityUserDto>();
         
         // Assert
@@ -100,7 +100,7 @@ public class UsersControllerIntegrationTests : IClassFixture<WebAppFactoryFixtur
     public async Task SetAdmin_ShouldReturnOk_WhenUserExists()
     {
         // Arrange
-        using var scope = _webAppFactory.Services.CreateScope();
+        using var scope = _controllersAppFactory.Services.CreateScope();
         var versityUsersRepository = scope.ServiceProvider.GetService<IVersityUsersRepository>();
         var (user, password) = await VersityUserSeeder.SeedUserDataAsync(versityUsersRepository);
      

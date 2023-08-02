@@ -1,37 +1,32 @@
-﻿using System.Reflection;
 using Application.Abstractions.Repositories;
-using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Containers;
-using Infrastructure.Persistence;
-using Infrastructure.Services.EmailServices;
+using Grpc.Net.Client;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Moq;
 using Presentation.bin;
 using Testcontainers.Elasticsearch;
 using Testcontainers.PostgreSql;
 using Testcontainers.Redis;
 using Users.Tests.Integrations.Helpers;
+using Users.Tests.Integrations.Helpers.Mocks;
 
 namespace Users.Tests.Integrations.Fixtures;
 
-public class WebAppFactoryFixture : WebApplicationFactory<Program>, IAsyncLifetime
+public class GrpcAppFactoryFixture : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly PostgreSqlContainer _dbContainer;
     private readonly RedisContainer _redisContainer;
     private readonly ElasticsearchContainer _elasticsearchContainer;
-    
-    public WebAppFactoryFixture()
+
+    public GrpcAppFactoryFixture()
     {
         _dbContainer = new PostgreSqlBuilder().Build();
         _redisContainer = new RedisBuilder().Build();
         _elasticsearchContainer = new ElasticsearchBuilder().Build();
     }
-
+    
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         TestUtils.SeedEnvironmentVariables(
@@ -39,13 +34,25 @@ public class WebAppFactoryFixture : WebApplicationFactory<Program>, IAsyncLifeti
             _redisContainer.GetConnectionString(),
             _elasticsearchContainer.GetConnectionString());
 
+        GrpcChannel grpcChannel = null;
+        var client = CreateDefaultClient(new ResponseVersionHandler());
+        if (client.BaseAddress is not null)
+        {
+            grpcChannel = GrpcChannel.ForAddress(client.BaseAddress, new GrpcChannelOptions
+            {
+                HttpClient = client
+            });
+        }
+        
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<ISmtpClientService>();
             services.AddTransient<ISmtpClientService, SmtpClientServiceMock>();
+            services.AddSingleton(grpcChannel);
+            services.AddScoped<IGrpcUsersDataServiceMock, GrpcUsersDataServiceMock>();
         });
     }
-
+    
     public async Task InitializeAsync()
     {
         await _dbContainer.StartAsync();
@@ -58,5 +65,16 @@ public class WebAppFactoryFixture : WebApplicationFactory<Program>, IAsyncLifeti
         await _dbContainer.StopAsync();
         await _redisContainer.StopAsync();
         await _elasticsearchContainer.StopAsync();
+    }
+    
+    private class ResponseVersionHandler : DelegatingHandler
+    {
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            var response = await base.SendAsync(request, cancellationToken);
+            response.Version = request.Version;
+            return response;
+        }
     }
 }

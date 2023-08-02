@@ -17,18 +17,18 @@ using Utils = Application.Common.Utils;
 
 namespace Users.Tests.Integrations.Controllers;
 
-public class AuthControllerIntegrationTests : IClassFixture<WebAppFactoryFixture>
+public class AuthControllerIntegrationTests : IClassFixture<ControllersAppFactoryFixture>
 {
     private readonly HttpClient _httpClient;
-    private readonly WebAppFactoryFixture _webAppFactory;
+    private readonly ControllersAppFactoryFixture _controllersAppFactory;
 
-    public AuthControllerIntegrationTests(WebAppFactoryFixture factoryUsersController)
+    public AuthControllerIntegrationTests(ControllersAppFactoryFixture factoryUsersController)
     {
-        _webAppFactory = factoryUsersController;
+        _controllersAppFactory = factoryUsersController;
         _httpClient = factoryUsersController.CreateClient();
         
         var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration());
-        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken("4e274126-1d8a-4dfd-a025-806987095809", "admin@mail.com", new List<string> { "Admin" }));
+        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
     }
 
     [Fact]
@@ -49,7 +49,7 @@ public class AuthControllerIntegrationTests : IClassFixture<WebAppFactoryFixture
     public async Task Login_ShouldReturnOk_WhenModelIsValid()
     {
         // Arrange
-        using var scope = _webAppFactory.Services.CreateScope();
+        using var scope = _controllersAppFactory.Services.CreateScope();
         var repository = scope.ServiceProvider.GetService<IVersityUsersRepository>();
         var (user, password) = await VersityUserSeeder.SeedUserDataAsync(repository);
         var command = new LoginVersityUserCommand(user.Email, password);
@@ -91,7 +91,7 @@ public class AuthControllerIntegrationTests : IClassFixture<WebAppFactoryFixture
     public async Task ResendEmailVerificationToken_ShouldReturnError_WhenEmailIsAlreadyVerified()
     {
         // Arrange
-        using var scope = _webAppFactory.Services.CreateScope();
+        using var scope = _controllersAppFactory.Services.CreateScope();
         var repository = scope.ServiceProvider.GetService<IVersityUsersRepository>();
         var (user, password) = await VersityUserSeeder.SeedUserDataAsync(repository);
         var command = new ResendEmailVerificationTokenCommand(user.Email, password);
@@ -119,7 +119,7 @@ public class AuthControllerIntegrationTests : IClassFixture<WebAppFactoryFixture
         // Arrange
         var token = Guid.NewGuid().ToString();
         
-        using var scope = _webAppFactory.Services.CreateScope();
+        using var scope = _controllersAppFactory.Services.CreateScope();
         var versityUsersRepository = scope.ServiceProvider.GetService<IVersityUsersRepository>();
         var versityRefreshTokensRepository = scope.ServiceProvider.GetService<IVersityRefreshTokensRepository>();
         

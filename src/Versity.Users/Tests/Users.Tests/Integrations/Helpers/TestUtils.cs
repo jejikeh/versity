@@ -7,6 +7,8 @@ namespace Users.Tests.Integrations.Helpers;
 
 public static class TestUtils
 {
+    public const string AdminId = "4e274126-1d8a-4dfd-a025-806987095809";
+    
     public static void SeedEnvironmentVariables(string dbConnectionString, string redisConnectionString, string elasticsearchConnectionString)
     {
         Environment.SetEnvironmentVariable("ConnectionString", dbConnectionString);
