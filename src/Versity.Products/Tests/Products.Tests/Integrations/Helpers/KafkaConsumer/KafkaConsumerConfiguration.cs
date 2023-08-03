@@ -1,7 +1,7 @@
 ﻿using Confluent.Kafka;
-using Infrastructure.Services.KafkaConsumer.Abstractions;
+using Products.Tests.Integrations.Helpers.KafkaConsumer.Abstractions;
 
-namespace Presentation.Configuration;
+namespace Products.Tests.Integrations.Helpers.KafkaConsumer;
 
 public class KafkaConsumerConfiguration : IKafkaConsumerConfiguration
 {
@@ -14,9 +14,9 @@ public class KafkaConsumerConfiguration : IKafkaConsumerConfiguration
 
     public KafkaConsumerConfiguration()
     {
-        GroupId = "versity.sessions";
-        Host = Environment.GetEnvironmentVariable("KAFKA_Host");
-        Topic = Environment.GetEnvironmentVariable("KAFKA_Topic");
+        GroupId = "versity.tests";
+        Host = Environment.GetEnvironmentVariable("KAFKA_Host") ?? "no_set";
+        Topic = Environment.GetEnvironmentVariable("KAFKA_Topic") ?? "no_set";
         
         Config = new ConsumerConfig()
         {
@@ -28,6 +28,7 @@ public class KafkaConsumerConfiguration : IKafkaConsumerConfiguration
             SessionTimeoutMs = 6000,
             AutoOffsetReset = AutoOffsetReset.Earliest,
             EnablePartitionEof = true,
+            AllowAutoCreateTopics = true
         };
     }
 }

@@ -2,21 +2,13 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Application.Abstractions;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
-namespace Infrastructure.Services.TokenServices;
+namespace Products.Tests.Integrations.Helpers;
 
-public class JwtTokenGeneratorService : IAuthTokenGeneratorService
+public class JwtTokenGeneratorService
 {
-    private readonly ITokenGenerationConfiguration _configuration;
-    
-    public JwtTokenGeneratorService(ITokenGenerationConfiguration configuration)
-    {
-        _configuration = configuration;
-    }
-
     public string GenerateToken(string userId, string userEmail, IEnumerable<string> roles)
     {
         var claims = new List<Claim>()
@@ -28,14 +20,14 @@ public class JwtTokenGeneratorService : IAuthTokenGeneratorService
         };
         
         claims.AddRange(roles.Select(userRole => new Claim("role", userRole)));
-        
+
         var securityToken = new JwtSecurityToken(
             claims: claims,
             expires: DateTime.UtcNow.AddHours(6),
-            issuer: _configuration.Issuer,
-            audience: _configuration.Audience,
+            issuer: Environment.GetEnvironmentVariable("JWT__Issuer"),
+            audience: Environment.GetEnvironmentVariable("JWT__Audience"),
             signingCredentials: new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.Key)), 
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT__Key"))), 
                 SecurityAlgorithms.HmacSha512Signature));
         
         return new JwtSecurityTokenHandler().WriteToken(securityToken);

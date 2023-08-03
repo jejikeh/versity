@@ -28,6 +28,7 @@ public class KafkaConsumerConfiguration : IKafkaConsumerConfiguration
             SessionTimeoutMs = 6000,
             AutoOffsetReset = AutoOffsetReset.Earliest,
             EnablePartitionEof = true,
+            AllowAutoCreateTopics=true
         };
     }
 }
