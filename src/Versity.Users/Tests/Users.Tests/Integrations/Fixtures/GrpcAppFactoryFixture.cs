@@ -18,38 +18,25 @@ public class GrpcAppFactoryFixture : WebApplicationFactory<Program>, IAsyncLifet
 {
     private readonly PostgreSqlContainer _dbContainer;
     private readonly RedisContainer _redisContainer;
-    private readonly ElasticsearchContainer _elasticsearchContainer;
+    //private readonly ElasticsearchContainer _elasticsearchContainer;
 
     public GrpcAppFactoryFixture()
     {
         _dbContainer = new PostgreSqlBuilder().Build();
         _redisContainer = new RedisBuilder().Build();
-        _elasticsearchContainer = new ElasticsearchBuilder().Build();
+      //  _elasticsearchContainer = new ElasticsearchBuilder().Build();
     }
     
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         TestUtils.SeedEnvironmentVariables(
             _dbContainer.GetConnectionString(),
-            _redisContainer.GetConnectionString(),
-            _elasticsearchContainer.GetConnectionString());
-
-        GrpcChannel grpcChannel = null;
-        var client = CreateDefaultClient(new ResponseVersionHandler());
-        if (client.BaseAddress is not null)
-        {
-            grpcChannel = GrpcChannel.ForAddress(client.BaseAddress, new GrpcChannelOptions
-            {
-                HttpClient = client
-            });
-        }
+            _redisContainer.GetConnectionString());
         
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<ISmtpClientService>();
             services.AddTransient<ISmtpClientService, SmtpClientServiceMock>();
-            services.AddSingleton(grpcChannel);
-            services.AddScoped<IGrpcUsersDataServiceMock, GrpcUsersDataServiceMock>();
         });
     }
     
@@ -57,24 +44,13 @@ public class GrpcAppFactoryFixture : WebApplicationFactory<Program>, IAsyncLifet
     {
         await _dbContainer.StartAsync();
         await _redisContainer.StartAsync();
-        await _elasticsearchContainer.StartAsync();
+    //    await _elasticsearchContainer.StartAsync();
     }
 
     public new async Task DisposeAsync()
     {
         await _dbContainer.StopAsync();
         await _redisContainer.StopAsync();
-        await _elasticsearchContainer.StopAsync();
-    }
-    
-    private class ResponseVersionHandler : DelegatingHandler
-    {
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
-            CancellationToken cancellationToken)
-        {
-            var response = await base.SendAsync(request, cancellationToken);
-            response.Version = request.Version;
-            return response;
-        }
+      //  await _elasticsearchContainer.StopAsync();
     }
 }

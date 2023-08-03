@@ -23,21 +23,18 @@ public class ControllersAppFactoryFixture : WebApplicationFactory<Program>, IAsy
 {
     private readonly PostgreSqlContainer _dbContainer;
     private readonly RedisContainer _redisContainer;
-    private readonly ElasticsearchContainer _elasticsearchContainer;
     
     public ControllersAppFactoryFixture()
     {
         _dbContainer = new PostgreSqlBuilder().Build();
         _redisContainer = new RedisBuilder().Build();
-        _elasticsearchContainer = new ElasticsearchBuilder().Build();
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         TestUtils.SeedEnvironmentVariables(
             _dbContainer.GetConnectionString(),
-            _redisContainer.GetConnectionString(),
-            _elasticsearchContainer.GetConnectionString());
+            _redisContainer.GetConnectionString());
 
         builder.ConfigureTestServices(services =>
         {
@@ -49,14 +46,12 @@ public class ControllersAppFactoryFixture : WebApplicationFactory<Program>, IAsy
     public async Task InitializeAsync()
     {
         await _dbContainer.StartAsync();
-        await _redisContainer.StartAsync();
-        await _elasticsearchContainer.StartAsync();
+        await _redisContainer.StartAsync(); 
     }
 
     public new async Task DisposeAsync()
     {
         await _dbContainer.StopAsync();
         await _redisContainer.StopAsync();
-        await _elasticsearchContainer.StopAsync();
     }
 }

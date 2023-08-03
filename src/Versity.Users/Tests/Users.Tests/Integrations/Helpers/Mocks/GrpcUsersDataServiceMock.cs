@@ -3,18 +3,11 @@ using Presentation;
 
 namespace Users.Tests.Integrations.Helpers.Mocks;
 
-public class GrpcUsersDataServiceMock : IGrpcUsersDataServiceMock
+public static class GrpcUsersDataServiceMock
 {
-    private readonly GrpcChannel _channel;
-
-    public GrpcUsersDataServiceMock(GrpcChannel grpcChannel)
+    public static async Task<IEnumerable<string>> GetUserRolesAsync(this GrpcChannel channel, string userId)
     {
-        _channel = grpcChannel;
-    }
-
-    public async Task<IEnumerable<string>> GetUserRolesAsync(string userId)
-    {
-        var client = new GrpcUsers.GrpcUsersClient(_channel);
+        var client = new GrpcUsers.GrpcUsersClient(channel);
         var request = new GetUserRolesRequest
         {
             UserId = userId
@@ -25,9 +18,9 @@ public class GrpcUsersDataServiceMock : IGrpcUsersDataServiceMock
         return reply.Roles.ToList();
     }
 
-    public async Task<bool> IsUserExistAsync(string userId)
+    public static async Task<bool> IsUserExistAsync(this GrpcChannel channel, string userId)
     {
-        var client = new GrpcUsers.GrpcUsersClient(_channel);
+        var client = new GrpcUsers.GrpcUsersClient(channel);
         var request = new GrpcIsUserExistRequest()
         {
             UserId = userId

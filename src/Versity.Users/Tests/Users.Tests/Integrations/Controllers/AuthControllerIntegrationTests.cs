@@ -20,12 +20,12 @@ namespace Users.Tests.Integrations.Controllers;
 public class AuthControllerIntegrationTests : IClassFixture<ControllersAppFactoryFixture>
 {
     private readonly HttpClient _httpClient;
-    private readonly ControllersAppFactoryFixture _controllersAppFactory;
+    private readonly ControllersAppFactoryFixture _controllersAppControllersAppFactory;
 
-    public AuthControllerIntegrationTests(ControllersAppFactoryFixture factoryUsersController)
+    public AuthControllerIntegrationTests(ControllersAppFactoryFixture controllersAppFactoryFixture)
     {
-        _controllersAppFactory = factoryUsersController;
-        _httpClient = factoryUsersController.CreateClient();
+        _controllersAppControllersAppFactory = controllersAppFactoryFixture;
+        _httpClient = controllersAppFactoryFixture.CreateClient();
         
         var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration());
         _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
@@ -49,7 +49,7 @@ public class AuthControllerIntegrationTests : IClassFixture<ControllersAppFactor
     public async Task Login_ShouldReturnOk_WhenModelIsValid()
     {
         // Arrange
-        using var scope = _controllersAppFactory.Services.CreateScope();
+        using var scope = _controllersAppControllersAppFactory.Services.CreateScope();
         var repository = scope.ServiceProvider.GetService<IVersityUsersRepository>();
         var (user, password) = await VersityUserSeeder.SeedUserDataAsync(repository);
         var command = new LoginVersityUserCommand(user.Email, password);
@@ -91,7 +91,7 @@ public class AuthControllerIntegrationTests : IClassFixture<ControllersAppFactor
     public async Task ResendEmailVerificationToken_ShouldReturnError_WhenEmailIsAlreadyVerified()
     {
         // Arrange
-        using var scope = _controllersAppFactory.Services.CreateScope();
+        using var scope = _controllersAppControllersAppFactory.Services.CreateScope();
         var repository = scope.ServiceProvider.GetService<IVersityUsersRepository>();
         var (user, password) = await VersityUserSeeder.SeedUserDataAsync(repository);
         var command = new ResendEmailVerificationTokenCommand(user.Email, password);
@@ -119,7 +119,7 @@ public class AuthControllerIntegrationTests : IClassFixture<ControllersAppFactor
         // Arrange
         var token = Guid.NewGuid().ToString();
         
-        using var scope = _controllersAppFactory.Services.CreateScope();
+        using var scope = _controllersAppControllersAppFactory.Services.CreateScope();
         var versityUsersRepository = scope.ServiceProvider.GetService<IVersityUsersRepository>();
         var versityRefreshTokensRepository = scope.ServiceProvider.GetService<IVersityRefreshTokensRepository>();
         

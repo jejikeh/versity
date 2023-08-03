@@ -37,7 +37,6 @@ public class UsersControllerIntegrationTests : IClassFixture<ControllersAppFacto
     {
         // Act
         var response = await _httpClient.GetAsync(HttpHelper.GetAllUsersUrl(1));
-        var result  = await response.Content.ReadFromJsonAsync<IEnumerable<ViewVersityUserDto>>();
         
         // Assert
         response.EnsureSuccessStatusCode();

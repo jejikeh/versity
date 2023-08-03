@@ -48,7 +48,7 @@ public static class ProgramExtensions
             app.UseExceptionHandler("/error");
         }
 
-        app.UseSerilogRequestLogging();
+        app.UseLoggingDependOnEnvironment();
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
