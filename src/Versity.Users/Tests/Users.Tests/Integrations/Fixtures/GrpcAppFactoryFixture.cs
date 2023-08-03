@@ -18,13 +18,11 @@ public class GrpcAppFactoryFixture : WebApplicationFactory<Program>, IAsyncLifet
 {
     private readonly PostgreSqlContainer _dbContainer;
     private readonly RedisContainer _redisContainer;
-    //private readonly ElasticsearchContainer _elasticsearchContainer;
 
     public GrpcAppFactoryFixture()
     {
         _dbContainer = new PostgreSqlBuilder().Build();
         _redisContainer = new RedisBuilder().Build();
-      //  _elasticsearchContainer = new ElasticsearchBuilder().Build();
     }
     
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -44,13 +42,11 @@ public class GrpcAppFactoryFixture : WebApplicationFactory<Program>, IAsyncLifet
     {
         await _dbContainer.StartAsync();
         await _redisContainer.StartAsync();
-    //    await _elasticsearchContainer.StartAsync();
     }
 
     public new async Task DisposeAsync()
     {
         await _dbContainer.StopAsync();
         await _redisContainer.StopAsync();
-      //  await _elasticsearchContainer.StopAsync();
     }
 }
