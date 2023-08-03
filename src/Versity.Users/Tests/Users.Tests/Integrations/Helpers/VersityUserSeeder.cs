@@ -27,7 +27,7 @@ public static class VersityUserSeeder
             PhoneNumber = "+000000000000"
         };
         
-        if (changeUserAction != null)
+        if (changeUserAction is not null)
         {
             user = changeUserAction(user);
         }
