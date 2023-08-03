@@ -1,22 +1,22 @@
-﻿using Bogus;
-using Domain.Models;
-using Infrastructure.Persistence;
-using Microsoft.AspNetCore.Identity;
-
-namespace Users.Tests.Integrations.Helpers;
+﻿namespace Products.Tests.Integrations.Helpers;
 
 public static class TestUtils
 {
     public const string AdminId = "4e274126-1d8a-4dfd-a025-806987095809";
     
-    public static void SeedEnvironmentVariables(string dbConnectionString, string redisConnectionString, string elasticsearchConnectionString)
+    public static void SeedEnvironmentVariables(
+        string dbConnectionString, 
+        string redisConnectionString, 
+        string kafkaConnectionString,
+        string elasticsearchConnectionString = "no_set")
     {
         Environment.SetEnvironmentVariable("ConnectionString", dbConnectionString);
         Environment.SetEnvironmentVariable("REDIS_Host", redisConnectionString);
         Environment.SetEnvironmentVariable("ElasticConfiguration:Uri", elasticsearchConnectionString);
+        Environment.SetEnvironmentVariable("KAFKA_Host", kafkaConnectionString);
+        Environment.SetEnvironmentVariable("KAFKA_ProducerName", "versity.products.tests");
+        Environment.SetEnvironmentVariable("KAFKA_Topic", "versity.products");
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-        Environment.SetEnvironmentVariable("ADMIN__Password", "admin");
-        Environment.SetEnvironmentVariable("ADMIN__Email", "admin@mail.com");
         Environment.SetEnvironmentVariable("JWT__Issuer", "testing");
         Environment.SetEnvironmentVariable("JWT__Audience", "testing");
         Environment.SetEnvironmentVariable("JWT__Key", Guid.NewGuid().ToString());

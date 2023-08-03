@@ -126,19 +126,16 @@ public class ProductsKafkaAndDbIntegrationTests : IClassFixture<ProductsServiceA
     private T? ConsumeKeyMessage<T>(string key)
     {
         ConsumeResult<string, string>? message = null;
+        
+        // kafka may have empty or system logs that are not related to the application
         for (var i = 0; i < 100; i++)
         {
             message = _consumerService?.Consume();
 
             if (string.Equals(message?.Message.Key, key))
             {
-                break;
+                return JsonSerializer.Deserialize<T>(message?.Message.Value ?? string.Empty);
             }
-        }
-
-        if (message is not null)
-        {
-            return JsonSerializer.Deserialize<T>(message.Message.Value);
         }
         
         return default;

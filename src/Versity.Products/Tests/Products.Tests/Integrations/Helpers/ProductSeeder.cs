@@ -22,7 +22,8 @@ public static class ProductSeeder
         changeProductAction?.Invoke(product);
 
         await repository.CreateProductAsync(product, CancellationToken.None);
-        
+        await repository.SaveChangesAsync(CancellationToken.None);
+         
         return product;
     }
 }

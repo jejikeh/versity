@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Products.Tests.Integrations.Helpers;
+using Products.Tests.Integrations.Helpers.KafkaConsumer;
 using Testcontainers.Kafka;
 using Testcontainers.PostgreSql;
 using Testcontainers.Redis;
@@ -27,6 +30,11 @@ public class ProductsServiceAppFactoryFixture : WebApplicationFactory<Program>, 
             _dbContainer.GetConnectionString(),
             _redisContainer.GetConnectionString(),
             _kafkaContainer.GetBootstrapAddress());
+
+        builder.ConfigureTestServices(services =>
+        {
+            services.UseKafkaConsumer(new KafkaConsumerConfiguration());
+        });
     }
     
     protected override IHost CreateHost(IHostBuilder builder)
