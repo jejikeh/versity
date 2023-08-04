@@ -5,8 +5,31 @@ using Serilog.Sinks.Elasticsearch;
 
 namespace Presentation.Extensions;
 
-public static class ElasticSerilogProgramExtension
+public static class LoggingOrElasticSerilogProgramExtension
 {
+    public static WebApplication UseLoggingDependOnEnvironment(this WebApplication application)
+    {
+        if (Environment.GetEnvironmentVariable("ElasticConfiguration:Uri") != "no_set")
+        {
+            application.UseSerilogRequestLogging();
+        }
+        
+        return application;
+    }
+    
+    public static WebApplicationBuilder AddLogging(this WebApplicationBuilder builder)
+    {
+        if (Environment.GetEnvironmentVariable("ElasticConfiguration:Uri") != "no_set")
+        {
+            return builder.AddElasticAndSerilog();
+        }
+        
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
+        
+        return builder;
+    }
+    
     public static WebApplicationBuilder AddElasticAndSerilog(this WebApplicationBuilder builder)
     {
         builder.Host.UseSerilog((context, configuration) =>
@@ -16,6 +39,7 @@ public static class ElasticSerilogProgramExtension
             {
                 throw new NullReferenceException("ASPNETCORE_ENVIRONMENT variable is empty!");
             }
+            
             var configurationRoot = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{environment}.json", optional: true)
@@ -41,6 +65,7 @@ public static class ElasticSerilogProgramExtension
         {
             throw new NullReferenceException("ElasticConfiguration:Uri configuration is empty");
         }
+        
         var connectionUri = new Uri(connectionString);
 
         return new ElasticsearchSinkOptions(connectionUri) 
