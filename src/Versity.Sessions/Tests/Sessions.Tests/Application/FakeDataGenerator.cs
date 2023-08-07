@@ -78,14 +78,27 @@ public static class FakeDataGenerator
         }).Generate();
     }
     
-    public static List<SessionLogs> GenerateFakeSessionsLogs(int count, int logCount)
+    public static (SessionLogs, List<LogData>) GenerateFakeSessionLogs(Guid sessionId, int count)
     {
-        return new Faker<SessionLogs>().CustomInstantiator(faker => new SessionLogs
+        var logs = GenerateFakeLogsData(count);
+        return (new Faker<SessionLogs>().CustomInstantiator(faker => new SessionLogs
         {
             Id = Guid.NewGuid(),
+            SessionId = sessionId,
+            Session = default!,
+            Logs = logs,
+        }).Generate(), logs);
+    }
+    
+    public static List<SessionLogs> GenerateFakeSessionsLogs(int count, int logCount)
+    {
+        var id = Guid.NewGuid();
+        return new Faker<SessionLogs>().CustomInstantiator(faker => new SessionLogs
+        {
+            Id = id,
             SessionId = Guid.NewGuid(),
             Session = default!,
-            Logs = GenerateFakeLogsData(logCount),
+            Logs = GenerateFakeLogsData(id, logCount),
         }).Generate(count);
     }
 
@@ -100,6 +113,19 @@ public static class FakeDataGenerator
             SessionLogsId = Guid.NewGuid(),
             SessionLogs = null!,
 
+        }).Generate(count);
+    }
+    
+    public static List<LogData> GenerateFakeLogsData(Guid sessionLogsId, int count)
+    {
+        return new Faker<LogData>().CustomInstantiator(faker => new LogData
+        {
+            Id = Guid.NewGuid(),
+            Time = faker.Date.Past(),
+            LogLevel = (LogLevel)new Random().Next(3),
+            Data = faker.Lorem.Sentence(),
+            SessionLogsId = sessionLogsId,
+            SessionLogs = null!,
         }).Generate(count);
     }
     
@@ -137,16 +163,49 @@ public static class FakeDataGenerator
     
     public static Session GenerateFakeSession(int logCount)
     {
+        var id = Guid.NewGuid();
         return new Faker<Session>().CustomInstantiator(faker => new Session()
         {
             Id = Guid.NewGuid(),
             UserId = Guid.NewGuid().ToString(),
             Status = (SessionStatus)new Random().Next(5),
             Product = GenerateFakeProduct(),
-            Logs = GenerateFakeSessionLogs(logCount),
+            Logs = GenerateFakeSessionLogs(id, logCount).Item1,
             Expiry = faker.Date.Past(),
             Start = faker.Date.Future()
         }).Generate();
+    }
+
+    public static (Session, Product, SessionLogs, List<LogData>) GenerateFakeSessionAndReturnAllDependEntities(int logCount)
+    {
+        var id = Guid.NewGuid();
+        var (sessionLogs, logDatas) = GenerateFakeSessionLogs(id, logCount);
+        var product = GenerateFakeProduct();
+        var session =  new Faker<Session>().CustomInstantiator(faker => new Session()
+        {
+            Id = id,
+            UserId = Guid.NewGuid().ToString(),
+            Status = (SessionStatus)new Random().Next(5),
+            Product = product,
+            Logs = sessionLogs,
+            Expiry = faker.Date.Past(),
+            Start = faker.Date.Future()
+        }).Generate();
+
+        return (session, product, sessionLogs, logDatas);
+    }
+    
+    public static List<(Session, Product, SessionLogs, List<LogData>)> GenerateFakeSessionsAndReturnAllDependEntities(int sessionCount, int logCount)
+    {
+        var result = new List<(Session, Product, SessionLogs, List<LogData>)>();
+        
+        for (var i = 0; i < sessionCount; i++)
+        {
+            var fakeData = GenerateFakeSessionAndReturnAllDependEntities(logCount);
+            result.Add(fakeData);
+        }
+
+        return result;
     }
     
     public static GetSessionByIdViewModel GenerateFakeSessionByIdViewModel(int logCount)

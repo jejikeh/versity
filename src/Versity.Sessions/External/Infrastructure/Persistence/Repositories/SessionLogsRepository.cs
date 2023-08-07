@@ -34,6 +34,11 @@ public class SessionLogsRepository : ISessionLogsRepository
         return entity.Entity;
     }
 
+    public async Task CreateSessionLogsRangeAsync(ICollection<SessionLogs> sessionsLogs, CancellationToken cancellationToken)
+    {
+        await _context.AddRangeAsync(sessionsLogs, cancellationToken);
+    }
+
     public async Task CreateRangeSessionLogsAsync(IEnumerable<SessionLogs> sessionsLogs, CancellationToken cancellationToken)
     {
         await _context.AddRangeAsync(sessionsLogs, cancellationToken);

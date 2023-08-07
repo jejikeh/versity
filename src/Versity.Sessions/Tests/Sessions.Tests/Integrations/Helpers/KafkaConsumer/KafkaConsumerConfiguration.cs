@@ -1,7 +1,7 @@
 ﻿using Confluent.Kafka;
-using Infrastructure.Services.KafkaConsumer.Abstractions;
+using Products.Tests.Integrations.Helpers.KafkaConsumer.Abstractions;
 
-namespace Presentation.Configuration;
+namespace Sessions.Tests.Integrations.Helpers.KafkaConsumer;
 
 public class KafkaConsumerConfiguration : IKafkaConsumerConfiguration
 {
@@ -14,7 +14,7 @@ public class KafkaConsumerConfiguration : IKafkaConsumerConfiguration
 
     public KafkaConsumerConfiguration()
     {
-        GroupId = "versity.sessions";
+        GroupId = "versity.tests";
         Host = Environment.GetEnvironmentVariable("KAFKA_Host") ?? "no_set";
         Topic = Environment.GetEnvironmentVariable("KAFKA_Topic") ?? "no_set";
         

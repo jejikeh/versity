@@ -1,4 +1,5 @@
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Presentation.Extensions;
 
 var builder = WebApplication
@@ -16,6 +17,7 @@ try
 {
     var versitySessionsServiceDbContext = serviceProvider.GetRequiredService<VersitySessionsServiceDbContext>();
     versitySessionsServiceDbContext.Database.EnsureCreated();
+    await versitySessionsServiceDbContext.Database.MigrateAsync();
     await app.RunAsync();
 }
 catch (Exception ex)

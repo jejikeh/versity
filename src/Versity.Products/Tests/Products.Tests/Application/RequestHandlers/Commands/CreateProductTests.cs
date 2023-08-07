@@ -95,7 +95,7 @@ public class CreateProductTests
         return new Faker<CreateProductCommand>().CustomInstantiator(f => 
                 new CreateProductCommand(
                     random.Next(2) == 1 ? f.Commerce.ProductName() : string.Empty, 
-                    random.Next(2) == 1 ? f.Commerce.ProductDescription() : "Small desc", 
+                    f.Lorem.Word(), 
                     random.Next(2) == 1 ? f.Company.CompanyName() : string.Empty, 
                     random.Next(2) == 1 ? f.Date.PastDateOnly() : default))
             .Generate();

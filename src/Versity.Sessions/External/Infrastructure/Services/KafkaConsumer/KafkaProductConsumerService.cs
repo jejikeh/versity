@@ -55,6 +55,7 @@ public class KafkaProductConsumerService : BackgroundService
             catch (Exception ex)
             {
                 _logger.LogError($"--> Kafka Consume error: {ex.Message}");
+                break;
             }
         }
     }

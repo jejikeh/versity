@@ -43,6 +43,11 @@ public class CachedSessionsRepository : ISessionsRepository
         return _sessions.CreateSessionAsync(session, cancellationToken);
     }
 
+    public Task CreateSessionRangeAsync(ICollection<Session> sessions, CancellationToken cancellationToken)
+    {
+        return _sessions.CreateSessionRangeAsync(sessions, cancellationToken);
+    }
+
     public Session UpdateSession(Session session)
     {
         return _sessions.UpdateSession(session);

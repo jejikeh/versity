@@ -35,6 +35,11 @@ public class ProductRepository : IProductsRepository
         return entityEntry.Entity;
     }
 
+    public async Task CreateRangeProductAsync(ICollection<Product> products, CancellationToken cancellationToken)
+    {
+        await _context.AddRangeAsync(products, cancellationToken);
+    }
+
     public Product UpdateProduct(Product product)
     {
         return _context.Update(product).Entity;

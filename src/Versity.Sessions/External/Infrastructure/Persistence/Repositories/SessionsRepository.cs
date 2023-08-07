@@ -52,6 +52,11 @@ public class SessionsRepository : ISessionsRepository
         return entityEntry.Entity;
     }
 
+    public async Task CreateSessionRangeAsync(ICollection<Session> sessions, CancellationToken cancellationToken)
+    {
+        await _context.AddRangeAsync(sessions, cancellationToken);
+    }
+
     public Session UpdateSession(Session session)
     {
         return _context.Update(session).Entity;
