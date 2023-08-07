@@ -18,7 +18,33 @@ public static class SessionSeeder
         var faker = new Faker();
 
         var (session, product, sessionLogs, logDatas) =
-            FakeDataGenerator.GenerateFakeSessionAndReturnAllDependEntities(count == 0 ? Random.Shared.Next(20) : count);
+            FakeDataGenerator.GenerateFakeSessionAndReturnAllDependEntities(count == 0 ? Random.Shared.Next(1, 20) : count);
+
+        await productsRepository.CreateProductAsync(product, CancellationToken.None);
+        await sessionsRepository.CreateSessionAsync(session, CancellationToken.None);
+        await sessionLogsRepository.CreateSessionLogsAsync(sessionLogs, CancellationToken.None);
+        await logsDataRepository.CreateRangeLogsDataAsync(logDatas, CancellationToken.None);
+
+        await productsRepository.SaveChangesAsync(CancellationToken.None);
+        await sessionsRepository.SaveChangesAsync(CancellationToken.None);
+        await sessionLogsRepository.SaveChangesAsync(CancellationToken.None);
+        await logsDataRepository.SaveChangesAsync(CancellationToken.None);
+
+        return (session, product, sessionLogs, logDatas);
+    }
+    
+    public static async Task<(Session, Product, SessionLogs, List<LogData>)> SeedSessionDataAsync(
+        ISessionsRepository sessionsRepository,
+        ISessionLogsRepository sessionLogsRepository,
+        ILogsDataRepository logsDataRepository,
+        IProductsRepository productsRepository,
+        Guid userId,
+        int count = 0)
+    {
+        var faker = new Faker();
+
+        var (session, product, sessionLogs, logDatas) =
+            FakeDataGenerator.GenerateFakeSessionAndReturnAllDependEntitiesWithUser(userId, count == 0 ? Random.Shared.Next(1, 20) : count);
 
         await productsRepository.CreateProductAsync(product, CancellationToken.None);
         await sessionsRepository.CreateSessionAsync(session, CancellationToken.None);
@@ -43,7 +69,7 @@ public static class SessionSeeder
         var faker = new Faker();
 
         var fakeData =
-            FakeDataGenerator.GenerateFakeSessionsAndReturnAllDependEntities(Random.Shared.Next(10), Random.Shared.Next(10));
+            FakeDataGenerator.GenerateFakeSessionsAndReturnAllDependEntities(Random.Shared.Next(1, 10), Random.Shared.Next(1, 10));
 
         await productsRepository.CreateRangeProductAsync(fakeData.Select(x => x.Item2).ToArray(), CancellationToken.None);
         await sessionsRepository.CreateSessionRangeAsync(fakeData.Select(x => x.Item1).ToArray(), CancellationToken.None);

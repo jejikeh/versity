@@ -1,7 +1,10 @@
-﻿using Infrastructure.Services.KafkaConsumer;
+﻿using Application.Abstractions;
+using Infrastructure.Services;
+using Infrastructure.Services.KafkaConsumer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Presentation.Configuration;
@@ -36,15 +39,19 @@ public class ControllersAppFactoryFixture : WebApplicationFactory<Program>, IAsy
         {
             services.RemoveAll<KafkaConsumerConfiguration>();
             services.UseKafkaConsumer(new KafkaConsumerConfiguration());
+
+            services.RemoveAll<IVersityUsersDataService>();
+            services.AddScoped<IVersityUsersDataService, GrpcUsersServiceMock>();
         });
     }
     
     protected override IHost CreateHost(IHostBuilder builder)
     {
-        builder.UseContentRoot(Directory.GetCurrentDirectory());    
+        builder.UseContentRoot(Directory.GetCurrentDirectory());
+        
         return base.CreateHost(builder);
     }
-
+    
     public async Task InitializeAsync()
     {
         await _dbContainer.StartAsync();

@@ -113,14 +113,18 @@ public class ProductsKafkaAndDbIntegrationTests : IClassFixture<ProductsServiceA
         var countBeforeCreating = await versityProductsRepository.GetAllProducts().CountAsync();
         
         // Act
-        var response = await _httpClient.PostAsJsonAsync(HttpHelper.CreateProduct(), command); 
+        var response = await _httpClient.PostAsJsonAsync(HttpHelper.CreateProduct(), command);
+        var result = await response.Content.ReadFromJsonAsync<Product>();
         var message = ConsumeKeyMessage<CreateProductMessage>("CreateProduct");
          
          // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
         countBeforeCreating.Should().BeLessThan(await versityProductsRepository.GetAllProducts().CountAsync());
         message.Should().NotBeNull();
         message?.Title.Should().Be(command.Title);
+        result.Author.Should().Be(command.Author);
+        result.Description.Should().Be(command.Description);
+        result.Release.Should().Be(command.Release);
     }
 
     private T? ConsumeKeyMessage<T>(string key)

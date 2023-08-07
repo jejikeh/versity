@@ -32,7 +32,8 @@ public class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand,
 
     public async Task<SessionViewModel> Handle(CreateSessionCommand request, CancellationToken cancellationToken)
     {
-        if (!await _users.IsUserExistAsync(request.UserId))
+        var userExists = await _users.IsUserExistAsync(request.UserId);
+        if (!userExists)
         {
             throw new NotFoundExceptionWithStatusCode("User with specified Id doesnt exist!");
         }

@@ -46,6 +46,7 @@ public sealed class ErrorController : ControllerBase
             title = httpResponseException.ErrorMessage;
             statusCode = httpResponseException.StatusCode;
         }
+        
         _logger.LogError("Request failure, {@Error}, debug_trace {@Trace}", title, exceptionHandlerFeature.Error.StackTrace);
         
         return Problem(

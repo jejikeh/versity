@@ -25,7 +25,7 @@ public sealed class AuthController : ApiController
     {
         var result = await Sender.Send(command, cancellationToken);
         
-        return result.Succeeded ? Ok("The confirmation message was send to your email!") : BadRequest(result.Errors);
+        return Ok("The confirmation message was send to your email!");
     }
 
     [HttpPost]

@@ -105,7 +105,7 @@ public class SessionsControllerTests
         var response = await _sessionsController.CreateSession(FakeDataGenerator.GenerateFakeCreateSessionCommand(), CancellationToken.None);
         
         // Assert
-        response.Should().BeOfType<OkObjectResult>();
+        response.Should().BeOfType<CreatedAtActionResult>();
     }
     
     [Fact]

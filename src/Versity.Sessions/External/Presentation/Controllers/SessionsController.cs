@@ -76,7 +76,7 @@ public class SessionsController : ApiController
     {
         var result = await Sender.Send(command, cancellationToken);
         
-        return Ok(result);
+        return CreatedAtAction(nameof(GetSessionById), new { id = result.Id }, result);;
     }
     
     [Authorize(Roles = "Admin")]

@@ -54,7 +54,7 @@ public class GrpcUsersDataService : IVersityUsersDataService
         catch (Exception e)
         {
             _logger.LogError($"--> Could`t call to GRPC server {e.Message}");
-            throw;
+            throw new Exception("Could`t call to GRPC server");
         }
     }
 }

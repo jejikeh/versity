@@ -53,7 +53,7 @@ public sealed class ProductsController : ApiController
     {
         var result = await Sender.Send(createProductCommand, cancellationToken);
         
-        return Ok(result);
+        return CreatedAtAction(nameof(GetProductById), new { id = result.Id }, result);
     }
     
     [Authorize(Roles = "Admin")]

@@ -195,6 +195,25 @@ public static class FakeDataGenerator
         return (session, product, sessionLogs, logDatas);
     }
     
+    public static (Session, Product, SessionLogs, List<LogData>) GenerateFakeSessionAndReturnAllDependEntitiesWithUser(Guid userId, int logCount)
+    {
+        var id = Guid.NewGuid();
+        var (sessionLogs, logDatas) = GenerateFakeSessionLogs(id, logCount);
+        var product = GenerateFakeProduct();
+        var session =  new Faker<Session>().CustomInstantiator(faker => new Session()
+        {
+            Id = id,
+            UserId = userId.ToString(),
+            Status = (SessionStatus)new Random().Next(5),
+            Product = product,
+            Logs = sessionLogs,
+            Expiry = faker.Date.Past(),
+            Start = faker.Date.Future()
+        }).Generate();
+
+        return (session, product, sessionLogs, logDatas);
+    }
+    
     public static List<(Session, Product, SessionLogs, List<LogData>)> GenerateFakeSessionsAndReturnAllDependEntities(int sessionCount, int logCount)
     {
         var result = new List<(Session, Product, SessionLogs, List<LogData>)>();
@@ -240,6 +259,16 @@ public static class FakeDataGenerator
         return new Faker<CreateSessionCommand>().CustomInstantiator(faker => new CreateSessionCommand(
             Guid.NewGuid().ToString(),
             Guid.NewGuid(),
+            faker.Date.Between(DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddYears(2)),
+            faker.Date.Between(DateTime.UtcNow.AddYears(2), DateTime.UtcNow.AddYears(3))
+        )).Generate();
+    }
+    
+    public static CreateSessionCommand GenerateFakeCreateSessionCommand(Guid userId, Guid productId)
+    {
+        return new Faker<CreateSessionCommand>().CustomInstantiator(faker => new CreateSessionCommand(
+            userId.ToString(),
+            productId,
             faker.Date.Between(DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddYears(2)),
             faker.Date.Between(DateTime.UtcNow.AddYears(2), DateTime.UtcNow.AddYears(3))
         )).Generate();

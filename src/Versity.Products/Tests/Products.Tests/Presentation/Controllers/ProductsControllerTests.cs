@@ -69,14 +69,15 @@ public class ProductsControllerTests
     {
         // Arrange
         _sender.Setup(x =>
-                x.Send(It.IsAny<GetProductByIdQuery>(), It.IsAny<CancellationToken>()))
+                x.Send(It.IsAny<CreateProductCommand>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(GenerateFakeProduct());
         
         // Act
         var response = await _productsController.CreateProduct(GenerateFakeCreateProductCommand(), CancellationToken.None);
         
         // Assert
-        response.Should().BeOfType<OkObjectResult>();
+        response.Should().BeOfType<CreatedAtActionResult>();
+        response.Should().NotBeNull();
     }
     
     [Fact]
