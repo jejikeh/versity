@@ -39,7 +39,8 @@ public class ProductsServiceAppFactoryFixture : WebApplicationFactory<Program>, 
     
     protected override IHost CreateHost(IHostBuilder builder)
     {
-        builder.UseContentRoot(Directory.GetCurrentDirectory());    
+        builder.UseContentRoot(Directory.GetCurrentDirectory());
+        
         return base.CreateHost(builder);
     }
 

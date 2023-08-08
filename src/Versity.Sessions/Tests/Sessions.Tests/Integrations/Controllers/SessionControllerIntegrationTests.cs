@@ -125,6 +125,37 @@ public class SessionControllerIntegrationTests : IClassFixture<ControllersAppFac
         response.StatusCode.Should().Be(HttpStatusCode.Created);
         content.Should().NotBeNull();
     }
+    
+    [Fact]
+    public async Task DeleteSession_ShouldReturnOk_WhenCommandIsValid()
+    {
+        // Arrange
+        var (session, _, _, _) = await SeedSessionEntities();
+        
+        // Act
+        var response = await _httpClient.DeleteAsync(SessionHttpHelper.DeleteSession(session.Id.ToString()));
+        
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+    
+    [Fact]
+    public async Task CloseSession_ShouldReturnOkAndCloseSession_WhenCommandIsValid()
+    {
+        // Arrange
+        var (session, _, _, _) = await SeedSessionEntities();
+        
+        // Act
+        var response = await _httpClient.PutAsJsonAsync(SessionHttpHelper.CloseSession(session.Id.ToString()), session.Id.ToString());
+        Task.WaitAll();
+        var responseSessionModel = await _httpClient.GetAsync(SessionHttpHelper.GetSessionById(session.Id.ToString()));
+        var content = await responseSessionModel.Content.ReadFromJsonAsync<GetSessionByIdViewModel>();
+        
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().NotBeNull();
+        content.Status.Should().Be(SessionStatus.Closed);
+    }
 
     private async Task<(Session, Product, SessionLogs, List<LogData>)> SeedSessionEntities()
     {

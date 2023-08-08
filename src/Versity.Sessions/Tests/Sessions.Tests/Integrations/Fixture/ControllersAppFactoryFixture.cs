@@ -1,5 +1,4 @@
 ﻿using Application.Abstractions;
-using Infrastructure.Services;
 using Infrastructure.Services.KafkaConsumer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -43,6 +42,13 @@ public class ControllersAppFactoryFixture : WebApplicationFactory<Program>, IAsy
             services.RemoveAll<IVersityUsersDataService>();
             services.AddScoped<IVersityUsersDataService, GrpcUsersServiceMock>();
         });
+    }
+    
+    protected override IHostBuilder CreateHostBuilder()
+    {
+        var builder = Host.CreateDefaultBuilder();
+        
+        return builder;
     }
     
     protected override IHost CreateHost(IHostBuilder builder)

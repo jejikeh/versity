@@ -38,6 +38,7 @@ public sealed class ErrorController : ControllerBase
         {
             return NotFound();
         }
+        
         var exceptionHandlerFeature = HttpContext.Features.Get<IExceptionHandlerFeature>()!;
         var title = exceptionHandlerFeature.Error.Message;
         var statusCode = StatusCodes.Status500InternalServerError;

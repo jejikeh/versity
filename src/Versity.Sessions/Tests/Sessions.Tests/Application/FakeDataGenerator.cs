@@ -66,6 +66,17 @@ public static class FakeDataGenerator
                     faker.Lorem.Sentence()))
             .Generate();
     }
+    
+    public static CreateLogDataCommand GenerateFakeCreateLogDataCommand(Guid sessionLogId)
+    {
+        return new Faker<CreateLogDataCommand>().CustomInstantiator(faker => 
+                new CreateLogDataCommand(
+                    sessionLogId, 
+                    faker.Date.Past(),
+                    (LogLevel)new Random().Next(3),
+                    faker.Lorem.Sentence()))
+            .Generate();
+    }
 
     public static SessionLogs GenerateFakeSessionLogs(int count)
     {
@@ -147,6 +158,15 @@ public static class FakeDataGenerator
         return new Faker<CreateLogsDataCommand>().CustomInstantiator(faker =>
                 new CreateLogsDataCommand(
                     Guid.NewGuid(),
+                    GenerateFakeCreateLogDataDto(count)))
+            .Generate();
+    }
+    
+    public static CreateLogsDataCommand GenerateFakeCreateLogsDataCommand(Guid sessionLogsId, int count)
+    {
+        return new Faker<CreateLogsDataCommand>().CustomInstantiator(faker =>
+                new CreateLogsDataCommand(
+                    sessionLogsId,
                     GenerateFakeCreateLogDataDto(count)))
             .Generate();
     }
@@ -269,8 +289,8 @@ public static class FakeDataGenerator
         return new Faker<CreateSessionCommand>().CustomInstantiator(faker => new CreateSessionCommand(
             userId.ToString(),
             productId,
-            faker.Date.Between(DateTime.UtcNow.AddDays(1), DateTime.UtcNow.AddYears(2)),
-            faker.Date.Between(DateTime.UtcNow.AddYears(2), DateTime.UtcNow.AddYears(3))
+            faker.Date.Between(DateTime.Now.AddDays(1), DateTime.Now.AddYears(2)),
+            faker.Date.Between(DateTime.Now.AddYears(2), DateTime.Now.AddYears(3))
         )).Generate();
     }
 

@@ -9,5 +9,5 @@ public static class SessionHttpHelper
     public static string GetAllProductSessions(string id, int page) => $"/api/sessions/products/{id}/{page}";
     public static string CreateSession() => "api/sessions/";
     public static string DeleteSession(string id) => $"/api/sessions/{id}";
-    public static string CloseSession(string id) => $"/api/sessions/{id}";
+    public static string CloseSession(string id) => $"/api/sessions/{id}/close";
 }
