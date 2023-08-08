@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Application.RequestHandlers.Sessions.Commands.CloseSession;
 
-public class CloseSessionCommandHandler : IRequestHandler<CloseSessionCommand>
+public class CloseSessionCommandHandler : IRequestHandler<CloseSessionCommand, GetSessionByIdViewModel>
 {
     private readonly ISessionsRepository _sessionsRepository;
     private readonly INotificationSender _notificationSender;
@@ -18,7 +18,7 @@ public class CloseSessionCommandHandler : IRequestHandler<CloseSessionCommand>
         _notificationSender = notificationSender;
     }
 
-    public async Task Handle(CloseSessionCommand request, CancellationToken cancellationToken)
+    public async Task<GetSessionByIdViewModel> Handle(CloseSessionCommand request, CancellationToken cancellationToken)
     {
         var session = await _sessionsRepository.GetSessionByIdAsync(request.Id, cancellationToken);
         if (session is null)
@@ -30,5 +30,7 @@ public class CloseSessionCommandHandler : IRequestHandler<CloseSessionCommand>
         _sessionsRepository.UpdateSession(session);
         await _sessionsRepository.SaveChangesAsync(cancellationToken);
         _notificationSender.PushClosedSession(session.UserId, UserSessionsViewModel.MapWithModel(session));
+        
+        return GetSessionByIdViewModel.MapWithModel(session);
     }
 }

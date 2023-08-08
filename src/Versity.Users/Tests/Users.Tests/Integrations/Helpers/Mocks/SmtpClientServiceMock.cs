@@ -1,9 +1,8 @@
 ﻿using Infrastructure.Services.EmailServices;
 using MailKit;
-using MailKit.Net.Smtp;
 using MimeKit;
 
-namespace Presentation.bin;
+namespace Users.Tests.Integrations.Helpers.Mocks;
 
 public class SmtpClientServiceMock : SmptClientService
 {

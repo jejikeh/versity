@@ -94,8 +94,8 @@ public class SessionsController : ApiController
     public async Task<IActionResult> CloseSession(Guid id, CancellationToken cancellationToken)
     {
         var command = new CloseSessionCommand(id);
-        await Sender.Send(command, cancellationToken);
+        var result = await Sender.Send(command, cancellationToken);
         
-        return Ok();
+        return Ok(result);
     }
 }

@@ -1,21 +1,13 @@
-﻿using System.Reflection;
-using Application.Abstractions.Repositories;
-using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Containers;
-using Infrastructure.Persistence;
-using Infrastructure.Services.EmailServices;
+﻿using Application.Abstractions.Repositories;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Moq;
-using Presentation.bin;
-using Testcontainers.Elasticsearch;
 using Testcontainers.PostgreSql;
 using Testcontainers.Redis;
 using Users.Tests.Integrations.Helpers;
+using Users.Tests.Integrations.Helpers.Mocks;
 
 namespace Users.Tests.Integrations.Fixtures;
 
