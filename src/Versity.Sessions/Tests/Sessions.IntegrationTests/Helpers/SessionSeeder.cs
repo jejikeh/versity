@@ -2,13 +2,12 @@
 using Bogus;
 using Domain.Models;
 using Domain.Models.SessionLogging;
-using Sessions.Tests.Application;
 
-namespace Sessions.Tests.Integrations.Helpers;
+namespace Sessions.IntegrationTests.Helpers;
 
 public static class SessionSeeder
 {
-    public static async Task<(Session, Product, SessionLogs, List<LogData>)> SeedSessionDataAsync(
+    public static async Task<(Domain.Models.Session, Product, SessionLogs, List<LogData>)> SeedSessionDataAsync(
         ISessionsRepository sessionsRepository,
         ISessionLogsRepository sessionLogsRepository,
         ILogsDataRepository logsDataRepository,
@@ -33,7 +32,7 @@ public static class SessionSeeder
         return (session, product, sessionLogs, logDatas);
     }
     
-    public static async Task<(Session, Product, SessionLogs, List<LogData>)> SeedSessionDataAsync(
+    public static async Task<(Domain.Models.Session, Product, SessionLogs, List<LogData>)> SeedSessionDataAsync(
         ISessionsRepository sessionsRepository,
         ISessionLogsRepository sessionLogsRepository,
         ILogsDataRepository logsDataRepository,
@@ -59,7 +58,7 @@ public static class SessionSeeder
         return (session, product, sessionLogs, logDatas);
     }
     
-    public static async Task<List<(Session, Product, SessionLogs, List<LogData>)>> SeedSessionsDataAsync(
+    public static async Task<List<(Domain.Models.Session, Product, SessionLogs, List<LogData>)>> SeedSessionsDataAsync(
         ISessionsRepository sessionsRepository,
         ISessionLogsRepository sessionLogsRepository,
         ILogsDataRepository logsDataRepository,

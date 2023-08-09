@@ -27,8 +27,11 @@ jobs:
     - name: Build
       run: dotnet build ./src/Versity.Sessions/External/Presentation/Presentation.csproj --no-restore
       
-    - name: Test
-      run: dotnet test ./src/Versity.Sessions/Tests/Sessions.Tests/Sessions.Tests.csproj --verbosity normal
+    - name: Unit Tests
+      run: dotnet test ./src/Versity.Sessions/Tests/Sessions.Tests/Sessions.Tests.csproj --verbosity detailed
+
+    - name: Integration Tests
+      run: dotnet test ./src/Versity.Sessions/Tests/Sessions.IntegrationTests/Sessions.IntegrationTests.csproj --verbosity detailed
 
     - name: Publish
       run: dotnet publish ./src/Versity.Sessions/External/Presentation/Presentation.csproj --no-build

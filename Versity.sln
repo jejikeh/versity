@@ -63,6 +63,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Products.Tests", "src\Versi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sessions.Tests", "src\Versity.Sessions\Tests\Sessions.Tests\Sessions.Tests.csproj", "{2E3CB299-5E18-4C51-92ED-58B1C81DE2A3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sessions.IntegrationTests", "src\Versity.Sessions\Tests\Sessions.IntegrationTests\Sessions.IntegrationTests.csproj", "{D1EC2A1B-A15C-41F9-B353-33B008DE3FDD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -133,6 +135,10 @@ Global
 		{2E3CB299-5E18-4C51-92ED-58B1C81DE2A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E3CB299-5E18-4C51-92ED-58B1C81DE2A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E3CB299-5E18-4C51-92ED-58B1C81DE2A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1EC2A1B-A15C-41F9-B353-33B008DE3FDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1EC2A1B-A15C-41F9-B353-33B008DE3FDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1EC2A1B-A15C-41F9-B353-33B008DE3FDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1EC2A1B-A15C-41F9-B353-33B008DE3FDD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -167,6 +173,7 @@ Global
 		{C67F4D4D-2C35-410E-824E-9D78A6C051E1} = {57A7CE4C-4626-4DF5-95FA-E3E07B8D2C68}
 		{A9114B0D-CA7D-4CD3-B4FA-84A7AB8D2CE3} = {C67F4D4D-2C35-410E-824E-9D78A6C051E1}
 		{2E3CB299-5E18-4C51-92ED-58B1C81DE2A3} = {1097DDF6-984C-4094-AA88-23944C72D807}
+		{D1EC2A1B-A15C-41F9-B353-33B008DE3FDD} = {1097DDF6-984C-4094-AA88-23944C72D807}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FB8E93AD-3799-4C23-8A1E-F5C44F4B9CDD}

@@ -5,16 +5,17 @@ using Application.Dtos;
 using Domain.Models;
 using Domain.Models.SessionLogging;
 using FluentAssertions;
+using Infrastructure.Services.KafkaConsumer;
 using Microsoft.Extensions.DependencyInjection;
 using Products.Tests.Integrations.Helpers;
-using Sessions.Tests.Application;
-using Sessions.Tests.Integrations.Fixture;
-using Sessions.Tests.Integrations.Helpers;
+using Sessions.IntegrationTests.Fixture;
+using Sessions.IntegrationTests.Helpers;
 using Sessions.Tests.Integrations.Helpers.Http;
+using TestUtils = Sessions.IntegrationTests.Helpers.TestUtils;
 
-namespace Sessions.Tests.Integrations;
+namespace Sessions.IntegrationTests;
 
-public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFactoryFixture>
+public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFactoryFixture>, IDisposable
 {
     private readonly HttpClient _httpClient;
     private readonly ControllersAppFactoryFixture _controllersAppFactory;
@@ -26,6 +27,10 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
         
         var jwtTokenGeneratorService = new JwtTokenGeneratorService();
         _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
+        
+        using var scope = _controllersAppFactory.Services.CreateScope();
+        var kafkaProductConsumerService = scope.ServiceProvider.GetService<KafkaProductConsumerService>();
+        kafkaProductConsumerService?.StopAsync(CancellationToken.None);
     }
     
     [Fact]
@@ -155,7 +160,7 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
         content.Status.Should().Be(SessionStatus.Closed);
     }
     
-    /*[Fact]
+    [Fact]
     public async Task GetAllLogData_ShouldReturnLogDatas_WhenCommandIsValid()
     {
         // Arrange
@@ -169,7 +174,7 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().NotBeNullOrEmpty();
         content.Count().Should().BeGreaterOrEqualTo(fakeData.Count);
-    }*/
+    }
     
     [Fact]
     public async Task GetLogDataById_ShouldReturnLogData_WhenCommandIsValid()
@@ -258,7 +263,12 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
         content.SessionId.Should().Be(sessionLogs.SessionId);
     }
 
-    private async Task<(Session, Product, SessionLogs, List<LogData>)> SeedSessionEntities()
+    public void Dispose()
+    {
+        
+    }
+
+    private async Task<(Domain.Models.Session, Product, SessionLogs, List<LogData>)> SeedSessionEntities()
     {
         using var scope = _controllersAppFactory.Services.CreateScope();
         var sessionRepository = scope.ServiceProvider.GetService<ISessionsRepository>();
@@ -275,7 +285,7 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
         return (session, product, sessionLogs, logDatas);
     }
     
-    private async Task<(Session, Product, SessionLogs, List<LogData>)> SeedSessionEntities(Guid userId)
+    private async Task<(Domain.Models.Session, Product, SessionLogs, List<LogData>)> SeedSessionEntities(Guid userId)
     {
         using var scope = _controllersAppFactory.Services.CreateScope();
         var sessionRepository = scope.ServiceProvider.GetService<ISessionsRepository>();
@@ -293,7 +303,7 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
         return (session, product, sessionLogs, logDatas);
     }
     
-    private async Task<List<(Session, Product, SessionLogs, List<LogData>)>> SeedSessionsEntities()
+    private async Task<List<(Domain.Models.Session, Product, SessionLogs, List<LogData>)>> SeedSessionsEntities()
     {
         using var scope = _controllersAppFactory.Services.CreateScope();
         var sessionRepository = scope.ServiceProvider.GetService<ISessionsRepository>();
