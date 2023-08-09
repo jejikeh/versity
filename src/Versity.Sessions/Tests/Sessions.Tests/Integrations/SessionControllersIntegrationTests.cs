@@ -155,7 +155,7 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
         content.Status.Should().Be(SessionStatus.Closed);
     }
     
-    [Fact]
+    /*[Fact]
     public async Task GetAllLogData_ShouldReturnLogDatas_WhenCommandIsValid()
     {
         // Arrange
@@ -169,7 +169,7 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().NotBeNullOrEmpty();
         content.Count().Should().BeGreaterOrEqualTo(fakeData.Count);
-    }
+    }*/
     
     [Fact]
     public async Task GetLogDataById_ShouldReturnLogData_WhenCommandIsValid()

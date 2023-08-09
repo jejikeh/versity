@@ -28,7 +28,7 @@ jobs:
       run: dotnet build ./src/Versity.Products/External/Presentation/Presentation.csproj --no-restore
       
     - name: Test
-      run: dotnet test ./src/Versity.Products/Tests/Sessions.Tests/Products.Tests.csproj --verbosity normal
+      run: dotnet test ./src/Versity.Products/Tests/Products.Tests/Products.Tests.csproj --verbosity normal
 
     - name: Publish
       run: dotnet publish ./src/Versity.Products/External/Presentation/Presentation.csproj --no-build
