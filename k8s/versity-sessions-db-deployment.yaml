@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Users\jejik\scoop\apps\kompose\current\kompose.exe convert -f .\docker-compose.yml -o .\k8s\
+    kompose.version: 1.30.0 (9d8dcb518)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: versity-sessions-db
+  name: versity-sessions-db
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: versity-sessions-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Users\jejik\scoop\apps\kompose\current\kompose.exe convert -f .\docker-compose.yml -o .\k8s\
+        kompose.version: 1.30.0 (9d8dcb518)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/versity-dev: "true"
+        io.kompose.service: versity-sessions-db
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DATABASE
+              value: versity_sessions_dev
+            - name: POSTGRES_PASSWORD
+              value: versity_dev
+            - name: POSTGRES_USER
+              value: versity_dev
+          image: debezium/postgres:13-alpine
+          name: versity-sessions-db
+          ports:
+            - containerPort: 5432
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - mountPath: /data/db
+              name: sessions-data
+      restartPolicy: Always
+      volumes:
+        - name: sessions-data
+          persistentVolumeClaim:
+            claimName: sessions-data
+status: {}

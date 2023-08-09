@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Users\jejik\scoop\apps\kompose\current\kompose.exe convert -f .\docker-compose.yml -o .\k8s\
+    kompose.version: 1.30.0 (9d8dcb518)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: versity-apigateway-service
+  name: versity-apigateway-service
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: versity-apigateway-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Users\jejik\scoop\apps\kompose\current\kompose.exe convert -f .\docker-compose.yml -o .\k8s\
+        kompose.version: 1.30.0 (9d8dcb518)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/versity-dev: "true"
+        io.kompose.service: versity-apigateway-service
+    spec:
+      containers:
+        - env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: DEVELOPMENT
+            - name: ASPNETCORE_HTTPS_PORT
+              value: "8001"
+            - name: ASPNETCORE_Kestrel__Certificates__Default__Password
+              value: localhost
+            - name: ASPNETCORE_Kestrel__Certificates__Default__Path
+              value: /root/.aspnet/https/localhost.pfx
+            - name: ASPNETCORE_URLS
+              value: https://+443;http://+80
+            - name: JWT__Audience
+              value: https://versity.users:4001
+            - name: JWT__Issuer
+              value: https://versity.users:4001
+            - name: JWT__Key
+              value: 06AA645D-B70D-446F-90D7-192A5C1CAA6A
+          image: jejikeh/versity.apigateway:latest
+          name: versity-apigateway-service
+          ports:
+            - containerPort: 443
+              hostPort: 8001
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - mountPath: /root/.aspnet/https
+              name: versity-apigateway-service-claim0
+              readOnly: true
+            - mountPath: /root/.microsoft/usersecrets
+              name: versity-apigateway-service-claim1
+              readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: versity-apigateway-service-claim0
+          persistentVolumeClaim:
+            claimName: versity-apigateway-service-claim0
+            readOnly: true
+        - name: versity-apigateway-service-claim1
+          persistentVolumeClaim:
+            claimName: versity-apigateway-service-claim1
+            readOnly: true
+status: {}

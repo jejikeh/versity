@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Users\jejik\scoop\apps\kompose\current\kompose.exe convert -f .\docker-compose.yml -o .\k8s\
+    kompose.version: 1.30.0 (9d8dcb518)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: versity-users-service
+  name: versity-users-service
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: versity-users-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Users\jejik\scoop\apps\kompose\current\kompose.exe convert -f .\docker-compose.yml -o .\k8s\
+        kompose.version: 1.30.0 (9d8dcb518)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/versity-dev: "true"
+        io.kompose.service: versity-users-service
+    spec:
+      containers:
+        - env:
+            - name: ADMIN__Email
+              value: versity.identity.dev@gmail.com
+            - name: ADMIN__Password
+              value: vers1ty.Admin
+            - name: ASPNETCORE_ENVIRONMENT
+              value: DEVELOPMENT
+            - name: ASPNETCORE_Kestrel__Certificates__Default__Password
+              value: localhost
+            - name: ASPNETCORE_Kestrel__Certificates__Default__Path
+              value: /root/.aspnet/https/localhost.pfx
+            - name: ASPNETCORE_URLS
+              value: https://+443;http://+80
+            - name: ConnectionString
+              value: Host=versity-users-db;Port=5432;Username=versity_dev;Password=versity_dev;Database=versity_users_dev;
+            - name: EMAIL__ConfirmUrl
+              value: https://localhost:8001/api/auth/confirmemail/
+            - name: EMAIL__From
+              value: versity.identity.dev@gmail.com
+            - name: EMAIL__Password
+              value: ebqatxmtxaurcdfu
+            - name: EMAIL__Port
+              value: "465"
+            - name: EMAIL__SmtpServer
+              value: smtp.gmail.com
+            - name: EMAIL__Username
+              value: versity.identity.dev@gmail.com
+            - name: JWT__Audience
+              value: https://versity.users:4001
+            - name: JWT__Issuer
+              value: https://versity.users:4001
+            - name: JWT__Key
+              value: 06AA645D-B70D-446F-90D7-192A5C1CAA6A
+            - name: Mailgun__Private__ApiKey
+              value: 43304ec0eca931e64b1adee47aaab749-135a8d32-174884e4
+            - name: REDIS_Host
+              value: redis.users.versity.dev:6379,password=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+          image: jejikeh/versity.users:latest
+          name: versity-users-service
+          ports:
+            - containerPort: 443
+              protocol: TCP
+            - containerPort: 777
+              protocol: TCP
+          resources: {}
+          volumeMounts:
+            - mountPath: /root/.aspnet/https
+              name: versity-users-service-claim0
+              readOnly: true
+            - mountPath: /root/.microsoft/usersecrets
+              name: versity-users-service-claim1
+              readOnly: true
+      restartPolicy: Always
+      volumes:
+        - name: versity-users-service-claim0
+          persistentVolumeClaim:
+            claimName: versity-users-service-claim0
+            readOnly: true
+        - name: versity-users-service-claim1
+          persistentVolumeClaim:
+            claimName: versity-users-service-claim1
+            readOnly: true
+status: {}

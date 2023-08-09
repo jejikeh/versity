@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Users\jejik\scoop\apps\kompose\current\kompose.exe convert -f .\docker-compose.yml -o .\k8s\
+    kompose.version: 1.30.0 (9d8dcb518)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: control-center
+  name: control-center
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: control-center
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Users\jejik\scoop\apps\kompose\current\kompose.exe convert -f .\docker-compose.yml -o .\k8s\
+        kompose.version: 1.30.0 (9d8dcb518)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/versity-dev: "true"
+        io.kompose.service: control-center
+    spec:
+      containers:
+        - env:
+            - name: CONFLUENT_METRICS_TOPIC_REPLICATION
+              value: "1"
+            - name: CONTROL_CENTER_BOOTSTRAP_SERVERS
+              value: kafka.versity.dev:29092
+            - name: CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS
+              value: "1"
+            - name: CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS
+              value: "1"
+            - name: CONTROL_CENTER_REPLICATION_FACTOR
+              value: "1"
+            - name: CONTROL_CENTER_ZOOKEEPER_CONNECT
+              value: zookeeper:32181
+            - name: PORT
+              value: "9021"
+          image: confluentinc/cp-enterprise-control-center:latest
+          name: control-center
+          ports:
+            - containerPort: 9021
+              hostPort: 9021
+              protocol: TCP
+          resources: {}
+      hostname: control-center
+      restartPolicy: Always
+status: {}

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Users\jejik\scoop\apps\kompose\current\kompose.exe convert -f .\docker-compose.yml -o .\k8s\
+    kompose.version: 1.30.0 (9d8dcb518)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: kibana
+  name: kibana
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: kibana
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Users\jejik\scoop\apps\kompose\current\kompose.exe convert -f .\docker-compose.yml -o .\k8s\
+        kompose.version: 1.30.0 (9d8dcb518)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/versity-dev: "true"
+        io.kompose.service: kibana
+    spec:
+      containers:
+        - env:
+            - name: ELASTICSEARCH_URL
+              value: http://localhost:19200
+          image: docker.elastic.co/kibana/kibana:8.8.0
+          name: kibana
+          ports:
+            - containerPort: 5601
+              hostPort: 5601
+              protocol: TCP
+          resources: {}
+      restartPolicy: Always
+status: {}
