@@ -30,33 +30,35 @@ public class KafkaProductConsumerService : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("--> Kafka Consumer Service is running.");
-        
-        while (!stoppingToken.IsCancellationRequested)
+
+        await ConsumeMessages(stoppingToken);
+    }
+
+    private async Task ConsumeMessages(CancellationToken stoppingToken)
+    {
+        try
         {
-            try 
+            var consumeResult = _consumer.Consume(stoppingToken);
+
+            if (consumeResult?.Message == null || !consumeResult.Topic.Equals(_configuration.Topic))
             {
-                var consumeResult = _consumer.Consume(stoppingToken);
-
-                if (consumeResult?.Message == null || !consumeResult.Topic.Equals(_configuration.Topic))
-                {
-                    continue;
-                }
-
-                _logger.LogInformation($"[{consumeResult.Message.Key}] {consumeResult.Topic} - {consumeResult.Message.Value}");
-
-                using var scope = _serviceProvider.CreateScope();
-                var kafkaHandlersContainer = scope.ServiceProvider.GetRequiredService<IKafkaHandlersContainer>();
-
-                await kafkaHandlersContainer.ProcessMessage(
-                    consumeResult.Message.Key,
-                    consumeResult.Message.Value,
-                    stoppingToken);
+                return;
             }
-            catch (Exception ex)
-            {
-                _logger.LogError($"--> Kafka Consume error: {ex.Message}");
-                break;
-            }
+
+            _logger.LogInformation(
+                $"[{consumeResult.Message.Key}] {consumeResult.Topic} - {consumeResult.Message.Value}");
+
+            using var scope = _serviceProvider.CreateScope();
+            var kafkaHandlersContainer = scope.ServiceProvider.GetRequiredService<IKafkaHandlersContainer>();
+
+            await kafkaHandlersContainer.ProcessMessage(
+                consumeResult.Message.Key,
+                consumeResult.Message.Value,
+                stoppingToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"--> Kafka Consume error: {ex.Message}");
         }
     }
 

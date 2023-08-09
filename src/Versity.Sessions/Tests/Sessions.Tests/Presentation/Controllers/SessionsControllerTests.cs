@@ -131,6 +131,6 @@ public class SessionsControllerTests
         var response = await _sessionsController.CloseSession(id, CancellationToken.None);
         
         // Assert
-        response.Should().BeOfType<OkResult>();
+        response.Should().BeOfType<OkObjectResult>();
     }
 }
