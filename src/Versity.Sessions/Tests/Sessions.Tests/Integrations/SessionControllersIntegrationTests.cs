@@ -29,109 +29,6 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
     }
     
     [Fact]
-    public async Task GetAllLogData_ShouldReturnLogDatas_WhenCommandIsValid()
-    {
-        // Arrange
-        var fakeData = await SeedSessionsEntities();
-
-        // Act
-        var response = await _httpClient.GetAsync(LogDataHttpHelper.GetAllLogsData(1));
-        var content = await response.Content.ReadFromJsonAsync<IEnumerable<LogData>>();
-        
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().NotBeNullOrEmpty();
-        content.Count().Should().BeGreaterOrEqualTo(fakeData.Count);
-    }
-    
-    [Fact]
-    public async Task GetLogDataById_ShouldReturnLogData_WhenCommandIsValid()
-    {
-        // Arrange
-        var (_, _, _, logDatas) = await SeedSessionEntities();
-        var logData = logDatas.First();
-
-        // Act
-        var response = await _httpClient.GetAsync(LogDataHttpHelper.GetLogDataById(logData.Id.ToString()));
-        var content = await response.Content.ReadFromJsonAsync<LogData>();
-        
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().NotBeNull();
-        content.Id.Should().Be(logData.Id);
-        content.Data.Should().Be(logData.Data);
-        content.LogLevel.Should().Be(logData.LogLevel);
-    }
-    
-    [Fact]
-    public async Task CreateLogData_ShouldReturnLogData_WhenCommandIsValid()
-    {
-        // Arrange
-        var (_, _, sessionLogs, _) = await SeedSessionEntities();
-        var command = FakeDataGenerator.GenerateFakeCreateLogDataCommand(sessionLogs.Id);
-        
-        // Act
-        var response = await _httpClient.PostAsJsonAsync(LogDataHttpHelper.CreateLogData(), command);
-        var content = await response.Content.ReadFromJsonAsync<LogData>();
-        
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().NotBeNull();
-        content.Data.Should().Be(command.Data);
-        content.LogLevel.Should().Be(command.LogLevel);
-    }
-    
-    [Fact]
-    public async Task CreateLogsData_ShouldReturnLogData_WhenCommandIsValid()
-    {
-        // Arrange
-        var (_, _, sessionLogs, _) = await SeedSessionEntities();
-        var randomCount = Random.Shared.Next(1, 10);
-        var command = FakeDataGenerator.GenerateFakeCreateLogDataDto(randomCount);
-        
-        // Act
-        var response = await _httpClient.PostAsJsonAsync(LogDataHttpHelper.CreateLogsData(sessionLogs.Id.ToString()), command);
-        var content = await response.Content.ReadFromJsonAsync<IEnumerable<LogData>>();
-        
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().NotBeNull();
-        content.Count().Should().BeGreaterOrEqualTo(randomCount);
-    }
-    
-    [Fact]
-    public async Task GetAllSessionLogs_ShouldReturnSessionsLogs_WhenCommandIsValid()
-    {
-        // Arrange
-        var fakeData = await SeedSessionsEntities();
-        
-        // Act
-        var response = await _httpClient.GetAsync(SessionLogsHttpHelper.GetSessionsLogs(1));
-        var content = await response.Content.ReadFromJsonAsync<IEnumerable<SessionLogs>>();
-        
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().NotBeNullOrEmpty();
-        content.Count().Should().BeGreaterOrEqualTo(fakeData.Select(x => x.Item3).Count());
-    }
-    
-    [Fact]
-    public async Task GetSessionLogsById_ShouldReturnSessionsLogs_WhenCommandIsValid()
-    {
-        // Arrange
-        var (_, _, sessionLogs, _) = await SeedSessionEntities(Guid.Parse(TestUtils.AdminId));
-        
-        // Act
-        var response = await _httpClient.GetAsync(SessionLogsHttpHelper.GetSessionLogsById(sessionLogs.Id.ToString()));
-        var content = await response.Content.ReadFromJsonAsync<SessionLogs>();
-        
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Id.Should().Be(sessionLogs.Id);
-        content.SessionId.Should().Be(sessionLogs.SessionId);
-    }
-
-    [Fact]
     public async Task GetAllSessions_ShouldReturnSessions_WhenCommandIsValid()
     {
         // Arrange
@@ -256,6 +153,109 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().NotBeNull();
         content.Status.Should().Be(SessionStatus.Closed);
+    }
+    
+    [Fact]
+    public async Task GetAllLogData_ShouldReturnLogDatas_WhenCommandIsValid()
+    {
+        // Arrange
+        var fakeData = await SeedSessionsEntities();
+
+        // Act
+        var response = await _httpClient.GetAsync(LogDataHttpHelper.GetAllLogsData(1));
+        var content = await response.Content.ReadFromJsonAsync<IEnumerable<LogData>>();
+        
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().NotBeNullOrEmpty();
+        content.Count().Should().BeGreaterOrEqualTo(fakeData.Count);
+    }
+    
+    [Fact]
+    public async Task GetLogDataById_ShouldReturnLogData_WhenCommandIsValid()
+    {
+        // Arrange
+        var (_, _, _, logDatas) = await SeedSessionEntities();
+        var logData = logDatas.First();
+
+        // Act
+        var response = await _httpClient.GetAsync(LogDataHttpHelper.GetLogDataById(logData.Id.ToString()));
+        var content = await response.Content.ReadFromJsonAsync<LogData>();
+        
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().NotBeNull();
+        content.Id.Should().Be(logData.Id);
+        content.Data.Should().Be(logData.Data);
+        content.LogLevel.Should().Be(logData.LogLevel);
+    }
+    
+    [Fact]
+    public async Task CreateLogData_ShouldReturnLogData_WhenCommandIsValid()
+    {
+        // Arrange
+        var (_, _, sessionLogs, _) = await SeedSessionEntities();
+        var command = FakeDataGenerator.GenerateFakeCreateLogDataCommand(sessionLogs.Id);
+        
+        // Act
+        var response = await _httpClient.PostAsJsonAsync(LogDataHttpHelper.CreateLogData(), command);
+        var content = await response.Content.ReadFromJsonAsync<LogData>();
+        
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().NotBeNull();
+        content.Data.Should().Be(command.Data);
+        content.LogLevel.Should().Be(command.LogLevel);
+    }
+    
+    [Fact]
+    public async Task CreateLogsData_ShouldReturnLogData_WhenCommandIsValid()
+    {
+        // Arrange
+        var (_, _, sessionLogs, _) = await SeedSessionEntities();
+        var randomCount = Random.Shared.Next(1, 10);
+        var command = FakeDataGenerator.GenerateFakeCreateLogDataDto(randomCount);
+        
+        // Act
+        var response = await _httpClient.PostAsJsonAsync(LogDataHttpHelper.CreateLogsData(sessionLogs.Id.ToString()), command);
+        var content = await response.Content.ReadFromJsonAsync<IEnumerable<LogData>>();
+        
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().NotBeNull();
+        content.Count().Should().BeGreaterOrEqualTo(randomCount);
+    }
+    
+    [Fact]
+    public async Task GetAllSessionLogs_ShouldReturnSessionsLogs_WhenCommandIsValid()
+    {
+        // Arrange
+        var fakeData = await SeedSessionsEntities();
+        
+        // Act
+        var response = await _httpClient.GetAsync(SessionLogsHttpHelper.GetSessionsLogs(1));
+        var content = await response.Content.ReadFromJsonAsync<IEnumerable<SessionLogs>>();
+        
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().NotBeNullOrEmpty();
+        content.Count().Should().BeGreaterOrEqualTo(fakeData.Select(x => x.Item3).Count());
+    }
+    
+    [Fact]
+    public async Task GetSessionLogsById_ShouldReturnSessionsLogs_WhenCommandIsValid()
+    {
+        // Arrange
+        var (_, _, sessionLogs, _) = await SeedSessionEntities(Guid.Parse(TestUtils.AdminId));
+        
+        // Act
+        var response = await _httpClient.GetAsync(SessionLogsHttpHelper.GetSessionLogsById(sessionLogs.Id.ToString()));
+        var content = await response.Content.ReadFromJsonAsync<SessionLogs>();
+        
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Id.Should().Be(sessionLogs.Id);
+        content.SessionId.Should().Be(sessionLogs.SessionId);
     }
 
     private async Task<(Session, Product, SessionLogs, List<LogData>)> SeedSessionEntities()

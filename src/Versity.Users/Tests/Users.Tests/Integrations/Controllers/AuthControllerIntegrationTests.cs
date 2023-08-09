@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using Application.Abstractions.Repositories;
-using Application.RequestHandlers.Auth.Commands.ConfirmEmail;
 using Application.RequestHandlers.Auth.Commands.LoginVersityUser;
 using Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
 using Application.RequestHandlers.Auth.Commands.ResendEmailVerificationToken;
@@ -17,6 +16,7 @@ using Utils = Application.Common.Utils;
 
 namespace Users.Tests.Integrations.Controllers;
 
+[Collection("Integration Tests")]
 public class AuthControllerIntegrationTests : IClassFixture<ControllersAppFactoryFixture>
 {
     private readonly HttpClient _httpClient;
@@ -82,6 +82,11 @@ public class AuthControllerIntegrationTests : IClassFixture<ControllersAppFactor
         
         // Act
         var response = await _httpClient.PostAsJsonAsync(HttpHelper.Register(), command);
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            throw new Exception(content);
+        }
         
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -138,6 +143,11 @@ public class AuthControllerIntegrationTests : IClassFixture<ControllersAppFactor
         
         // Act
         var response = await _httpClient.PostAsJsonAsync(HttpHelper.RefreshJwtToken(user.Id, token), user.Id);
+        if (response.StatusCode == HttpStatusCode.InternalServerError)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            throw new Exception(content);
+        }
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

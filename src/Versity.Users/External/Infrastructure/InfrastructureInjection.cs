@@ -25,7 +25,11 @@ public static class InfrastructureInjection
             options.EnableDetailedErrors();
             options.UseNpgsql(
                 connectionString,
-                builder => builder.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName));
+                builder =>
+                {
+                    builder.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
+                    builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+                });
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         });
 

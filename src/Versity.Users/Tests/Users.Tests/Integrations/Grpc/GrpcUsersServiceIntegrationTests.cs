@@ -8,6 +8,7 @@ using Users.Tests.Integrations.Helpers.Mocks;
 
 namespace Users.Tests.Integrations.Grpc;
 
+[Collection("Integration Tests")]
 public class GrpcUsersServiceIntegrationTests : IClassFixture<GrpcAppFactoryFixture>
 {
     private readonly GrpcAppFactoryFixture _grpcAppFactoryFixture;

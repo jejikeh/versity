@@ -2,6 +2,9 @@
 using System.Net.Http.Json;
 using Application.Abstractions.Repositories;
 using Application.Dtos;
+using Application.RequestHandlers.Auth.Commands.LoginVersityUser;
+using Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
+using Application.RequestHandlers.Auth.Commands.ResendEmailVerificationToken;
 using Bogus;
 using Domain.Models;
 using DotNet.Testcontainers.Builders;
@@ -10,6 +13,7 @@ using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services.TokenServices;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using Presentation.Configuration;
 using Users.Tests.Integrations.Fixtures;
 using Users.Tests.Integrations.Helpers;
@@ -18,7 +22,7 @@ using Utils = Application.Common.Utils;
 
 namespace Users.Tests.Integrations.Controllers;
 
-[TestCaseOrderer(PriorityOrderer.Name, PriorityOrderer.Assembly)]
+[Collection("Integration Tests")]
 public class UsersControllerIntegrationTests : IClassFixture<ControllersAppFactoryFixture>
 {
     private readonly HttpClient _httpClient;
@@ -42,7 +46,7 @@ public class UsersControllerIntegrationTests : IClassFixture<ControllersAppFacto
         response.EnsureSuccessStatusCode();
     }
 
-    [Fact, Priority(-10)]
+    [Fact]
     public async Task GetUserById_ShouldReturnUser_WhenUserExists()
     {
         // Act
