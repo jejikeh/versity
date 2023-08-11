@@ -19,21 +19,18 @@ namespace Sessions.IntegrationTests.Fixture
     {
         private readonly PostgreSqlContainer _dbContainer;
         private readonly RedisContainer _redisContainer;
-        private readonly KafkaContainer _kafkaContainer;
     
         public ControllersAppFactoryFixture()
         {
             _dbContainer = new PostgreSqlBuilder().Build();
             _redisContainer = new RedisBuilder().Build();
-            _kafkaContainer = new KafkaBuilder().WithImage("confluentinc/cp-kafka:latest").Build();
         }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             TestUtils.SeedEnvironmentVariables(
                 _dbContainer.GetConnectionString(),
-                _redisContainer.GetConnectionString(),
-                _kafkaContainer.GetBootstrapAddress());
+                _redisContainer.GetConnectionString());
 
             builder.ConfigureTestServices(services =>
             {
@@ -49,14 +46,12 @@ namespace Sessions.IntegrationTests.Fixture
         {
             await _dbContainer.StartAsync();
             await _redisContainer.StartAsync();
-            await _kafkaContainer.StartAsync();
         }
 
         public new async Task DisposeAsync()
         {
             await _dbContainer.StopAsync();
             await _redisContainer.StopAsync();
-            await _kafkaContainer.StopAsync();
         }
     }
 }

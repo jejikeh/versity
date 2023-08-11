@@ -9,7 +9,7 @@ namespace Infrastructure.Services.KafkaConsumer;
 public class KafkaProductConsumerService : BackgroundService
 {
     private readonly ILogger<KafkaProductConsumerService> _logger;
-    private readonly IConsumer<string, string> _consumer;
+    private readonly IConsumer<string, string>? _consumer;
     private readonly IKafkaConsumerConfiguration _configuration;
     private readonly IServiceProvider _serviceProvider;
 
@@ -22,9 +22,12 @@ public class KafkaProductConsumerService : BackgroundService
         _configuration = configuration;
         _serviceProvider = serviceProvider;
 
-        _consumer = new ConsumerBuilder<string, string>(_configuration.Config)
-            .SetErrorHandler((_, e) => _logger.LogError($"Kafka Exception: ErrorCode:[{e.Code}] Reason:[{e.Reason}] Message:[{e.ToString()}]"))
-            .Build();
+        if (Environment.GetEnvironmentVariable("KAFKA_Host") != "no_set")
+        {
+            _consumer = new ConsumerBuilder<string, string>(_configuration.Config)
+                .SetErrorHandler((_, e) => _logger.LogError($"Kafka Exception: ErrorCode:[{e.Code}] Reason:[{e.Reason}] Message:[{e.ToString()}]"))
+                .Build();
+        }
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -36,6 +39,9 @@ public class KafkaProductConsumerService : BackgroundService
 
     private async Task ConsumeMessages(CancellationToken stoppingToken)
     {
+        if (_consumer is null)
+            return;
+        
         try
         {
             var consumeResult = _consumer.Consume(stoppingToken);
@@ -65,6 +71,9 @@ public class KafkaProductConsumerService : BackgroundService
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("--> Kafka Consumer Service has started.");
+
+        if (_consumer is null)
+            return;
         
         _consumer.Subscribe(new List<string>() { _configuration.Topic });
         
@@ -75,6 +84,9 @@ public class KafkaProductConsumerService : BackgroundService
     {
         _logger.LogInformation("--> Kafka Consumer Service is stopping.");
 
+        if (_consumer is null)
+            return;
+        
         _consumer.Close();
 
         await base.StopAsync(cancellationToken);

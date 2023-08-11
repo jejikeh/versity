@@ -55,6 +55,6 @@ public class ProductsServiceAppFactoryFixture : WebApplicationFactory<Program>, 
     {
         await _dbContainer.StopAsync();
         await _redisContainer.StopAsync();
-        await _kafkaContainer.StartAsync();
+        await _kafkaContainer.StopAsync();
     }
 }
