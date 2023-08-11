@@ -9,7 +9,7 @@ namespace Products.Tests.Integrations.Helpers;
 
 public class JwtTokenGeneratorService
 {
-    public string GenerateToken(string userId, string userEmail, IEnumerable<string> roles)
+    public static string GenerateToken(string userId, string userEmail, IEnumerable<string> roles)
     {
         var claims = new List<Claim>()
         {

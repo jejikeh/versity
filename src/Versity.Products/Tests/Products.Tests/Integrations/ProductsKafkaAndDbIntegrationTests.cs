@@ -31,7 +31,7 @@ public class ProductsKafkaAndDbIntegrationTests : IClassFixture<ProductsServiceA
         _consumerService?.Start();
         
         var jwtTokenGeneratorService = new JwtTokenGeneratorService();
-        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
+        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + JwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
     }
     
     [Fact]

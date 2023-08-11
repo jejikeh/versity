@@ -25,7 +25,7 @@ public class CachedRefreshTokensRepositoryTests
     public async Task GetAllAsync_ShouldReturnAllRefreshTokens_WhenEmptyValueInCacheKey()
     {
         // Arrange
-        var refreshTokens = GenerateFakeProductsList();
+        var refreshTokens = GenerateFakeRefreshTokenList();
 
         _distributedCache.Setup(cacheService =>
                 cacheService.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<IEnumerable<RefreshToken>?>>>()))
@@ -45,7 +45,7 @@ public class CachedRefreshTokensRepositoryTests
     public async Task FindUserTokenAsync_ShouldReturnRefreshToken_WhenValueInCacheKey()
     {
         // Arrange
-        var refreshTokens = GenerateFakeProductsList().ToList();
+        var refreshTokens = GenerateFakeRefreshTokenList().ToList();
 
         _distributedCache.Setup(cacheService =>
                 cacheService.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<RefreshToken?>>>()))
@@ -94,7 +94,7 @@ public class CachedRefreshTokensRepositoryTests
             Times.Once);
     }
     
-    private static IEnumerable<RefreshToken> GenerateFakeProductsList()
+    private static IEnumerable<RefreshToken> GenerateFakeRefreshTokenList()
     {
         return Enumerable.Range(0, 10).Select(_ => new RefreshToken() { Token = new Guid().ToString() }).ToList();
     }

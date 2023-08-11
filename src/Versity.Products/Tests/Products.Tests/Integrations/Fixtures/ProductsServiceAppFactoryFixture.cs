@@ -21,7 +21,7 @@ public class ProductsServiceAppFactoryFixture : WebApplicationFactory<Program>, 
     {
         _dbContainer = new PostgreSqlBuilder().Build();
         _redisContainer = new RedisBuilder().Build();
-        _kafkaContainer = new KafkaBuilder().Build();
+        _kafkaContainer = new KafkaBuilder().WithImage("confluentinc/cp-kafka:latest").Build();
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
