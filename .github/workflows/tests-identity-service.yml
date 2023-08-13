@@ -20,7 +20,25 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.0.x
-        
+      env:
+        AdminId: ${{ secrets.TEST_ADMIN_ID }}
+        AdminEmail: ${{ secrets.TEST_ADMIN_Email }}
+        AdminPassword: ${{ secrets.TEST_ADMIN_Password }}
+        JwtIssuer: ${{ secrets.TEST_JWT_ISSUER }}
+        JWtAudience: ${{ secrets.TEST_JWT_AUDIENCE }}
+        JwtKey: ${{ secrets.TEST_JWT_KEY }}
+    
+    - name: Setup UserSecrets
+      shell: bash
+      run: |
+        dotnet user-secrets init --project ./src/Versity.Users/External/Presentation
+        dotnet user-secrets set "Admin:Id" "$AdminId" --project ./src/Versity.Users/External/Presentation
+        dotnet user-secrets set "Admin:Email" "$AdminEmail" --project ./src/Versity.Users/External/Presentation
+        dotnet user-secrets set "Admin:Password" "$AdminPassword" --project ./src/Versity.Users/External/Presentation
+        dotnet user-secrets set "Jwt:Issuer" "$JwtIssuer" --project ./src/Versity.Users/External/Presentation
+        dotnet user-secrets set "Jwt:Audience" "$JwtAudience" --project ./src/Versity.Users/External/Presentation
+        dotnet user-secrets set "Jwt:Key" "$JwtKey" --project ./src/Versity.Users/External/Presentation
+          
     - name: Restore dependencies
       run: dotnet restore ./src/Versity.Users/External/Presentation/Presentation.csproj
       
