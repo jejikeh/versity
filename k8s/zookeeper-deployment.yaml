@@ -35,7 +35,6 @@ spec:
           name: zookeeper
           ports:
             - containerPort: 32181
-              hostPort: 32181
               protocol: TCP
           resources: {}
       hostname: zookeeper

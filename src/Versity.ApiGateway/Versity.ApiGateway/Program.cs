@@ -1,21 +1,19 @@
 using Versity.ApiGateway.Extensions;
 
-var builder = WebApplication
-    .CreateBuilder(args)
-    .ConfigureBuilder();
+namespace Versity.ApiGateway;
 
-var app = await builder
-    .Build()
-    .ConfigureApplication();
+public class Program
+{
+    public static async Task Main(string[] args)
+    {
+        var builder = WebApplication
+            .CreateBuilder(args)
+            .ConfigureBuilder();
 
-using var scope = app.Services.CreateScope();
-var serviceProvider = scope.ServiceProvider;
-try
-{
-    app.Run();
-}
-catch (Exception ex)
-{
-    var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "Host terminated unexpectedly");
+        var application = await builder
+            .Build()
+            .ConfigureApplication();
+
+        await application.RunApplicationAsync();
+    }
 }

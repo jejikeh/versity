@@ -30,7 +30,6 @@
 
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Versity.Users\External\Presentation\Presentation.csproj" />
       <ProjectReference Include="..\..\Core\Application\Application.csproj" />
       <ProjectReference Include="..\..\Core\Domain\Domain.csproj" />
       <ProjectReference Include="..\..\External\Infrastructure\Infrastructure.csproj" />

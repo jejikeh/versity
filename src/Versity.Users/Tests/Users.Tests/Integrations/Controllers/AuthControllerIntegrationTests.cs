@@ -8,6 +8,7 @@ using Bogus;
 using Domain.Models;
 using FluentAssertions;
 using Infrastructure.Services.TokenServices;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Presentation.Configuration;
 using Users.Tests.Integrations.Fixtures;
@@ -27,7 +28,9 @@ public class AuthControllerIntegrationTests : IClassFixture<ControllersAppFactor
         _controllersAppControllersAppFactory = controllersAppFactoryFixture;
         _httpClient = controllersAppFactoryFixture.CreateClient();
         
-        var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration());
+        using var scope = _controllersAppControllersAppFactory.Services.CreateScope();
+        var configuration = scope.ServiceProvider.GetService<IConfiguration>();
+        var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration(configuration));
         _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
     }
 

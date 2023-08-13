@@ -25,7 +25,13 @@ public static class ProgramExtensions
     
     public static async Task<WebApplication> ConfigureApplication(this WebApplication app)
     {
-        app.UseHttpsRedirection();
+        // if we will be deploying in kubernetes, then https and ssl certificates
+        // will be managing by kubernetes ingress
+        if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "false")
+        {
+            app.UseHttpsRedirection();
+        }
+        
         app.UseAuthorization();
         app.UseAuthentication();
         app.UseCors("AllowAll");
@@ -33,6 +39,24 @@ public static class ProgramExtensions
         await app.UseOcelot();
 
         return app;
+    }
+
+    public static async Task<WebApplication> RunApplicationAsync(this WebApplication application)
+    {
+        using var scope = application.Services.CreateScope();
+        var serviceProvider = scope.ServiceProvider;
+        
+        try
+        {
+            await application.RunAsync();
+        }
+        catch (Exception ex)
+        {
+            var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "Host terminated unexpectedly");
+        }
+        
+        return application;
     }
     
     private static CorsOptions ConfigureFrontendCors(this CorsOptions options)
@@ -43,6 +67,7 @@ public static class ProgramExtensions
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials()
+                // i fix this after deploying frontend to kubernetes
                 .WithOrigins("http://localhost:3000");
         });
         

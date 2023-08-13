@@ -33,7 +33,6 @@ spec:
           name: kibana
           ports:
             - containerPort: 5601
-              hostPort: 5601
               protocol: TCP
           resources: {}
       restartPolicy: Always

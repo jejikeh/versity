@@ -12,6 +12,7 @@ using FluentAssertions;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services.TokenServices;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using Presentation.Configuration;
@@ -32,7 +33,10 @@ public class UsersControllerIntegrationTests : IClassFixture<ControllersAppFacto
     {
         _controllersAppFactory = factoryUsersController;
         _httpClient = factoryUsersController.CreateClient();
-        var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration());
+
+        using var scope = _controllersAppFactory.Services.CreateScope();
+        var configuration = scope.ServiceProvider.GetService<IConfiguration>();
+        var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration(configuration));
         _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
     }
     
@@ -64,7 +68,7 @@ public class UsersControllerIntegrationTests : IClassFixture<ControllersAppFacto
     public async Task ChangeUserPassword_ShouldReturnValidationError_WhenPasswordTooShort()
     {
         // Arrange
-        var command = new ChangeUserPasswordDto("admin", "new_admin");
+        var command = new ChangeUserPasswordDto("versity.Adm1n.dev-31_13%versity", "new_admin");
         
         // Act
         var response = await _httpClient.PutAsJsonAsync(HttpHelper.ChangeUserPassword("4e274126-1d8a-4dfd-a025-806987095809"), command);
@@ -77,10 +81,16 @@ public class UsersControllerIntegrationTests : IClassFixture<ControllersAppFacto
     public async Task ChangeUserPassword_ShouldChangePassword_WhenPasswordIsStrong()
     {
         // Arrange
-        var command = new ChangeUserPasswordDto("admin", "neW_admin!123");
+        using var scope = _controllersAppFactory.Services.CreateScope();
+        var repository = scope.ServiceProvider.GetService<IVersityUsersRepository>();
+        var (user, password) = await VersityUserSeeder.SeedUserDataAsync(repository);
+        var faker = new Faker();
+        var command = new ChangeUserPasswordDto(
+            password,
+            faker.Internet.Password(5) + $"!{Utils.GenerateRandomString(2)}!p1A2");
         
         // Act
-        var response = await _httpClient.PutAsJsonAsync(HttpHelper.ChangeUserPassword("4e274126-1d8a-4dfd-a025-806987095809"), command);
+        var response = await _httpClient.PutAsJsonAsync(HttpHelper.ChangeUserPassword(user.Id), command);
         
         // Act
         response.EnsureSuccessStatusCode();

@@ -11,10 +11,10 @@ public static class TestUtils
     
     public static void SeedEnvironmentVariables(string dbConnectionString, string redisConnectionString, string elasticSearchConnectionString = "no_set")
     {
-        Environment.SetEnvironmentVariable("ConnectionString", dbConnectionString);
-        Environment.SetEnvironmentVariable("REDIS_Host", redisConnectionString);
+        Environment.SetEnvironmentVariable("TEST_ConnectionString", dbConnectionString);
+        Environment.SetEnvironmentVariable("TEST_CacheHost", redisConnectionString);
         Environment.SetEnvironmentVariable("ElasticConfiguration:Uri", elasticSearchConnectionString);
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production");
         Environment.SetEnvironmentVariable("ADMIN__Password", "admin");
         Environment.SetEnvironmentVariable("ADMIN__Email", "admin@mail.com");
         Environment.SetEnvironmentVariable("JWT__Issuer", "testing");

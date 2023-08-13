@@ -45,7 +45,6 @@ spec:
           name: control-center
           ports:
             - containerPort: 9021
-              hostPort: 9021
               protocol: TCP
           resources: {}
       hostname: control-center
