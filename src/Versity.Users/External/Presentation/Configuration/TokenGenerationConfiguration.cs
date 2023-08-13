@@ -5,12 +5,21 @@ namespace Presentation.Configuration;
 
 public class TokenGenerationConfiguration : ITokenGenerationConfiguration
 {
-    public string Issuer { get; } = Environment.GetEnvironmentVariable("JWT__Issuer") ?? "none";
-    public string Audience { get; } = Environment.GetEnvironmentVariable("JWT__Audience") ?? "none";
-    public string Key { get; } = Environment.GetEnvironmentVariable("JWT__Key") ?? "none";
+    public string Issuer { get; }
+    public string Audience { get; }
+    public string Key { get; }
 
     public TokenGenerationConfiguration(IConfiguration configuration)
     {
+        if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TEST_ConnectionString")))
+        {
+            Issuer = "versity.identity";
+            Audience = "versity.identity";
+            Key = "865D92FD-B1C8-41A4-850F-409792C9B740";
+            
+            return;
+        }
+        
         Issuer = configuration["Jwt:Issuer"] ?? throw new UserSecretsInvalidException("setup-jwt-issuer-secret");
         Audience = configuration["Jwt:Audience"] ?? throw new UserSecretsInvalidException("setup-jwt-audience-secret");
         Key = configuration["Jwt:Key"] ?? throw new UserSecretsInvalidException("setup-jwt-key-secrets");

@@ -18,14 +18,27 @@ public class AdminSeederConfiguration : IEntityTypeConfiguration<VersityUser>
 
     public void Configure(EntityTypeBuilder<VersityUser> builder)
     {
+        string id, email, password;
+        
+        if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TEST_ConnectionString")))
+        {
+            id = "4e274126-1d8a-4dfd-a025-806987095809";
+            email = "versity.identity.dev@gmail.com";
+            password = "versity.Adm1n.dev-31_13%versity";
+        }
+        else
+        {
+            id = _configuration["Admin:Id"] ?? throw new UserSecretsInvalidException("setup-admin-id-secret");
+            email = _configuration["Admin:Email"] ?? throw new UserSecretsInvalidException("setup-admin-email-secret");
+            password = _configuration["Admin:Password"] ?? throw new UserSecretsInvalidException("setup-admin-password-secret");
+        }
+        
         var user = new VersityUser
         {
-            Id = _configuration["Admin:Id"] 
-                 ?? throw new UserSecretsInvalidException("setup-admin-id-secret"),
+            Id = id,
             UserName = "Versity Admin",
-            Email = _configuration["Admin:Email"] 
-                    ?? throw new UserSecretsInvalidException("setup-admin-email-secret"),
-            NormalizedEmail = _configuration["Admin:Email"]!.ToUpper(),
+            Email = email,
+            NormalizedEmail = email.ToUpper(),
             NormalizedUserName = "VERSITY ADMIN",
             EmailConfirmed = true,
             FirstName = "Versity",
@@ -35,10 +48,7 @@ public class AdminSeederConfiguration : IEntityTypeConfiguration<VersityUser>
         };
         
         var passwordHasher = new PasswordHasher<VersityUser>();
-        user.PasswordHash = passwordHasher.HashPassword(
-            user, 
-            _configuration["Admin:Password"] ?? throw new UserSecretsInvalidException("setup-admin-password-secret"));
-        
+        user.PasswordHash = passwordHasher.HashPassword(user, password);
         builder.HasData(user);
     }
 }

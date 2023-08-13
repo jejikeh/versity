@@ -20,6 +20,7 @@ public static class ProgramExtensions
     public static WebApplicationBuilder ConfigureBuilder(this WebApplicationBuilder builder)
     {
         var applicationConfiguration = new ApplicationConfiguration(builder.Configuration);
+        var tokenGenerationConfiguration = new TokenGenerationConfiguration(builder.Configuration);
         
         builder.Services
             .AddDbContext(applicationConfiguration)
@@ -29,8 +30,8 @@ public static class ProgramExtensions
             .AddVersityIdentity()
             .AddServices(
                 new EmailServicesConfiguration(), 
-                new TokenGenerationConfiguration(builder.Configuration))
-            .AddJwtAuthentication(builder.Configuration)
+                tokenGenerationConfiguration)
+            .AddJwtAuthentication(tokenGenerationConfiguration)
             .AddSwagger()
             .AddCors(options => options.ConfigureAllowAllCors())
             .AddEndpointsApiExplorer()

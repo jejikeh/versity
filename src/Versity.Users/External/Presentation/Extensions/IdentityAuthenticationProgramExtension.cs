@@ -6,6 +6,7 @@ using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Presentation.Configuration;
 
 namespace Presentation.Extensions;
 
@@ -29,7 +30,9 @@ public static class IdentityAuthenticationProgramExtension
         return serviceCollection;
     }
 
-    public static IServiceCollection AddJwtAuthentication(this IServiceCollection serviceCollection, IConfiguration configuration)
+    public static IServiceCollection AddJwtAuthentication(
+        this IServiceCollection serviceCollection, 
+        TokenGenerationConfiguration tokenGenerationConfiguration)
     {
         serviceCollection.AddAuthentication(options =>
         {
@@ -44,9 +47,9 @@ public static class IdentityAuthenticationProgramExtension
                 ValidateAudience = true,
                 RequireExpirationTime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = Environment.GetEnvironmentVariable("JWT__Issuer") ?? configuration.GetSection("Jwt:Issuer").Value,
-                ValidAudience = Environment.GetEnvironmentVariable("JWT__Audience") ?? configuration.GetSection("Jwt:Audience").Value,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT__Key") ?? configuration.GetSection("Jwt:Key").Value))
+                ValidIssuer = tokenGenerationConfiguration.Issuer,
+                ValidAudience = tokenGenerationConfiguration.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenGenerationConfiguration.Key))
             };
         });
 
