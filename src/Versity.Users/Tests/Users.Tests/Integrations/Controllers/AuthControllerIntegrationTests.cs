@@ -31,7 +31,10 @@ public class AuthControllerIntegrationTests : IClassFixture<ControllersAppFactor
         using var scope = _controllersAppControllersAppFactory.Services.CreateScope();
         var configuration = scope.ServiceProvider.GetService<IConfiguration>();
         var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration(configuration));
-        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
+        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(
+            TestUtils.AdminId, 
+            TestUtils.AdminEmail, 
+            new List<string> { "Admin" }));
     }
 
     [Fact]

@@ -37,7 +37,10 @@ public class UsersControllerIntegrationTests : IClassFixture<ControllersAppFacto
         using var scope = _controllersAppFactory.Services.CreateScope();
         var configuration = scope.ServiceProvider.GetService<IConfiguration>();
         var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration(configuration));
-        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
+        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(
+            TestUtils.AdminId, 
+            TestUtils.AdminEmail, 
+            new List<string> { "Admin" }));
     }
     
     [Fact]
@@ -61,7 +64,7 @@ public class UsersControllerIntegrationTests : IClassFixture<ControllersAppFacto
         response.EnsureSuccessStatusCode();
         result.Should().NotBeNull();
         result.Role.Should().Contain("Admin");
-        result.Email.Should().Be("admin@mail.com");
+        result.Email.Should().Be(TestUtils.AdminEmail);
     }
 
     [Fact]
