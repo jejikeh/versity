@@ -13,9 +13,25 @@ public class VersityProductsRepository : IVersityProductsRepository
         _context = context;
     }
 
-    public IQueryable<Product> GetAllProducts()
+    public async Task<IEnumerable<Product>> GetProductsAsync(
+        int? skipEntitiesCount, 
+        int? takeEntitiesCount,
+        CancellationToken cancellationToken)
     {
-        return _context.Products.AsQueryable();
+        if (skipEntitiesCount is null && takeEntitiesCount is null)
+        {
+            return await _context.Products
+                .AsQueryable()
+                .OrderBy(refreshToken => refreshToken.Release)
+                .ToListAsync(cancellationToken);
+        }
+        
+        return await _context.Products
+            .AsQueryable()
+            .OrderBy(refreshToken => refreshToken.Release)
+            .Skip(skipEntitiesCount ?? 0)
+            .Take(takeEntitiesCount ?? 10)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<Product?> GetProductByIdAsync(Guid id, CancellationToken cancellationToken)

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: products-db-service
+spec:
+  selector:
+    app: products-db
+    app.kubernetes.io/name: products-db
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP

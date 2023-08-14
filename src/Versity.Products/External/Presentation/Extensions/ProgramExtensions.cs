@@ -1,5 +1,6 @@
 ﻿using Application;
 using Infrastructure;
+using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.OpenApi.Models;
 using Presentation.Configuration;
@@ -11,19 +12,34 @@ public static class ProgramExtensions
 {
     public static WebApplicationBuilder ConfigureBuilder(this WebApplicationBuilder builder)
     {
+        var applicationConfiguration = new ApplicationConfiguration(builder.Configuration);
+        var tokenGenerationConfiguration = new TokenGenerationConfiguration(builder.Configuration);
+        var kafkaProducerConfiguration = new KafkaProducerConfiguration(builder.Configuration);
+        
         builder.Services
-            .AddDbContext(builder.Configuration)
+            .AddDbContext(applicationConfiguration)
             .AddRepositories()
-            .AddRedisCaching()
+            .AddRedisCaching(applicationConfiguration)
             .AddApplication()
-            .AddKafkaFlow()
-            .AddKafkaServices(new KafkaProducerConfiguration())
-            .AddJwtAuthentication(builder.Configuration)
+            .AddJwtAuthentication(tokenGenerationConfiguration)
             .AddSwagger()
             .AddCors(options => options.ConfigureAllowAllCors())
             .AddEndpointsApiExplorer()
             .AddControllers();
 
+        if (!string.Equals(kafkaProducerConfiguration.ProducerName, "NO_SET"))
+        {
+            builder.Services
+                .AddKafkaServices(kafkaProducerConfiguration)
+                .AddKafkaFlow(kafkaProducerConfiguration);
+        }
+        else
+        {
+            builder.Services.AddFallbackKafkaServices(kafkaProducerConfiguration);
+        }
+        
+        builder.AddLoggingServices(applicationConfiguration);
+        
         return builder;
     }
     
@@ -48,6 +64,27 @@ public static class ProgramExtensions
         app.MapControllers();
         
         return app;
+    }
+    
+    public static async Task<WebApplication> RunApplicationAsync(this WebApplication webApplication)
+    {
+        using var scope = webApplication.Services.CreateScope();
+        var serviceProvider = scope.ServiceProvider;
+        
+        try
+        {
+            var versityProductsDbContext = serviceProvider.GetRequiredService<VersityProductsDbContext>();
+            await versityProductsDbContext.Database.EnsureCreatedAsync();
+            
+            await webApplication.RunAsync();
+        }
+        catch (Exception ex)
+        {
+            var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "Host terminated unexpectedly");
+        }
+
+        return webApplication;
     }
     
     private static CorsOptions ConfigureAllowAllCors(this CorsOptions options)

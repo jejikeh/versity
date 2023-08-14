@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products-db-deployment
+  labels:
+    app: products-db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: products-db
+  template:
+    metadata:
+      name: products-db
+      labels:
+        app: products-db
+        app.kubernetes.io/name: products-db
+    spec:
+      containers:
+        - name: products-db
+          image: postgres:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DATABASE
+              value: products-db
+            - name: POSTGRES_PASSWORD
+              value: products-service
+            - name: POSTGRES_USER
+              value: products-service
+          volumeMounts:
+            - mountPath: "/var/lib/postgresql/data"
+              name: products-volume
+      volumes:
+        - name: products-volume
+          persistentVolumeClaim:
+            claimName: products-volume-claim
+      restartPolicy: Always

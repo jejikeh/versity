@@ -15,9 +15,12 @@ public class CachedProductsRepository : IVersityProductsRepository
         _distributedCache = distributedCache;
     }
 
-    public IQueryable<Product> GetAllProducts()
+    public Task<IEnumerable<Product>> GetProductsAsync(
+        int? skipEntitiesCount, 
+        int? takeEntitiesCount,
+        CancellationToken cancellationToken)
     {
-        return _productsRepository.GetAllProducts();
+        return _productsRepository.GetProductsAsync(skipEntitiesCount, takeEntitiesCount, cancellationToken);
     }
 
     public async Task<Product?> GetProductByIdAsync(Guid id, CancellationToken cancellationToken)

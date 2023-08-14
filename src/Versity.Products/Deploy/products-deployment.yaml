@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products-deployment
+  labels:
+    app: products-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: products
+  template:
+    metadata:
+      name: products
+      labels:
+        app: products
+        app.kubernetes.io/name: products
+    spec:
+      containers:
+        - name: products-deployment
+          image: jejikeh/versity.products
+          ports:
+            - containerPort: 443
+              name: https-web-api
+            - containerPort: 80
+              name: http-web-api
+          env:
+            - name: ASPNETCORE_URLS
+              value: http://+80
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /health-check
+              port: 80
+          readinessProbe:
+            httpGet:
+              path: /health-check
+              port: 80
+          volumeMounts:
+            - mountPath: /app/appsettings.Production.json
+              subPath: appsettings.Production.json
+              name: products-secret-appsettings
+      restartPolicy: Always
+      volumes:
+        - name: products-secret-appsettings
+          secret:
+            secretName: secret-products-appsettings

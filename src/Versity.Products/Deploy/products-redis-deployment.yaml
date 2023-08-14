@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products-redis-deployment
+  labels:
+    app: products-redis-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: products-redis
+  template:
+    metadata:
+      name: products-redis
+      labels:
+        app: products-redis
+        app.kubernetes.io/name: products-redis
+    spec:
+      containers:
+        - name: products-redis
+          image: redis/redis-stack:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6379
+          env:
+            - name: REDIS_ARGS
+              value: --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+          volumeMounts:
+            - mountPath: "/var/lib/postgresql/data"
+              name: products-volume-cache
+      volumes:
+        - name: products-volume-cache
+          persistentVolumeClaim:
+            claimName: products-volume-claim-cache
+      restartPolicy: Always
