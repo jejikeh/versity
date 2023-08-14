@@ -9,7 +9,7 @@ public class ProductsConfiguration : IEntityTypeConfiguration<Product>
     public void Configure(EntityTypeBuilder<Product> builder)
     {
         builder
-            .HasMany<Session>()
-            .WithOne();
+            .HasMany(product => product.Sessions)
+            .WithOne(session => session.Product);
     }
 }

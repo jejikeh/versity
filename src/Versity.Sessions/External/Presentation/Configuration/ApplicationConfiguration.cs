@@ -40,7 +40,7 @@ public class ApplicationConfiguration : IApplicationConfiguration
     
     private bool SetupDbConnectionString(IConfiguration configuration)
     {
-        var dbConnectionString = configuration.GetConnectionString("ProductsDbContext");
+        var dbConnectionString = configuration.GetConnectionString("SessionsDbContext");
         var cacheConnectionString = configuration.GetConnectionString("CacheDbContext");
 
         // This is used for test environment. I could use appsettings.Integrations.json,
@@ -73,7 +73,7 @@ public class ApplicationConfiguration : IApplicationConfiguration
         
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
         IsDevelopmentEnvironment = true;
-        DatabaseConnectionString = "Data Source=IdentityContext.db";
+        DatabaseConnectionString = "Data Source=SessionsContext.db";
         
         return true;
     }

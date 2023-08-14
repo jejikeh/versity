@@ -74,14 +74,6 @@ public static class InfrastructureInjection
         return serviceCollection;
     }
     
-    public static IServiceCollection AddFallbackKafkaServices(this IServiceCollection serviceCollection, IKafkaProducerConfiguration configuration)
-    {
-        serviceCollection.AddSingleton(configuration);
-        serviceCollection.AddTransient<IProductProducerService, FallbackKafkaProductProducerService>();
-
-        return serviceCollection;
-    }
-    
     public static IServiceCollection AddRedisCaching(
         this IServiceCollection serviceCollection,
         IApplicationConfiguration configuration)

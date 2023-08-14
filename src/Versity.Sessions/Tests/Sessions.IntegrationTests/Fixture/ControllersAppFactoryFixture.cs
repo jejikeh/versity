@@ -34,9 +34,6 @@ namespace Sessions.IntegrationTests.Fixture
 
             builder.ConfigureTestServices(services =>
             {
-                services.RemoveAll<KafkaConsumerConfiguration>();
-                services.UseKafkaConsumer(new KafkaConsumerConfiguration());
-
                 services.RemoveAll<IVersityUsersDataService>();
                 services.AddScoped<IVersityUsersDataService, GrpcUsersServiceMock>();
             });

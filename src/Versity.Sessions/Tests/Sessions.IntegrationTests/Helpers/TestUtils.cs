@@ -10,13 +10,13 @@ public static class TestUtils
         string kafkaConnectionString = "no_set",
         string elasticsearchConnectionString = "no_set")
     {
-        Environment.SetEnvironmentVariable("ConnectionString", dbConnectionString);
-        Environment.SetEnvironmentVariable("REDIS_Host", redisConnectionString);
+        Environment.SetEnvironmentVariable("TEST_ConnectionString", dbConnectionString);
+        Environment.SetEnvironmentVariable("TEST_CacheHost", redisConnectionString);
         Environment.SetEnvironmentVariable("ElasticConfiguration:Uri", elasticsearchConnectionString);
         Environment.SetEnvironmentVariable("KAFKA_Host", kafkaConnectionString);
         Environment.SetEnvironmentVariable("KAFKA_ProducerName", "versity.products.tests");
         Environment.SetEnvironmentVariable("KAFKA_Topic", "versity.products");
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Production");
         Environment.SetEnvironmentVariable("JWT__Issuer", "testing");
         Environment.SetEnvironmentVariable("JWT__Audience", "testing");
         Environment.SetEnvironmentVariable("JWT__Key", Guid.NewGuid().ToString());

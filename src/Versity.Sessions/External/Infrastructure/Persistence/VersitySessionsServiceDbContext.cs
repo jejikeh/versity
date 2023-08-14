@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Domain.Models;
 using Domain.Models.SessionLogging;
+using Infrastructure.Persistence.Configurations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence;

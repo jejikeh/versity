@@ -3,6 +3,7 @@ using Application.Abstractions;
 using Application.Abstractions.Repositories;
 using Hangfire;
 using Hangfire.PostgreSql;
+using Infrastructure.Configurations;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services;
@@ -11,20 +12,47 @@ using Infrastructure.Services.KafkaConsumer.Abstractions;
 using Infrastructure.Services.KafkaConsumer.Handlers.CreateProduct;
 using Infrastructure.Services.KafkaConsumer.Handlers.DeleteProduct;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using StackExchange.Redis;
 
 namespace Infrastructure;
 
 public static class InfrastructureInjection
 {
-    public static IServiceCollection AddDbContext(this IServiceCollection serviceCollection, IConfiguration configuration)
+    public static IServiceCollection AddDbContext(
+        this IServiceCollection serviceCollection, 
+        IApplicationConfiguration configuration)
     {
-        var connectionString = Environment.GetEnvironmentVariable("ConnectionString");
+        return configuration.IsDevelopmentEnvironment
+            ? serviceCollection.AddSqliteDatabase(configuration.DatabaseConnectionString)
+            : serviceCollection.AddPostgresDatabase(configuration.DatabaseConnectionString);
+    }
+
+    private static IServiceCollection AddSqliteDatabase(
+        this IServiceCollection serviceCollection, 
+        string? connectionString)
+    {
         serviceCollection.AddDbContext<VersitySessionsServiceDbContext>(options =>
         {
             options.EnableDetailedErrors();
+            options.UseSqlite(
+                connectionString,
+                builder =>
+                {
+                    builder.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
+                });
+        });
+
+        return serviceCollection;
+    }
+
+    private static IServiceCollection AddPostgresDatabase(
+        this IServiceCollection serviceCollection, 
+        string? connectionString)
+    {
+        serviceCollection.AddDbContext<VersitySessionsServiceDbContext>(options =>
+        {
+            options.EnableDetailedErrors();
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             options.UseNpgsql(
                 connectionString,
                 builder =>
@@ -32,7 +60,6 @@ public static class InfrastructureInjection
                     builder.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
                     builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
                 });
-            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         });
 
         return serviceCollection;
@@ -48,17 +75,19 @@ public static class InfrastructureInjection
         return serviceCollection;
     }
 
-    public static IServiceCollection AddRedisCaching(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddRedisCaching(
+        this IServiceCollection serviceCollection,
+        IApplicationConfiguration configuration)
     {
         serviceCollection.Decorate<ISessionsRepository, CachedSessionsRepository>();
-        serviceCollection.AddSingleton(ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS_Host")));
-        serviceCollection.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(provider => provider.GetService<ConnectionMultiplexer>());
-        serviceCollection.AddSingleton<ICacheService, RedisCacheService>();
+        configuration.InjectCacheService(serviceCollection);
         
         return serviceCollection;
     }
 
-    public static IServiceCollection AddKafka(this IServiceCollection serviceCollection, IKafkaConsumerConfiguration configuration)
+    public static IServiceCollection AddKafka(
+        this IServiceCollection serviceCollection, 
+        IKafkaConsumerConfiguration configuration)
     {
         serviceCollection
             .AddKafkaHandler<CreateProductMessageHandler>()
@@ -68,13 +97,26 @@ public static class InfrastructureInjection
         return serviceCollection;
     }
     
-    public static IServiceCollection AddHangfireService(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddHangfireService(
+        this IServiceCollection serviceCollection,
+        IApplicationConfiguration applicationConfiguration)
     {
         serviceCollection.AddHangfireServer();
-        serviceCollection.AddHangfire(configuration => configuration
-            .UseSimpleAssemblyNameTypeSerializer()
-            .UseRecommendedSerializerSettings()
-            .UsePostgreSqlStorage(Environment.GetEnvironmentVariable("ConnectionString")));
+        serviceCollection.AddHangfire(configuration =>
+        {
+            configuration
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings();
+            
+            if (applicationConfiguration.IsDevelopmentEnvironment)
+            {
+                configuration.UseInMemoryStorage();
+            }
+            else
+            {
+                configuration.UsePostgreSqlStorage(applicationConfiguration.DatabaseConnectionString);
+            }
+        });
 
         serviceCollection.AddTransient<UpdateSessionStatusService>();
         serviceCollection.AddTransient<BackgroundWorkersCacheService>();

@@ -1,6 +1,9 @@
 ﻿using Application;
+using Application.Abstractions;
 using Infrastructure;
+using Infrastructure.Configurations;
 using Infrastructure.Persistence;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.OpenApi.Models;
 using Presentation.Configuration;
@@ -55,9 +58,15 @@ public static class ProgramExtensions
         {
             app.UseExceptionHandler("/error");
         }
+        
+        // if we will be deploying in kubernetes, then https and ssl certificates
+        // will be managing by kubernetes it self
+        if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "false")
+        {
+            app.UseHttpsRedirection();
+        }
 
         app.UseLoggingDependOnEnvironment();
-        app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseCors("AllowAll");
@@ -85,6 +94,16 @@ public static class ProgramExtensions
         }
 
         return webApplication;
+    }
+    
+    public static IServiceCollection AddFallbackKafkaServices(
+        this IServiceCollection serviceCollection, 
+        IKafkaProducerConfiguration configuration)
+    {
+        serviceCollection.AddSingleton(configuration);
+        serviceCollection.AddTransient<IProductProducerService, FallbackKafkaProductProducerService>();
+
+        return serviceCollection;
     }
     
     private static CorsOptions ConfigureAllowAllCors(this CorsOptions options)
