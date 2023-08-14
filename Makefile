@@ -141,3 +141,6 @@ build-all: build-users push-users build-products push-products build-apigateway 
 
 .PHONY: all
 deploy: users products apigateway setup-projects-secrets
+
+.PHONY: all
+apply: apply-users apply-products apply-apigateway

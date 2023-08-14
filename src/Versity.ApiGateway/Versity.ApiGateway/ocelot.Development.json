@@ -146,8 +146,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "products.versity.dev",
-          "Port": 3001
+          "Host": "localhost",
+          "Port": 4001
         }
       ],
       "DownstreamPathTemplate": "/api/products/",
@@ -162,8 +162,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "products.versity.dev",
-          "Port": 3001
+          "Host": "localhost",
+          "Port": 4001
         }
       ],
       "DownstreamPathTemplate": "/api/products/{page}"
@@ -174,8 +174,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "products.versity.dev", 
-          "Port": 3001
+          "Host": "localhost", 
+          "Port": 4001
         }
       ],
       "DownstreamPathTemplate": "/api/products/{productId}",
@@ -190,8 +190,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "products.versity.dev",
-          "Port": 3001
+          "Host": "localhost",
+          "Port": 4001
         }
       ],
       "DownstreamPathTemplate": "/api/products/{productId}",
