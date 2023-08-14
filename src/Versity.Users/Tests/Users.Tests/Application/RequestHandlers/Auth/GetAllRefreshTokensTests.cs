@@ -21,11 +21,14 @@ public class GetAllRefreshTokensTests
     {
         // Arrange
         var itemsCount = new Random().Next(1, 10);
-        var command = new GetAllRefreshTokensQuery();
+        var command = new GetAllRefreshTokensQuery(1);
         var handler = new GetAllRefreshTokensQueryHandler(_tokensRepository.Object);
         
         _tokensRepository.Setup(versityRefreshTokensRepository =>
-                versityRefreshTokensRepository.GetAllAsync(It.IsAny<CancellationToken>()))
+                versityRefreshTokensRepository.GetAllAsync(
+                    It.IsAny<int?>(), 
+                    It.IsAny<int?>(), 
+                    It.IsAny<CancellationToken>()))
             .ReturnsAsync(GenerateFakeRefreshTokens(itemsCount));
         
         // Act

@@ -4,10 +4,31 @@ namespace Presentation.Configuration;
 
 public class EmailServicesConfiguration : IEmailServicesConfiguration
 {
-    public string SmtpServer { get; set; } = Environment.GetEnvironmentVariable("EMAIL__SmtpServer") ?? "none";
-    public int Port { get; set; } = int.Parse(Environment.GetEnvironmentVariable("EMAIL__Port") ?? "0");
-    public string Username { get; set; } = Environment.GetEnvironmentVariable("EMAIL__Username") ?? "none";
-    public string Password { get; set; } = Environment.GetEnvironmentVariable("EMAIL__Password") ?? "none";
-    public string From { get; set; } = Environment.GetEnvironmentVariable("EMAIL__From") ?? "none"; 
-    public string ConfirmUrl { get; set; } = Environment.GetEnvironmentVariable("EMAIL__ConfirmUrl") ?? "none";
+    public string SmtpServer { get; set; }
+    public int Port { get; set; }
+    public string Username { get; set; }
+    public string Password { get; set; }
+    public string From { get; set; }
+    public string ConfirmUrl { get; set; }
+
+    public EmailServicesConfiguration(IConfiguration configuration)
+    {
+        SmtpServer = configuration.GetConfigurationStringOrThrowException("Smtp:Server");
+        Port = int.Parse(configuration.GetConfigurationStringOrThrowException("Smtp:Port"));
+        Username = configuration.GetConfigurationStringOrThrowException("Smtp:Username");
+        Password = configuration.GetConfigurationStringOrThrowException("Smtp:Password");
+        From = configuration.GetConfigurationStringOrThrowException("Smtp:From");
+        ConfirmUrl = configuration.GetConfigurationStringOrThrowException("Smtp:ConfirmUrl");
+    }
+}
+
+file static class ConfigurationExtension
+{
+    public static string GetConfigurationStringOrThrowException(
+        this IConfiguration configuration,
+        string configurationString)
+    {
+        return configuration[configurationString] 
+               ?? throw new InvalidOperationException($"The {configurationString} is empty. Please set the {configurationString} in appsettings.json");
+    }
 }

@@ -32,10 +32,13 @@ public class CachedRefreshTokensRepositoryTests
             .ReturnsAsync(() => null);
 
         _refreshTokensRepository.Setup(x => 
-            x.GetAllAsync(It.IsAny<CancellationToken>())).ReturnsAsync(refreshTokens);
+            x.GetAllAsync(
+                It.IsAny<int?>(), 
+                It.IsAny<int?>(), 
+                It.IsAny<CancellationToken>())).ReturnsAsync(refreshTokens);
 
         // Act        
-        var result = await _cachedRefreshTokensRepository.GetAllAsync(CancellationToken.None);
+        var result = await _cachedRefreshTokensRepository.GetAllAsync(1, 1, CancellationToken.None);
        
         // Assert
         result.Should().BeSameAs(refreshTokens);

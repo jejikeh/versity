@@ -9,9 +9,8 @@ public class Program
     {
         var builder = WebApplication
             .CreateBuilder(args)
-            .ConfigureBuilder()
-            .AddLogging();
-
+            .ConfigureBuilder();
+        
         var application = builder
             .Build()
             .ConfigureApplication();

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Cors.Infrastructure;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using Versity.ApiGateway.Configuration;
 
 namespace Versity.ApiGateway.Extensions;
 
@@ -10,11 +11,13 @@ public static class ProgramExtensions
     {
         builder.Configuration
             .SetBasePath(builder.Environment.ContentRootPath)
-            .AddJsonFile("ocelot.json", optional: false, reloadOnChange: true)
+            .AddJsonFile("appsettings.json", true, true)
+            .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true)
+            .AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json")
             .AddEnvironmentVariables();
 
         builder.Services
-            .AddJwtAuthentication(builder.Configuration)
+            .AddJwtAuthentication(new TokenGenerationConfiguration(builder.Configuration))
             .AddCors(options => options.ConfigureFrontendCors())
             .AddOcelot(builder.Configuration);
 
@@ -25,7 +28,7 @@ public static class ProgramExtensions
     
     public static async Task<WebApplication> ConfigureApplication(this WebApplication app)
     {
-        // if we will be deploying in kubernetes, then https and ssl certificates
+        // if deploying in kubernetes, then https and ssl certificates
         // will be managing by kubernetes ingress
         if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "false")
         {

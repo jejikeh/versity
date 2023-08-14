@@ -3,15 +3,10 @@ using Application;
 using Infrastructure;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Presentation.Configuration;
 using Presentation.Services;
-using Serilog;
 
 namespace Presentation.Extensions;
 
@@ -21,7 +16,7 @@ public static class ProgramExtensions
     {
         var applicationConfiguration = new ApplicationConfiguration(builder.Configuration);
         var tokenGenerationConfiguration = new TokenGenerationConfiguration(builder.Configuration);
-        
+
         builder.Services
             .AddDbContext(applicationConfiguration)
             .AddRepositories()
@@ -29,7 +24,7 @@ public static class ProgramExtensions
             .AddApplication()
             .AddVersityIdentity()
             .AddServices(
-                new EmailServicesConfiguration(), 
+                new EmailServicesConfiguration(builder.Configuration),
                 tokenGenerationConfiguration)
             .AddJwtAuthentication(tokenGenerationConfiguration)
             .AddSwagger()
@@ -49,6 +44,8 @@ public static class ProgramExtensions
                     o => o.Protocols = HttpProtocols.Http2);
             });
         }
+        
+        builder.AddLoggingServices(applicationConfiguration);
         
         return builder;
     }

@@ -46,7 +46,7 @@ public class ApplicationConfiguration : IApplicationConfiguration
     
     private bool SetupDbConnectionString(IConfiguration configuration)
     {
-        var dbConnectionString = configuration.GetConnectionString("TokensDbContext");
+        var dbConnectionString = configuration.GetConnectionString("IdentityDbContext");
         var cacheConnectionString = configuration.GetConnectionString("CacheDbContext");
 
         // This is used for test environment. I could use appsettings.Integrations.json,

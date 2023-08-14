@@ -19,17 +19,29 @@ setup-admin-email-secret:
 setup-admin-password-secret:
 	dotnet user-secrets set "Admin:Password" "versity.Adm1n.dev-31_13%versity" --project ./src/Versity.Users/External/Presentation
 
+setup-jwt-issuer-secret-apigateway:
+	dotnet user-secrets set "Jwt:Issuer" "versity.identity" --project ./src/Versity.Apigateway/Versity.Apigateway
+
 setup-jwt-issuer-secret:
 	dotnet user-secrets set "Jwt:Issuer" "versity.identity" --project ./src/Versity.Users/External/Presentation
 
 setup-jwt-audience-secret:
 	dotnet user-secrets set "Jwt:Audience" "versity.identity" --project ./src/Versity.Users/External/Presentation
 
+setup-jwt-audience-secret-apigateway:
+	dotnet user-secrets set "Jwt:Audience" "versity.identity" --project ./src/Versity.Apigateway/Versity.Apigateway
+
 setup-jwt-key-secret:
 	dotnet user-secrets set "Jwt:Key" "865D92FD-B1C8-41A4-850F-409792C9B740" --project ./src/Versity.Users/External/Presentation
 
+setup-jwt-key-secret-apigateway:
+	dotnet user-secrets set "Jwt:Key" "865D92FD-B1C8-41A4-850F-409792C9B740" --project ./src/Versity.Apigateway/Versity.Apigateway
+
+setup-email-password-secret:
+	dotnet user-secrets set "Smtp:Password" "ebqatxmtxaurcdfu" --project ./src/Versity.Users/External/Presentation
+
 .PHONY: all
-setup-projects-secrets: setup-project-secrets-users setup-project-secrets-products setup-project-secrets-sessions setup-admin-id-secret setup-admin-email-secret setup-admin-password-secret setup-jwt-issuer-secret setup-jwt-audience-secret setup-jwt-key-secret
+setup-projects-secrets: setup-project-secrets-users setup-project-secrets-products setup-project-secrets-sessions setup-admin-id-secret setup-admin-email-secret setup-admin-password-secret setup-jwt-issuer-secret setup-jwt-audience-secret setup-jwt-key-secret setup-email-password-secret
 
 # identity service
 build-users:
@@ -43,6 +55,12 @@ apply-users:
 
 up-users:
 	docker-compose up -d versity-users-service
+
+delete-secrets-users:
+	 -kubectl delete secrets secret-identity-appsettings
+
+secrets-users:
+	kubectl create secret generic secret-identity-appsettings --from-file="./src/Versity.Users/Deploy/Secrets/appsettings.Production.json"
 
 .PHONY: all
 users: build-users push-users up-users
@@ -67,8 +85,17 @@ build-apigateway:
 push-apigateway:
 	docker push $(DOCKER_REGISTRY)/versity.apigateway
 
+apply-apigateway:
+	kubectl apply -f ./src/Versity.Apigateway/Deploy
+
 up-apigateway:
 	docker-compose up -d versity-apigateway-service
+
+delete-secrets-api-gateway:
+	 -kubectl delete secrets secret-api-gateway-appsettings
+
+secrets-api-gateway:
+	kubectl create secret generic secret-api-gateway-appsettings --from-file="./src/Versity.ApiGateway/Deploy/Secrets/appsettings.Production.json"
 
 .PHONY: all
 apigateway: build-apigateway push-apigateway up-apigateway

@@ -13,9 +13,25 @@ public class VersityRefreshTokensRepository : IVersityRefreshTokensRepository
         _usersDbContext = usersDbContext;
     }
 
-    public async Task<IEnumerable<RefreshToken>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<RefreshToken>> GetAllAsync(
+        int? skipEntitiesCount, 
+        int? takeEntitiesCount,
+        CancellationToken cancellationToken)
     {
-        return await _usersDbContext.RefreshTokens.ToListAsync(cancellationToken);
+        if (skipEntitiesCount is null && takeEntitiesCount is null)
+        {
+            return await _usersDbContext.RefreshTokens
+                .AsQueryable()
+                .OrderBy(refreshToken => refreshToken.ExpiryTime)
+                .ToListAsync(cancellationToken);
+        }
+        
+        return await _usersDbContext.RefreshTokens
+            .AsQueryable()
+            .OrderBy(refreshToken => refreshToken.ExpiryTime)
+            .Skip(skipEntitiesCount ?? 0)
+            .Take(takeEntitiesCount ?? 10)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task AddAsync(RefreshToken token, CancellationToken cancellationToken)

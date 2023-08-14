@@ -16,12 +16,15 @@ public class CachedRefreshTokensRepository : IVersityRefreshTokensRepository
         _distributedCache = distributedCache;
     }
 
-    public async Task<IEnumerable<RefreshToken>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<RefreshToken>> GetAllAsync(
+        int? skipEntitiesCount, 
+        int? takeEntitiesCount,
+        CancellationToken cancellationToken)
     {
         return await _distributedCache.GetOrCreateAsync(
             CachingKeys.Tokens,
-            async () => await _refreshTokensRepository.GetAllAsync(cancellationToken)) ?? 
-               await _refreshTokensRepository.GetAllAsync(cancellationToken);
+            async () => await _refreshTokensRepository.GetAllAsync(skipEntitiesCount, takeEntitiesCount, cancellationToken)) ?? 
+               await _refreshTokensRepository.GetAllAsync(skipEntitiesCount, takeEntitiesCount, cancellationToken);
     }
 
     public Task AddAsync(RefreshToken token, CancellationToken cancellationToken)

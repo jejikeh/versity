@@ -1,12 +1,10 @@
 ﻿using System.Text;
-using Application.Abstractions;
 using Domain.Models;
 using Infrastructure.Persistence;
-using Infrastructure.Services;
+using Infrastructure.Services.TokenServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
-using Presentation.Configuration;
 
 namespace Presentation.Extensions;
 
@@ -32,7 +30,7 @@ public static class IdentityAuthenticationProgramExtension
 
     public static IServiceCollection AddJwtAuthentication(
         this IServiceCollection serviceCollection, 
-        TokenGenerationConfiguration tokenGenerationConfiguration)
+        ITokenGenerationConfiguration tokenGenerationConfiguration)
     {
         serviceCollection.AddAuthentication(options =>
         {

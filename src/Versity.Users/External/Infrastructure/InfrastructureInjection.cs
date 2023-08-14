@@ -1,15 +1,12 @@
 ﻿using System.Reflection;
-using Application.Abstractions;
 using Application.Abstractions.Repositories;
 using Infrastructure.Configurations;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
-using Infrastructure.Services;
 using Infrastructure.Services.EmailServices;
 using Infrastructure.Services.TokenServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using StackExchange.Redis;
 
 namespace Infrastructure;
 

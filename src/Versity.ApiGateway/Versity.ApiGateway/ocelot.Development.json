@@ -6,8 +6,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "users.versity.dev",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/auth/register"
@@ -18,8 +18,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "users.versity.dev",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/auth/refreshtoken/{userId}/{refreshToken}"
@@ -30,8 +30,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "users.versity.dev",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/auth/getallrefreshtokens",
@@ -46,8 +46,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "users.versity.dev",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/auth/login"
@@ -58,8 +58,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "users.versity.dev",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/auth/resendemailverificationtoken"
@@ -70,8 +70,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "users.versity.dev",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/auth/confirmemail/{userId}/{code}"
@@ -82,8 +82,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "users.versity.dev",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/users/{userId}/set-admin",
@@ -98,8 +98,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "users.versity.dev",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/users/{userId}",
@@ -114,8 +114,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "users.versity.dev",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/users/page/{page}",
@@ -130,8 +130,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "users.versity.dev",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/users/{userId}/password/",
@@ -147,7 +147,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "products.versity.dev",
-          "Port": 443
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/products/",
@@ -163,7 +163,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "products.versity.dev",
-          "Port": 443
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/products/{page}"
@@ -175,7 +175,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "products.versity.dev", 
-          "Port": 443
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/products/{productId}",
@@ -191,7 +191,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "products.versity.dev",
-          "Port": 443
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/products/{productId}",
@@ -207,7 +207,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions.versity.dev",
-          "Port": 443
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/{page}",
@@ -223,7 +223,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions.versity.dev",
-          "Port": 443
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/products/{page}",
@@ -239,7 +239,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions.versity.dev",
-          "Port": 443
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/products/{id}/{page}",
@@ -255,7 +255,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions.versity.dev",
-          "Port": 443
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/",
@@ -271,7 +271,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions.versity.dev",
-          "Port": 443
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/{id}",
@@ -287,7 +287,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions.versity.dev",
-          "Port": 443
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/users/{id}",
@@ -303,7 +303,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions.versity.dev",
-          "Port": 443
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/{id}/close",
@@ -319,7 +319,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions.versity.dev",
-          "Port": 443
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/logdata/{page}",
@@ -335,7 +335,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions.versity.dev",
-          "Port": 443
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/logdata/",
@@ -351,7 +351,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions.versity.dev",
-          "Port": 443
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/logdata/{id}",
@@ -367,7 +367,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions.versity.dev",
-          "Port": 443
+          "Port": 3001
         }
       ],
       "DownstreamPathTemplate": "/api/sessionlogs/{page}",
@@ -384,7 +384,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions.versity.dev",
-          "Port": 443
+          "Port": 3001
         }
       ],
       "QoSOptions": {

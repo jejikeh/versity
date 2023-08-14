@@ -8,12 +8,13 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: identity-deployment
+      app: identity
   template:
     metadata:
-      name: identity-deployment
+      name: identity
       labels:
-        app: identity-deployment
+        app: identity
+        app.kubernetes.io/name: identity
     spec:
       containers:
         - name: identity-deployment
@@ -35,4 +36,12 @@ spec:
             httpGet:
               path: /health-check
               port: 80
+          volumeMounts:
+            - mountPath: /app/appsettings.Production.json
+              subPath: appsettings.Production.json
+              name: identity-secret-appsettings
       restartPolicy: Always
+      volumes:
+        - name: identity-secret-appsettings
+          secret:
+            secretName: secret-identity-appsettings

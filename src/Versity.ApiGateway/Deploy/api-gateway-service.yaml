@@ -4,9 +4,9 @@ metadata:
   name: api-gateway-service
 spec:
   selector:
-    app: api-gateway-service
+    app.kubernetes.io/name: api-gateway
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 8080
-  type: NodePort
+      port: 7080
+      targetPort: 80
+  type: LoadBalancer

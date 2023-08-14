@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: token-service-ingress
+  name: identity-service-ingress
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
@@ -9,11 +9,12 @@ spec:
   tls:
     - hosts:
         - localhost
-      secretName: identity-service-tls-secret
+      secretName: versity-service-tls-secret
   rules:
-    - http:
+    - host: localhost
+      http:
         paths:
-          - path: /api
+          - path: /
             pathType: Prefix
             backend:
               service:
