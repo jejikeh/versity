@@ -38,6 +38,7 @@ jobs:
         dotnet user-secrets set "Jwt:Issuer" "$JwtIssuer" --project ./src/Versity.Users/External/Presentation
         dotnet user-secrets set "Jwt:Audience" "$JwtAudience" --project ./src/Versity.Users/External/Presentation
         dotnet user-secrets set "Jwt:Key" "$JwtKey" --project ./src/Versity.Users/External/Presentation
+        dotnet user-secrets set "Smtp:Password" "$JwtKey" --project ./src/Versity.Users/External/Presentation
           
     - name: Restore dependencies
       run: dotnet restore ./src/Versity.Users/External/Presentation/Presentation.csproj
