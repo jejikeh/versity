@@ -53,11 +53,11 @@ public class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand,
         {
             Id = Guid.NewGuid(),
             UserId = request.UserId,
-            Product = product,
+            ProductId = product.Id,
             Start = request.Start,
             Expiry = request.Expiry,
             Status = SessionStatus.Inactive,
-            Logs = sessionLogs
+            LogsId = sessionLogs.Id
         };
         
         var result = await _sessions.CreateSessionAsync(session, cancellationToken);

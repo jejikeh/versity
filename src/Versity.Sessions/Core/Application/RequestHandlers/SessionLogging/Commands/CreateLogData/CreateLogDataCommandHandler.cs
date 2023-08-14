@@ -31,11 +31,8 @@ public class CreateLogDataCommandHandler : IRequestHandler<CreateLogDataCommand,
             LogLevel = request.LogLevel,
             Data = request.Data,
             SessionLogsId = request.SessionLogsId,
-            SessionLogs = sessionLogs
         };
         
-        sessionLogs.Logs.Add(logData);
-
         var result = await _logsDataRepository.CreateLogDataAsync(logData, cancellationToken);
         
         await _sessionLogsRepository.SaveChangesAsync(cancellationToken);

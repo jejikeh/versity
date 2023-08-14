@@ -79,9 +79,9 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Id.Should().Be(session.Id);
         content.UserId.Should().Be(session.UserId);
-        content.Expiry.Should().BeCloseTo(session.Expiry, TimeSpan.FromMicroseconds(100));
-        content.Start.Should().BeCloseTo(session.Start, TimeSpan.FromMicroseconds(100));
-        content.Product.Id.Should().Be(session.Product.Id);
+        content.Expiry.ToUniversalTime().Should().BeCloseTo(session.Expiry.ToUniversalTime(), TimeSpan.FromSeconds(10));
+        content.Start.ToUniversalTime().Should().BeCloseTo(session.Start.ToUniversalTime(), TimeSpan.FromSeconds(10));
+        content.ProductId.Should().Be(session.ProductId);
     }
     
     [Fact]

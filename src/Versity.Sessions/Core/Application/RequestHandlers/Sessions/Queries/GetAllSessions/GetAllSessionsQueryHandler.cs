@@ -17,13 +17,11 @@ public class GetAllSessionsQueryHandler : IRequestHandler<GetAllSessionsQuery, I
 
     public async Task<IEnumerable<SessionViewModel>> Handle(GetAllSessionsQuery request, CancellationToken cancellationToken)
     {
-        var sessions = _sessionsRepository
-            .GetAllSessions()
-            .OrderBy(x => x.Status)
-            .Skip(PageFetchSettings.ItemsOnPage * (request.Page - 1))
-            .Take(PageFetchSettings.ItemsOnPage);
+        var sessions = _sessionsRepository.GetSessions(
+            PageFetchSettings.ItemsOnPage * (request.Page - 1),
+            PageFetchSettings.ItemsOnPage);
         
-        var viewModels = SessionViewModel.MapWithModels(await _sessionsRepository.ToListAsync(sessions));
+        var viewModels = SessionViewModel.MapWithModels(sessions);
         
         return viewModels;
     }

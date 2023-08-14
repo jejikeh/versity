@@ -17,14 +17,14 @@ public record SessionViewModel(
         return new SessionViewModel(
             session.Id,
             session.UserId,
-            session.Product.Id,
-            session.Logs.Id,
+            session.ProductId,
+            session.LogsId ?? new Guid(),
             session.Start,
             session.Expiry,
             session.Status);
     }
 
-    public static IEnumerable<SessionViewModel> MapWithModels(List<Session> models)
+    public static IEnumerable<SessionViewModel> MapWithModels(IEnumerable<Session> models)
     {
         var viewModels = new List<SessionViewModel>();
         foreach (var session in models) 

@@ -1,21 +1,35 @@
 ﻿using Application.Abstractions.Repositories;
 using Domain.Models.SessionLogging;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 
-namespace Infrastructure.Persistence.Repositories;
+namespace Infrastructure.Persistence.SqlRepositories;
 
-public class LogsDataRepository : ILogsDataRepository
+public class LogsDataSqlRepository : ILogsDataRepository
 {
-    private readonly VersitySessionsServiceDbContext _context;
+    private readonly VersitySessionsServiceSqlDbContext _context;
 
-    public LogsDataRepository(VersitySessionsServiceDbContext context)
+    public LogsDataSqlRepository(VersitySessionsServiceSqlDbContext context)
     {
         _context = context;
     }
 
-    public IQueryable<LogData> GetAllLogsData()
+    public IEnumerable<LogData> GetLogsData(int? skipCount, int? takeCount)
     {
-        return _context.LogsData.AsQueryable();
+        if (skipCount is null && takeCount is null)
+        {
+            return _context.LogsData
+                .AsQueryable()
+                .OrderBy(data => data.Time)
+                .ToList();
+        }
+        
+        return _context.LogsData
+            .AsQueryable()
+            .OrderBy(data => data.Time)
+            .Skip(skipCount ?? 0)
+            .Take(takeCount ?? 10)
+            .ToList();
     }
 
     public async Task<LogData?> GetLogDataByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -34,12 +48,7 @@ public class LogsDataRepository : ILogsDataRepository
     {
         await _context.AddRangeAsync(logsData, cancellationToken);
     }
-
-    public async Task<List<LogData>> ToListAsync(IQueryable<LogData> logsData)
-    {
-        return await logsData.ToListAsync();
-    }
-
+    
     public async Task SaveChangesAsync(CancellationToken cancellationToken)
     {
         await _context.SaveChangesAsync(cancellationToken);

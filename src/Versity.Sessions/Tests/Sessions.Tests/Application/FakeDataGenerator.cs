@@ -84,8 +84,6 @@ public static class FakeDataGenerator
         {
             Id = Guid.NewGuid(),
             SessionId = Guid.NewGuid(),
-            Session = default!,
-            Logs = GenerateFakeLogsData(count),
         }).Generate();
     }
     
@@ -96,8 +94,6 @@ public static class FakeDataGenerator
         {
             Id = Guid.NewGuid(),
             SessionId = sessionId,
-            Session = default!,
-            Logs = logs,
         }).Generate(), logs);
     }
     
@@ -108,8 +104,6 @@ public static class FakeDataGenerator
         {
             Id = id,
             SessionId = Guid.NewGuid(),
-            Session = default!,
-            Logs = GenerateFakeLogsData(id, logCount),
         }).Generate(count);
     }
 
@@ -122,8 +116,6 @@ public static class FakeDataGenerator
             LogLevel = (LogLevel)new Random().Next(3),
             Data = faker.Lorem.Sentence(),
             SessionLogsId = Guid.NewGuid(),
-            SessionLogs = null!,
-
         }).Generate(count);
     }
     
@@ -136,7 +128,6 @@ public static class FakeDataGenerator
             LogLevel = (LogLevel)new Random().Next(3),
             Data = faker.Lorem.Sentence(),
             SessionLogsId = sessionLogsId,
-            SessionLogs = null!,
         }).Generate(count);
     }
     
@@ -149,7 +140,6 @@ public static class FakeDataGenerator
             LogLevel = (LogLevel)new Random().Next(3),
             Data = faker.Lorem.Sentence(),
             SessionLogsId = Guid.NewGuid(),
-            SessionLogs = null!,
         }).Generate();
     }
     
@@ -189,8 +179,8 @@ public static class FakeDataGenerator
             Id = Guid.NewGuid(),
             UserId = Guid.NewGuid().ToString(),
             Status = (SessionStatus)new Random().Next(5),
-            Product = GenerateFakeProduct(),
-            Logs = GenerateFakeSessionLogs(id, logCount).Item1,
+            ProductId = GenerateFakeProduct().Id,
+            LogsId = GenerateFakeSessionLogs(id, logCount).Item1.Id,
             Expiry = faker.Date.Past(),
             Start = faker.Date.Future()
         }).Generate();
@@ -206,8 +196,8 @@ public static class FakeDataGenerator
             Id = id,
             UserId = Guid.NewGuid().ToString(),
             Status = (SessionStatus)new Random().Next(5),
-            Product = product,
-            Logs = sessionLogs,
+            ProductId = product.Id,
+            LogsId = sessionLogs.Id,
             Expiry = faker.Date.Past(),
             Start = faker.Date.Future()
         }).Generate();
@@ -225,8 +215,8 @@ public static class FakeDataGenerator
             Id = id,
             UserId = userId.ToString(),
             Status = (SessionStatus)new Random().Next(5),
-            Product = product,
-            Logs = sessionLogs,
+            ProductId = product.Id,
+            LogsId = sessionLogs.Id,
             Expiry = faker.Date.Past(),
             Start = faker.Date.Future()
         }).Generate();
@@ -252,7 +242,7 @@ public static class FakeDataGenerator
         return new Faker<GetSessionByIdViewModel>().CustomInstantiator(faker => new GetSessionByIdViewModel(
             Guid.NewGuid(),
             Guid.NewGuid().ToString(),
-            GenerateFakeProduct(),
+            GenerateFakeProduct().Id,
             Guid.NewGuid(),
             faker.Date.Past(),
             faker.Date.Future(),
@@ -267,8 +257,8 @@ public static class FakeDataGenerator
             Id = Guid.NewGuid(),
             UserId = Guid.NewGuid().ToString(),
             Status = (SessionStatus)new Random().Next(5),
-            Product = GenerateFakeProduct(),
-            Logs = GenerateFakeSessionLogs(logCount),
+            ProductId = GenerateFakeProduct().Id,
+            LogsId = GenerateFakeSessionLogs(logCount).Id,
             Expiry = faker.Date.Future(),
             Start = faker.Date.Past()
         }).Generate(count);
@@ -298,7 +288,7 @@ public static class FakeDataGenerator
     {
         return new Faker<UserSessionsViewModel>().CustomInstantiator(faker => new UserSessionsViewModel(
             Guid.NewGuid(),
-            faker.Commerce.ProductName(),
+            Guid.NewGuid(),
             Guid.NewGuid(),
             faker.Date.Future(),
             faker.Date.Past(),
@@ -310,7 +300,7 @@ public static class FakeDataGenerator
     {
         return new Faker<UserSessionsViewModel>().CustomInstantiator(faker => new UserSessionsViewModel(
                 Guid.NewGuid(),
-                faker.Commerce.ProductName(),
+                Guid.NewGuid(),
                 Guid.NewGuid(),
                 faker.Date.Future(),
                 faker.Date.Past(),

@@ -2,29 +2,38 @@
 using Domain.Models.SessionLogging;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Persistence.Repositories;
+namespace Infrastructure.Persistence.SqlRepositories;
 
-public class SessionLogsRepository : ISessionLogsRepository
+public class SessionLogsSqlRepository : ISessionLogsRepository
 {
-    private readonly VersitySessionsServiceDbContext _context;
+    private readonly VersitySessionsServiceSqlDbContext _context;
 
-    public SessionLogsRepository(VersitySessionsServiceDbContext context)
+    public SessionLogsSqlRepository(VersitySessionsServiceSqlDbContext context)
     {
         _context = context;
     }
 
-    public IQueryable<SessionLogs> GetAllSessionsLogs()
+    public IEnumerable<SessionLogs> GetSessionsLogs(int? skipCount, int? takeCount)
     {
+        if (skipCount is null && takeCount is null)
+        {
+            return _context.SessionLogs
+                .AsQueryable()
+                .OrderBy(data => data.Id)
+                .ToList();
+        }
+        
         return _context.SessionLogs
-            .Include(x => x.Logs)
-            .AsQueryable();
+            .AsQueryable()
+            .OrderBy(data => data.Id)
+            .Skip(skipCount ?? 0)
+            .Take(takeCount ?? 10)
+            .ToList();
     }
 
     public async Task<SessionLogs?> GetSessionLogsByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _context.SessionLogs
-            .Include(x => x.Logs)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return await _context.SessionLogs.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
     public async Task<SessionLogs> CreateSessionLogsAsync(SessionLogs sessionLogs, CancellationToken cancellationToken)
@@ -42,11 +51,6 @@ public class SessionLogsRepository : ISessionLogsRepository
     public async Task CreateRangeSessionLogsAsync(IEnumerable<SessionLogs> sessionsLogs, CancellationToken cancellationToken)
     {
         await _context.AddRangeAsync(sessionsLogs, cancellationToken);
-    }
-
-    public async Task<List<SessionLogs>> ToListAsync(IQueryable<SessionLogs> sessionLogs)
-    {
-        return await sessionLogs.ToListAsync();
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken)

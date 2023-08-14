@@ -34,10 +34,8 @@ public class CreateLogsDataCommandHandler : IRequestHandler<CreateLogsDataComman
                 LogLevel = command.LogLevel,
                 Data = command.Data,
                 SessionLogsId = request.SessionLogsId,
-                SessionLogs = sessionLogs
             };
         
-            sessionLogs.Logs.Add(logData);
             results.Add(logData);
         }
 

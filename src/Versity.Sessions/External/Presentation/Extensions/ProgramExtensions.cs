@@ -3,6 +3,7 @@ using Application.Abstractions;
 using Application.Abstractions.Hubs;
 using Hangfire;
 using Infrastructure;
+using Infrastructure.Configurations;
 using Infrastructure.Persistence;
 using Infrastructure.Services;
 using Infrastructure.Services.KafkaConsumer;
@@ -22,6 +23,7 @@ public static class ProgramExtensions
         var kafkaConsumerConfiguration = new KafkaConsumerConfiguration(builder.Configuration);
         
         builder.Services
+            .AddSingleton<IApplicationConfiguration>(applicationConfiguration)
             .AddDbContext(applicationConfiguration)
             .AddRepositories()
             .AddRedisCaching(applicationConfiguration)
@@ -88,10 +90,6 @@ public static class ProgramExtensions
         var serviceProvider = scope.ServiceProvider;
         try
         {
-            var versitySessionsServiceDbContext = serviceProvider.GetRequiredService<VersitySessionsServiceDbContext>();
-            await versitySessionsServiceDbContext.Database.EnsureCreatedAsync();
-            await versitySessionsServiceDbContext.Database.MigrateAsync();
-            
             await webApplication.RunAsync();
         }
         catch (Exception ex)

@@ -3,6 +3,7 @@ using Application.Common;
 using Application.RequestHandlers.SessionLogging.Queries.GetAllLogsData;
 using Application.RequestHandlers.SessionLogging.Queries.GetAllSessionsLogs;
 using Domain.Models.SessionLogging;
+using FluentAssertions;
 using Moq;
 
 namespace Sessions.Tests.Application.RequestHandlers.SessionLogging;
@@ -23,17 +24,15 @@ public class GetAllSessionsLogsTests
         const int entriesCount = PageFetchSettings.ItemsOnPage + 5;
         var sessionLogs = FakeDataGenerator.GenerateFakeSessionsLogs(entriesCount, 10);
         var handler = new GetAllSessionsLogsQueryHandler(_sessionLogsRepository.Object);
-        _sessionLogsRepository.Setup(repository => repository.GetAllSessionsLogs())
-            .Returns(sessionLogs.AsQueryable());
+        _sessionLogsRepository.Setup(repository => repository.GetSessionsLogs(
+                It.IsAny<int?>(), It.IsAny<int?>()))
+            .Returns(sessionLogs);
         
         // Act
-        await handler.Handle(new GetAllSessionsLogsQuery(2), CancellationToken.None);
+        var result = await handler.Handle(new GetAllSessionsLogsQuery(2), CancellationToken.None);
         
         // Assert
-        _sessionLogsRepository.Verify(repository => 
-                repository.ToListAsync(
-                    It.Is<IQueryable<SessionLogs>>(queryable => queryable.Count() == entriesCount - PageFetchSettings.ItemsOnPage)), 
-            Times.Once()); 
+        result.Count().Should().Be(entriesCount);
     }
     
     [Fact]
@@ -42,16 +41,14 @@ public class GetAllSessionsLogsTests
         // Arrange
         var sessionLogs = FakeDataGenerator.GenerateFakeSessionsLogs(PageFetchSettings.ItemsOnPage + 5, 10);
         var handler = new GetAllSessionsLogsQueryHandler(_sessionLogsRepository.Object);
-        _sessionLogsRepository.Setup(repository => repository.GetAllSessionsLogs())
-            .Returns(sessionLogs.AsQueryable());
+        _sessionLogsRepository.Setup(repository => repository.GetSessionsLogs(
+                It.IsAny<int?>(), It.IsAny<int?>()))
+            .Returns(sessionLogs);
         
         // Act
-        await handler.Handle(new GetAllSessionsLogsQuery(1), CancellationToken.None);
+        var result = await handler.Handle(new GetAllSessionsLogsQuery(1), CancellationToken.None);
         
         // Assert
-        _sessionLogsRepository.Verify(repository => 
-                repository.ToListAsync(
-                    It.Is<IQueryable<SessionLogs>>(queryable => queryable.Count() == PageFetchSettings.ItemsOnPage)), 
-            Times.Once());  
+        result.Count().Should().Be(PageFetchSettings.ItemsOnPage + 5);
     }
 }

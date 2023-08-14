@@ -10,7 +10,8 @@ public class ApplicationConfiguration : IApplicationConfiguration
     public string DatabaseConnectionString { get; private set; } = string.Empty;
     public bool IsDevelopmentEnvironment { get; private set; }
     public string CacheServiceConnectionString { get; set; } = string.Empty;
-    
+    public string DatabaseName { get; set; } = string.Empty;
+
     public ApplicationConfiguration(IConfiguration configuration)
     {
         IsDevelopmentEnvironment = string.Equals(
@@ -42,22 +43,27 @@ public class ApplicationConfiguration : IApplicationConfiguration
     {
         var dbConnectionString = configuration.GetConnectionString("SessionsDbContext");
         var cacheConnectionString = configuration.GetConnectionString("CacheDbContext");
+        var databaseName = configuration.GetConnectionString("DatabaseName");
 
         // This is used for test environment. I could use appsettings.Integrations.json,
         // but im getting connection string to database in runtime at startup of integration tests
         if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TEST_ConnectionString")))
         {
-            dbConnectionString = Environment.GetEnvironmentVariable("TEST_ConnectionString");
             cacheConnectionString = Environment.GetEnvironmentVariable("TEST_CacheHost");
+            databaseName = Environment.GetEnvironmentVariable("TEST_DatabaseName");
+            dbConnectionString = Environment.GetEnvironmentVariable("TEST_ConnectionString") + databaseName + "?authSource=admin";
         }
 
-        if (string.IsNullOrEmpty(dbConnectionString) || string.IsNullOrEmpty(cacheConnectionString))
+        if (string.IsNullOrEmpty(dbConnectionString) || 
+            string.IsNullOrEmpty(cacheConnectionString) ||
+            string.IsNullOrEmpty(databaseName))
         {
             return false;
         }
 
         DatabaseConnectionString =  dbConnectionString;
         CacheServiceConnectionString = cacheConnectionString;
+        DatabaseName = databaseName;
         
         return true;
     }
@@ -74,6 +80,7 @@ public class ApplicationConfiguration : IApplicationConfiguration
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
         IsDevelopmentEnvironment = true;
         DatabaseConnectionString = "Data Source=SessionsContext.db";
+        DatabaseName = "SessionsContext";
         
         return true;
     }

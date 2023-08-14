@@ -2,10 +2,11 @@
 using Application.Abstractions;
 using Application.Abstractions.Repositories;
 using Hangfire;
+using Hangfire.Mongo;
 using Hangfire.PostgreSql;
 using Infrastructure.Configurations;
 using Infrastructure.Persistence;
-using Infrastructure.Persistence.Repositories;
+using Infrastructure.Persistence.MongoRepositories;
 using Infrastructure.Services;
 using Infrastructure.Services.KafkaConsumer;
 using Infrastructure.Services.KafkaConsumer.Abstractions;
@@ -13,6 +14,7 @@ using Infrastructure.Services.KafkaConsumer.Handlers.CreateProduct;
 using Infrastructure.Services.KafkaConsumer.Handlers.DeleteProduct;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
 
 namespace Infrastructure;
 
@@ -22,16 +24,28 @@ public static class InfrastructureInjection
         this IServiceCollection serviceCollection, 
         IApplicationConfiguration configuration)
     {
-        return configuration.IsDevelopmentEnvironment
-            ? serviceCollection.AddSqliteDatabase(configuration.DatabaseConnectionString)
-            : serviceCollection.AddPostgresDatabase(configuration.DatabaseConnectionString);
+        if (configuration.IsDevelopmentEnvironment)
+        {
+            return serviceCollection.AddSqlite<>()
+        }
+        else
+        {
+            return serviceCollection.AddMongoDb();
+        }
     }
 
-    private static IServiceCollection AddSqliteDatabase(
-        this IServiceCollection serviceCollection, 
-        string? connectionString)
+    private static IServiceCollection AddMongoDb(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddDbContext<VersitySessionsServiceDbContext>(options =>
+        serviceCollection.AddSingleton<VersitySessionsServiceMongoDbContext>();
+
+        return serviceCollection;
+    }
+    
+    private static IServiceCollection AddSqliteDatabase<T>(
+        this IServiceCollection serviceCollection, 
+        string? connectionString) where T : DbContext
+    {
+        serviceCollection.AddDbContext<T>(options =>
         {
             options.EnableDetailedErrors();
             options.UseSqlite(
@@ -45,11 +59,11 @@ public static class InfrastructureInjection
         return serviceCollection;
     }
 
-    private static IServiceCollection AddPostgresDatabase(
+    private static IServiceCollection AddPostgresDatabase<T>(
         this IServiceCollection serviceCollection, 
-        string? connectionString)
+        string? connectionString) where T : DbContext
     {
-        serviceCollection.AddDbContext<VersitySessionsServiceDbContext>(options =>
+        serviceCollection.AddDbContext<T>(options =>
         {
             options.EnableDetailedErrors();
             AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
@@ -67,10 +81,10 @@ public static class InfrastructureInjection
     
     public static IServiceCollection AddRepositories(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddScoped<ISessionsRepository, SessionsRepository>();
-        serviceCollection.AddScoped<IProductsRepository, ProductRepository>();
-        serviceCollection.AddScoped<ISessionLogsRepository, SessionLogsRepository>();
-        serviceCollection.AddScoped<ILogsDataRepository, LogsDataRepository>();
+        serviceCollection.AddScoped<ISessionsRepository, SessionsMongoRepository>();
+        serviceCollection.AddScoped<IProductsRepository, ProductMongoRepository>();
+        serviceCollection.AddScoped<ISessionLogsRepository, SessionLogsMongoRepository>();
+        serviceCollection.AddScoped<ILogsDataRepository, LogsDataMongoRepository>();
         
         return serviceCollection;
     }
@@ -114,7 +128,8 @@ public static class InfrastructureInjection
             }
             else
             {
-                configuration.UsePostgreSqlStorage(applicationConfiguration.DatabaseConnectionString);
+                // configuration.UseMongoStorage(applicationConfiguration.DatabaseConnectionString);
+                configuration.UseInMemoryStorage();
             }
         });
 

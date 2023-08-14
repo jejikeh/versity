@@ -2,7 +2,7 @@
 using Application.Abstractions.Repositories;
 using Domain.Models;
 using FluentAssertions;
-using Infrastructure.Persistence.Repositories;
+using Infrastructure.Persistence.MongoRepositories;
 using Moq;
 using Sessions.Tests.Application;
 
@@ -25,14 +25,15 @@ public class CachedSessionsRepositoryTests
     public void GetAllSessions_ShouldReturnSessionsFromRepository_WhenValueNotCached()
     {
         // Arrange
-        _sessionsRepository.Setup(repository => repository.GetAllSessions())
+        _sessionsRepository.Setup(repository => repository.GetSessions(
+                It.IsAny<int?>(), It.IsAny<int?>()))
             .Returns(FakeDataGenerator.GenerateFakeSessions(10, 10).AsQueryable());
         
         // Act
-        _cachedSessions.GetAllSessions();
+        _cachedSessions.GetSessions(1, 2);
         
         // Assert
-        _sessionsRepository.Verify(repository => repository.GetAllSessions(), Times.Once());
+        _sessionsRepository.Verify(repository => repository.GetSessions(1, 2), Times.Once());
     }
     
     [Fact]
@@ -56,14 +57,17 @@ public class CachedSessionsRepositoryTests
     public void GetAllUserSessions_ShouldReturnSessionsFromRepository_WhenValueNotCached()
     {
         // Arrange
-        _sessionsRepository.Setup(repository => repository.GetAllUserSessions(It.IsAny<string>()))
+        _sessionsRepository.Setup(repository => repository.GetAllUserSessions(
+                It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<int?>()))
             .Returns(FakeDataGenerator.GenerateFakeSessions(10, 10).AsQueryable());
         
         // Act
-        _cachedSessions.GetAllUserSessions(Guid.NewGuid().ToString());
+        _cachedSessions.GetAllUserSessions(Guid.NewGuid().ToString(), 1, 1);
         
         // Assert
-        _sessionsRepository.Verify(repository => repository.GetAllUserSessions(It.IsAny<string>()), Times.Once());
+        _sessionsRepository.Verify(repository => repository.GetAllUserSessions(
+            It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<int?>()), 
+            Times.Once());
     }
     
     [Fact]

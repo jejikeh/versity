@@ -12,6 +12,7 @@ public static class TestUtils
     {
         Environment.SetEnvironmentVariable("TEST_ConnectionString", dbConnectionString);
         Environment.SetEnvironmentVariable("TEST_CacheHost", redisConnectionString);
+        Environment.SetEnvironmentVariable("TEST_DatabaseName", "versity_sessions");
         Environment.SetEnvironmentVariable("ElasticConfiguration:Uri", elasticsearchConnectionString);
         Environment.SetEnvironmentVariable("KAFKA_Host", kafkaConnectionString);
         Environment.SetEnvironmentVariable("KAFKA_ProducerName", "versity.products.tests");

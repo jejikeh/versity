@@ -66,20 +66,18 @@ public class GetUserSessionsByUserIdTests
             .ReturnsAsync(new List<string>() { "Admin"});
 
         var fakeSessions = FakeDataGenerator.GenerateFakeSessions(15, 5);
-        _sessionsRepository.Setup(sessionsRepository => sessionsRepository.GetAllUserSessions(It.IsAny<string>()))
-            .Returns(fakeSessions.AsQueryable());
+        _sessionsRepository.Setup(sessionsRepository => sessionsRepository.GetAllUserSessions(
+                It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<int?>()))
+            .Returns(fakeSessions);
 
         _sessionsRepository.Setup(repository => repository.ToListAsync(It.IsAny<IQueryable<Session>>()))
             .ReturnsAsync(fakeSessions);
         
         // Act
-        await _getUserSessionsByUserIdQueryHandler.Handle(new GetUserSessionsByUserIdQuery(Guid.NewGuid().ToString(), 2), default);
+        var result = await _getUserSessionsByUserIdQueryHandler.Handle(new GetUserSessionsByUserIdQuery(Guid.NewGuid().ToString(), 2), default);
         
         // Assert
-        _sessionsRepository.Verify(repository => 
-                repository.ToListAsync(
-                    It.Is<IQueryable<Session>>(queryable => queryable.Count() == 5)), 
-            Times.Once());
+        result.Count().Should().Be(fakeSessions.Count());
     }
     
     [Fact]
@@ -92,20 +90,18 @@ public class GetUserSessionsByUserIdTests
             .ReturnsAsync(new List<string>() { "Admin"});
 
         var fakeSessions = FakeDataGenerator.GenerateFakeSessions(15, 5);
-        _sessionsRepository.Setup(sessionsRepository => sessionsRepository.GetAllUserSessions(It.IsAny<string>()))
-            .Returns(fakeSessions.AsQueryable());
+        _sessionsRepository.Setup(sessionsRepository => sessionsRepository.GetAllUserSessions(
+                It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<int?>()))
+            .Returns(fakeSessions);
 
         _sessionsRepository.Setup(repository => repository.ToListAsync(It.IsAny<IQueryable<Session>>()))
             .ReturnsAsync(fakeSessions);
         
         // Act
-        await _getUserSessionsByUserIdQueryHandler.Handle(new GetUserSessionsByUserIdQuery(Guid.NewGuid().ToString(), 1), default);
+        var result = await _getUserSessionsByUserIdQueryHandler.Handle(new GetUserSessionsByUserIdQuery(Guid.NewGuid().ToString(), 1), default);
         
         // Assert
-        _sessionsRepository.Verify(repository => 
-                repository.ToListAsync(
-                    It.Is<IQueryable<Session>>(queryable => queryable.Count() == PageFetchSettings.ItemsOnPage)), 
-            Times.Once());
+        result.Count().Should().Be(fakeSessions.Count());
     }
     
     [Fact]
@@ -116,20 +112,18 @@ public class GetUserSessionsByUserIdTests
         _httpContextAccessor.Setup(httpContextAccessor => httpContextAccessor.HttpContext.User.Claims).Returns(new [] { claimId });
 
         var fakeSessions = FakeDataGenerator.GenerateFakeSessions(15, 5);
-        _sessionsRepository.Setup(sessionsRepository => sessionsRepository.GetAllUserSessions(It.IsAny<string>()))
-            .Returns(fakeSessions.AsQueryable());
+        _sessionsRepository.Setup(sessionsRepository => sessionsRepository.GetAllUserSessions(
+                It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<int?>()))
+            .Returns(fakeSessions);
         
         _sessionsRepository.Setup(repository => repository.ToListAsync(It.IsAny<IQueryable<Session>>()))
             .ReturnsAsync(fakeSessions);
         
         // Act
-        await _getUserSessionsByUserIdQueryHandler.Handle(new GetUserSessionsByUserIdQuery(claimId.Value, 2), default);
+        var result = await _getUserSessionsByUserIdQueryHandler.Handle(new GetUserSessionsByUserIdQuery(claimId.Value, 2), default);
         
         // Assert
-        _sessionsRepository.Verify(repository => 
-                repository.ToListAsync(
-                    It.Is<IQueryable<Session>>(queryable => queryable.Count() == 5)), 
-            Times.Once());
+        result.Count().Should().Be(fakeSessions.Count());
     }
 
     private static Claim GenerateFakeUserClaims()

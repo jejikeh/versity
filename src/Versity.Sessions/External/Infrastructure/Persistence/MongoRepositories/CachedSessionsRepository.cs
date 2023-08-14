@@ -3,7 +3,7 @@ using Application.Abstractions.Repositories;
 using Application.Common;
 using Domain.Models;
 
-namespace Infrastructure.Persistence.Repositories;
+namespace Infrastructure.Persistence.MongoRepositories;
 
 public class CachedSessionsRepository : ISessionsRepository
 {
@@ -16,9 +16,19 @@ public class CachedSessionsRepository : ISessionsRepository
         _distributedCache = distributedCache;
     }
 
-    public IQueryable<Session> GetAllSessions()
+    public IEnumerable<Session> GetSessions(int? skipCount, int? takeCount)
     {
-        return _sessions.GetAllSessions();
+        return _sessions.GetSessions(skipCount, takeCount);
+    }
+
+    public IEnumerable<Session> GetExpiredSessions()
+    {
+        return _sessions.GetExpiredSessions();
+    }
+
+    public IEnumerable<Session> GetInactiveSessions()
+    {
+        return _sessions.GetInactiveSessions();
     }
 
     public async Task<Session?> GetSessionByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -28,9 +38,9 @@ public class CachedSessionsRepository : ISessionsRepository
             async () => await _sessions.GetSessionByIdAsync(id, cancellationToken));
     }
 
-    public IQueryable<Session> GetAllUserSessions(string userId)
+    public IEnumerable<Session> GetAllUserSessions(string userId, int? skipCount, int? takeCount)
     {
-        return _sessions.GetAllUserSessions(userId);
+       return _sessions.GetAllUserSessions(userId, skipCount, takeCount);
     }
 
     public IQueryable<Session> GetAllProductSessions(Guid productId)
@@ -48,6 +58,11 @@ public class CachedSessionsRepository : ISessionsRepository
         return _sessions.CreateSessionRangeAsync(sessions, cancellationToken);
     }
 
+    public Task<Session> UpdateSessionAsync(Session session, CancellationToken cancellationToken)
+    {
+        return _sessions.UpdateSessionAsync(session, cancellationToken);
+    }
+    
     public Session UpdateSession(Session session)
     {
         return _sessions.UpdateSession(session);

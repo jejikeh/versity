@@ -16,12 +16,10 @@ public class GetAllProductQueryHandler : IRequestHandler<GetAllProductsQuery, IE
 
     public async Task<IEnumerable<Product>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
     {
-        var products = _productsRepository
-            .GetAllProducts()
-            .OrderBy(x => x.Id)
-            .Skip(PageFetchSettings.ItemsOnPage * (request.Page - 1))
-            .Take(PageFetchSettings.ItemsOnPage);
+        var products = _productsRepository.GetProducts(
+            PageFetchSettings.ItemsOnPage * (request.Page - 1),
+            PageFetchSettings.ItemsOnPage);
 
-        return await _productsRepository.ToListAsync(products);
+        return products;
     }
 }

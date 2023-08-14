@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(VersitySessionsServiceDbContext))]
-    [Migration("20230814160947_Initial")]
-    partial class Initial
+    [Migration("20230814170428_Initial-Setup")]
+    partial class InitialSetup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

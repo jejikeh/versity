@@ -1,48 +1,33 @@
 ﻿using Application.Abstractions.Repositories;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 
-namespace Infrastructure.Persistence.Repositories;
+namespace Infrastructure.Persistence.SqlRepositories;
 
-public class SessionsRepository : ISessionsRepository
+public class SessionsSqlRepository : ISessionsRepository
 {
-    private readonly VersitySessionsServiceDbContext _context;
+    private readonly VersitySessionsServiceSqlDbContext _context;
 
-    public SessionsRepository(VersitySessionsServiceDbContext context)
+    public SessionsSqlRepository(VersitySessionsServiceSqlDbContext context)
     {
         _context = context;
     }
-
-    public IQueryable<Session> GetAllSessions()
-    {
-        return _context.Sessions
-            .Include(x => x.Product)
-            .Include(x => x.Logs)
-            .AsQueryable();
-    }
+    
 
     public async Task<Session?> GetSessionByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await _context.Sessions
-            .Include(x => x.Product)
-            .Include(x => x.Logs)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return await _context.Sessions.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
     public IQueryable<Session> GetAllUserSessions(string userId)
     {
-        return _context.Sessions
-            .Include(x => x.Product)
-            .Include(x => x.Logs)
-            .Where(x => x.UserId == userId);
+        return _context.Sessions.Where(x => x.UserId == userId);
     }
 
     public IQueryable<Session> GetAllProductSessions(Guid productId)
     {
-        return _context.Sessions
-            .Include(x => x.Product)
-            .Include(x => x.Logs)
-            .Where(x => x.Product.Id == productId);
+        return _context.Sessions.Where(x => x.ProductId == productId);
     }
 
     public async Task<Session> CreateSessionAsync(Session session, CancellationToken cancellationToken)
@@ -65,11 +50,6 @@ public class SessionsRepository : ISessionsRepository
     public void DeleteSession(Session session)
     {
         _context.Remove(session);
-    }
-
-    public async Task<List<Session>> ToListAsync(IQueryable<Session> sessions)
-    {
-        return await sessions.ToListAsync();
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken)

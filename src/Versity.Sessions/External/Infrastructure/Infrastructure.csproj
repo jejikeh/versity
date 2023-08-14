@@ -22,6 +22,7 @@
     <PackageReference Include="Hangfire" Version="1.8.3" />
     <PackageReference Include="Hangfire.Core" Version="1.8.3" />
     <PackageReference Include="Hangfire.InMemory" Version="0.5.1" />
+    <PackageReference Include="Hangfire.Mongo" Version="1.9.7" />
     <PackageReference Include="Hangfire.PostgreSql" Version="1.19.12" />
     <PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
     <PackageReference Include="KafkaFlow.TypedHandler" Version="2.3.0" />
@@ -31,6 +32,7 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="7.0.0" />
+      <PackageReference Include="MongoDB.Driver" Version="2.21.0" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
       <PackageReference Include="NRedisStack" Version="0.8.0" />
       <PackageReference Include="Scrutor" Version="4.2.2" />

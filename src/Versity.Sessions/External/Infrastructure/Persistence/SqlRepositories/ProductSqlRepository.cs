@@ -1,21 +1,35 @@
 ﻿using Application.Abstractions.Repositories;
 using Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 
-namespace Infrastructure.Persistence.Repositories;
+namespace Infrastructure.Persistence.SqlRepositories;
 
-public class ProductRepository : IProductsRepository
+public class ProductSqlRepository : IProductsRepository
 {
-    private readonly VersitySessionsServiceDbContext _context;
+    private readonly VersitySessionsServiceSqlDbContext _context;
 
-    public ProductRepository(VersitySessionsServiceDbContext context)
+    public ProductSqlRepository(VersitySessionsServiceSqlDbContext context)
     {
         _context = context;
     }
-
-    public IQueryable<Product> GetAllProducts()
+    
+    public IEnumerable<Product> GetProducts(int? skipCount, int? takeCount)
     {
-        return _context.Products.AsQueryable();
+        if (skipCount is null && takeCount is null)
+        {
+            return _context.Products
+                .AsQueryable()
+                .OrderBy(data => data.Title)
+                .ToList();
+        }
+        
+        return _context.Products
+            .AsQueryable()
+            .OrderBy(data => data.Title)
+            .Skip(skipCount ?? 0)
+            .Take(takeCount ?? 10)
+            .ToList();
     }
 
     public async Task<Product?> GetProductByIdAsync(Guid id, CancellationToken cancellationToken)
@@ -40,19 +54,9 @@ public class ProductRepository : IProductsRepository
         await _context.AddRangeAsync(products, cancellationToken);
     }
 
-    public Product UpdateProduct(Product product)
-    {
-        return _context.Update(product).Entity;
-    }
-
     public void DeleteProduct(Product product)
     {
         _context.Remove(product);
-    }
-
-    public async Task<List<Product>> ToListAsync(IQueryable<Product> products)
-    {
-        return await products.ToListAsync();
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken)

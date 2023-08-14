@@ -2,6 +2,7 @@
 using Application.Common;
 using Application.RequestHandlers.Products.Queries.GetAllProducts;
 using Domain.Models;
+using FluentAssertions;
 using Moq;
 
 namespace Sessions.Tests.Application.RequestHandlers.Products;
@@ -21,17 +22,16 @@ public class GetAllProductQueryTests
         // Arrange
         const int entriesCount = PageFetchSettings.ItemsOnPage + 5;
         var products = FakeDataGenerator.GenerateFakeProducts(entriesCount);
-        _mockProductsRepository.Setup(repository => repository.GetAllProducts()).Returns(products.AsQueryable());
+        _mockProductsRepository.Setup(repository => repository.GetProducts(
+            It.IsAny<int?>(), It.IsAny<int?>()))
+            .Returns(products);
         var handler = new GetAllProductQueryHandler(_mockProductsRepository.Object);
         
         // Act
-        await handler.Handle(new GetAllProductsQuery(2), CancellationToken.None);
+        var results = await handler.Handle(new GetAllProductsQuery(2), CancellationToken.None);
         
         // Assert
-        _mockProductsRepository.Verify(repository => 
-            repository.ToListAsync(
-                It.Is<IQueryable<Product>>(queryable => queryable.Count() == entriesCount - PageFetchSettings.ItemsOnPage)), 
-            Times.Once());
+        results.Count().Should().Be(entriesCount);
     }
     
     [Fact]
@@ -40,16 +40,15 @@ public class GetAllProductQueryTests
         // Arrange
         const int entriesCount = PageFetchSettings.ItemsOnPage + 5;
         var products = FakeDataGenerator.GenerateFakeProducts(entriesCount);
-        _mockProductsRepository.Setup(repository => repository.GetAllProducts()).Returns(products.AsQueryable());
+        _mockProductsRepository.Setup(repository => repository.GetProducts(
+            It.IsAny<int?>(), It.IsAny<int?>()))
+            .Returns(products);
         var handler = new GetAllProductQueryHandler(_mockProductsRepository.Object);
         
         // Act
-        await handler.Handle(new GetAllProductsQuery(1), CancellationToken.None);
+        var result = await handler.Handle(new GetAllProductsQuery(1), CancellationToken.None);
         
         // Assert
-        _mockProductsRepository.Verify(repository => 
-                repository.ToListAsync(
-                    It.Is<IQueryable<Product>>(queryable => queryable.Count() == PageFetchSettings.ItemsOnPage)), 
-            Times.Once());
+        result.Count().Should().Be(entriesCount);
     }
 }

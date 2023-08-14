@@ -4,7 +4,7 @@ namespace Application.Dtos;
 
 public record UserSessionsViewModel(
     Guid Id, 
-    string ProductTitle,
+    Guid ProductId,
     Guid SessionLogsId,
     DateTime Start,
     DateTime Expiry,
@@ -14,14 +14,14 @@ public record UserSessionsViewModel(
     {
         return new UserSessionsViewModel(
             session.Id,
-            session.Product.Title,
-            session.Logs.Id,
+            session.ProductId,
+            session.LogsId ?? new Guid(),
             session.Start,
             session.Expiry,
             session.Status);
     }
 
-    public static IEnumerable<UserSessionsViewModel> MapWithModels(List<Session> models)
+    public static IEnumerable<UserSessionsViewModel> MapWithModels(IEnumerable<Session> models)
     {
         var viewModels = new List<UserSessionsViewModel>();
         foreach (var session in models) 

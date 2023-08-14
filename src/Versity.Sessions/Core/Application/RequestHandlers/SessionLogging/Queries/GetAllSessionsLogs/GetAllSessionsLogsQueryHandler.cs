@@ -16,12 +16,10 @@ public class GetAllSessionsLogsQueryHandler : IRequestHandler<GetAllSessionsLogs
 
     public async Task<IEnumerable<SessionLogs>> Handle(GetAllSessionsLogsQuery request, CancellationToken cancellationToken)
     {
-        var sessionLogs = _sessionLogsRepository
-            .GetAllSessionsLogs()
-            .OrderBy(x => x.Session.Start)
-            .Skip(PageFetchSettings.ItemsOnPage * (request.Page - 1))
-            .Take(PageFetchSettings.ItemsOnPage);
+        var sessionLogs = _sessionLogsRepository.GetSessionsLogs(
+            PageFetchSettings.ItemsOnPage * (request.Page - 1),
+            PageFetchSettings.ItemsOnPage);
 
-        return await _sessionLogsRepository.ToListAsync(sessionLogs);
+        return sessionLogs;
     }
 }

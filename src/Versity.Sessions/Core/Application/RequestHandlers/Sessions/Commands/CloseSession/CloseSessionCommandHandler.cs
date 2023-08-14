@@ -27,7 +27,7 @@ public class CloseSessionCommandHandler : IRequestHandler<CloseSessionCommand, G
         }
 
         session.Status = SessionStatus.Closed;
-        _sessionsRepository.UpdateSession(session);
+        await _sessionsRepository.UpdateSessionAsync(session, cancellationToken);
         await _sessionsRepository.SaveChangesAsync(cancellationToken);
         _notificationSender.PushClosedSession(session.UserId, UserSessionsViewModel.MapWithModel(session));
         

@@ -5,7 +5,7 @@ namespace Application.Dtos;
 public record GetSessionByIdViewModel(
     Guid Id,
     string UserId,
-    Product Product,
+    Guid ProductId,
     Guid LogsId,
     DateTime Start,
     DateTime Expiry,
@@ -16,8 +16,8 @@ public record GetSessionByIdViewModel(
         return new GetSessionByIdViewModel(
             session.Id,
             session.UserId,
-            session.Product,
-            session.Logs.Id,
+            session.ProductId,
+            session.LogsId ?? new Guid(),
             session.Start,
             session.Expiry,
             session.Status);
