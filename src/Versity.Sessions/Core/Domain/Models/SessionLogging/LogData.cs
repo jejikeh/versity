@@ -19,4 +19,7 @@ public class LogData
     
     [BsonElement("session_logs_id")]
     public Guid SessionLogsId { get; set; }
+
+    [BsonIgnore] 
+    public SessionLogs SessionLogs { get; set; } = null!;
 }

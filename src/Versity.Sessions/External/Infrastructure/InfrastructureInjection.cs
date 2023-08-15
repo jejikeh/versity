@@ -2,11 +2,10 @@
 using Application.Abstractions;
 using Application.Abstractions.Repositories;
 using Hangfire;
-using Hangfire.Mongo;
-using Hangfire.PostgreSql;
 using Infrastructure.Configurations;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.MongoRepositories;
+using Infrastructure.Persistence.SqlRepositories;
 using Infrastructure.Services;
 using Infrastructure.Services.KafkaConsumer;
 using Infrastructure.Services.KafkaConsumer.Abstractions;
@@ -14,7 +13,6 @@ using Infrastructure.Services.KafkaConsumer.Handlers.CreateProduct;
 using Infrastructure.Services.KafkaConsumer.Handlers.DeleteProduct;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Driver;
 
 namespace Infrastructure;
 
@@ -24,19 +22,16 @@ public static class InfrastructureInjection
         this IServiceCollection serviceCollection, 
         IApplicationConfiguration configuration)
     {
-        if (configuration.IsDevelopmentEnvironment)
-        {
-            return serviceCollection.AddSqlite<>()
-        }
-        else
-        {
-            return serviceCollection.AddMongoDb();
-        }
+        return configuration.IsDevelopmentEnvironment 
+            ? serviceCollection.AddSqliteDatabase<VersitySessionsServiceSqlDbContext>(configuration.DatabaseConnectionString) 
+            : serviceCollection.AddMongoDb();
     }
 
     private static IServiceCollection AddMongoDb(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddSingleton<VersitySessionsServiceMongoDbContext>();
+        return serviceCollection
+            .AddSingleton<VersitySessionsServiceMongoDbContext>()
+            .AddMongoRepositories();
 
         return serviceCollection;
     }
@@ -55,6 +50,8 @@ public static class InfrastructureInjection
                     builder.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
                 });
         });
+
+        serviceCollection.AddSqlRepositories();
 
         return serviceCollection;
     }
@@ -79,12 +76,22 @@ public static class InfrastructureInjection
         return serviceCollection;
     }
     
-    public static IServiceCollection AddRepositories(this IServiceCollection serviceCollection)
+    private static IServiceCollection AddMongoRepositories(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<ISessionsRepository, SessionsMongoRepository>();
         serviceCollection.AddScoped<IProductsRepository, ProductMongoRepository>();
         serviceCollection.AddScoped<ISessionLogsRepository, SessionLogsMongoRepository>();
         serviceCollection.AddScoped<ILogsDataRepository, LogsDataMongoRepository>();
+        
+        return serviceCollection;
+    }
+    
+    private static IServiceCollection AddSqlRepositories(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddScoped<ISessionsRepository, SessionsSqlRepository>();
+        serviceCollection.AddScoped<IProductsRepository, ProductSqlRepository>();
+        serviceCollection.AddScoped<ISessionLogsRepository, SessionLogsSqlRepository>();
+        serviceCollection.AddScoped<ILogsDataRepository, LogsDataSqlRepository>();
         
         return serviceCollection;
     }

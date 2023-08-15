@@ -11,4 +11,10 @@ public class SessionLogs
     
     [BsonElement("session_id")]
     public Guid SessionId { get; set; }
+
+    [BsonIgnore] 
+    public Session Session { get; set; } = null!;
+
+    [BsonIgnore, JsonIgnore] 
+    public ICollection<LogData> Logs { get; set; } = null!;
 }

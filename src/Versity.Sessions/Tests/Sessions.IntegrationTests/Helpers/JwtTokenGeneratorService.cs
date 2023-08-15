@@ -5,11 +5,11 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
-namespace Products.Tests.Integrations.Helpers;
+namespace Sessions.IntegrationTests.Helpers;
 
-public class JwtTokenGeneratorService
+public static class JwtTokenGeneratorService
 {
-    public string GenerateToken(string userId, string userEmail, IEnumerable<string> roles)
+    public static string GenerateToken(string userId, string userEmail, IEnumerable<string> roles)
     {
         var claims = new List<Claim>()
         {
@@ -24,10 +24,10 @@ public class JwtTokenGeneratorService
         var securityToken = new JwtSecurityToken(
             claims: claims,
             expires: DateTime.UtcNow.AddHours(6),
-            issuer: Environment.GetEnvironmentVariable("JWT__Issuer"),
-            audience: Environment.GetEnvironmentVariable("JWT__Audience"),
+            issuer: "versity.identity",
+            audience: "versity.identity",
             signingCredentials: new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT__Key"))), 
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes("865D92FD-B1C8-41A4-850F-409792C9B740")), 
                 SecurityAlgorithms.HmacSha512Signature));
         
         return new JwtSecurityTokenHandler().WriteToken(securityToken);

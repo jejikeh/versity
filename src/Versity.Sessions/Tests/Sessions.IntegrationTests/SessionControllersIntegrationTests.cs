@@ -7,7 +7,6 @@ using Domain.Models.SessionLogging;
 using FluentAssertions;
 using Infrastructure.Services.KafkaConsumer;
 using Microsoft.Extensions.DependencyInjection;
-using Products.Tests.Integrations.Helpers;
 using Sessions.IntegrationTests.Fixture;
 using Sessions.IntegrationTests.Helpers;
 using Sessions.Tests.Integrations.Helpers.Http;
@@ -26,7 +25,7 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
         _httpClient = _controllersAppFactory.CreateClient();
         
         var jwtTokenGeneratorService = new JwtTokenGeneratorService();
-        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
+        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + JwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
         
         using var scope = _controllersAppFactory.Services.CreateScope();
         var kafkaProductConsumerService = scope.ServiceProvider.GetService<KafkaProductConsumerService>();

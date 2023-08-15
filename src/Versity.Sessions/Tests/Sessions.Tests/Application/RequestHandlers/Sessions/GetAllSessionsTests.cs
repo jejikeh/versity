@@ -28,9 +28,6 @@ public class GetAllSessionsTests
                 It.IsAny<int?>(), It.IsAny<int?>()))
             .Returns(sessionLogs);
 
-        _sessionsRepository.Setup(repository => repository.ToListAsync(It.IsAny<IQueryable<Session>>()))
-            .ReturnsAsync(sessionLogs);
-        
         // Act
         var result = await _getAllSessionsQueryHandler.Handle(new GetAllSessionsQuery(2), CancellationToken.None);
         
@@ -47,9 +44,6 @@ public class GetAllSessionsTests
                 It.IsAny<int?>(), It.IsAny<int?>()))
             .Returns(sessionLogs);
 
-        _sessionsRepository.Setup(repository => repository.ToListAsync(It.IsAny<IQueryable<Session>>()))
-            .ReturnsAsync(sessionLogs);
-        
         // Act
         var result = await _getAllSessionsQueryHandler.Handle(new GetAllSessionsQuery(1), CancellationToken.None);
         

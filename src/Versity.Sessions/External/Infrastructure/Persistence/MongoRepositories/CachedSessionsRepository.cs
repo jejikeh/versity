@@ -43,9 +43,9 @@ public class CachedSessionsRepository : ISessionsRepository
        return _sessions.GetAllUserSessions(userId, skipCount, takeCount);
     }
 
-    public IQueryable<Session> GetAllProductSessions(Guid productId)
+    public IEnumerable<Session> GetAllProductSessions(Guid productId, int? skipCount, int? takeCount)
     {
-        return _sessions.GetAllProductSessions(productId);
+        return _sessions.GetAllProductSessions(productId, skipCount, takeCount);
     }
 
     public Task<Session> CreateSessionAsync(Session session, CancellationToken cancellationToken)
@@ -71,11 +71,6 @@ public class CachedSessionsRepository : ISessionsRepository
     public void DeleteSession(Session session)
     {
         _sessions.DeleteSession(session);
-    }
-
-    public Task<List<Session>> ToListAsync(IQueryable<Session> sessions)
-    {
-        return _sessions.ToListAsync(sessions);
     }
 
     public Task SaveChangesAsync(CancellationToken cancellationToken)

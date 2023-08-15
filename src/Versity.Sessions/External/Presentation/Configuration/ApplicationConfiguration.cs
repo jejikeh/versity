@@ -14,11 +14,7 @@ public class ApplicationConfiguration : IApplicationConfiguration
 
     public ApplicationConfiguration(IConfiguration configuration)
     {
-        IsDevelopmentEnvironment = string.Equals(
-            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), 
-            "development", 
-            StringComparison.InvariantCultureIgnoreCase);
-
+        IsDevelopmentEnvironment = IsDevelopment();
         _ = SetupDbConnectionString(configuration) || FallBackToDevelopmentEnvironment();
     }
 
@@ -83,5 +79,13 @@ public class ApplicationConfiguration : IApplicationConfiguration
         DatabaseName = "SessionsContext";
         
         return true;
+    }
+    
+    private static bool IsDevelopment()
+    {
+        return string.Equals(
+            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), 
+            "development", 
+            StringComparison.InvariantCultureIgnoreCase);
     }
 }

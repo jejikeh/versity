@@ -70,9 +70,6 @@ public class GetUserSessionsByUserIdTests
                 It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<int?>()))
             .Returns(fakeSessions);
 
-        _sessionsRepository.Setup(repository => repository.ToListAsync(It.IsAny<IQueryable<Session>>()))
-            .ReturnsAsync(fakeSessions);
-        
         // Act
         var result = await _getUserSessionsByUserIdQueryHandler.Handle(new GetUserSessionsByUserIdQuery(Guid.NewGuid().ToString(), 2), default);
         
@@ -94,9 +91,6 @@ public class GetUserSessionsByUserIdTests
                 It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<int?>()))
             .Returns(fakeSessions);
 
-        _sessionsRepository.Setup(repository => repository.ToListAsync(It.IsAny<IQueryable<Session>>()))
-            .ReturnsAsync(fakeSessions);
-        
         // Act
         var result = await _getUserSessionsByUserIdQueryHandler.Handle(new GetUserSessionsByUserIdQuery(Guid.NewGuid().ToString(), 1), default);
         
@@ -115,9 +109,6 @@ public class GetUserSessionsByUserIdTests
         _sessionsRepository.Setup(sessionsRepository => sessionsRepository.GetAllUserSessions(
                 It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<int?>()))
             .Returns(fakeSessions);
-        
-        _sessionsRepository.Setup(repository => repository.ToListAsync(It.IsAny<IQueryable<Session>>()))
-            .ReturnsAsync(fakeSessions);
         
         // Act
         var result = await _getUserSessionsByUserIdQueryHandler.Handle(new GetUserSessionsByUserIdQuery(claimId.Value, 2), default);

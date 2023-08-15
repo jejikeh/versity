@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using System.Reflection;
+using Domain.Models;
 using Domain.Models.SessionLogging;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,5 +14,11 @@ public class VersitySessionsServiceSqlDbContext : DbContext
 
     public VersitySessionsServiceSqlDbContext(DbContextOptions<VersitySessionsServiceSqlDbContext> options) : base(options)
     {
+    }
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

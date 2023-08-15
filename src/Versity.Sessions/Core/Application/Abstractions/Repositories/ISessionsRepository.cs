@@ -9,13 +9,12 @@ public interface ISessionsRepository
     public IEnumerable<Session> GetInactiveSessions();
     public Task<Session?> GetSessionByIdAsync(Guid id, CancellationToken cancellationToken);
     public IEnumerable<Session> GetAllUserSessions(string userId, int? skipCount, int? takeCount);
-    public IQueryable<Session> GetAllProductSessions(Guid productId);
+    public IEnumerable<Session> GetAllProductSessions(Guid productId, int? skipCount, int? takeCount);
     public Task<Session> CreateSessionAsync(Session session, CancellationToken cancellationToken);
     public Task CreateSessionRangeAsync(ICollection<Session> sessions, CancellationToken cancellationToken);
     public Task<Session> UpdateSessionAsync(Session session, CancellationToken cancellationToken);
     public Session UpdateSession(Session session);
     public void DeleteSession(Session session);
-    public Task<List<Session>> ToListAsync(IQueryable<Session> sessions);
     public Task SaveChangesAsync(CancellationToken cancellationToken);
     public void SaveChanges();
 }

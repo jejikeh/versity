@@ -66,11 +66,15 @@ public class SessionsMongoRepository : ISessionsRepository
             .Take(takeCount ?? 10);
     }
 
-    public IQueryable<Session> GetAllUserSessions(string userId)
+    public IEnumerable<Session> GetAllProductSessions(Guid productId, int? skipCount, int? takeCount)
     {
-        var result = _context.Sessions.Find(x => x.UserId == userId);
-
-        return result.ToList().AsQueryable();
+        var result = _context.Sessions.Find(x => x.ProductId == productId);
+        
+        return result
+            .ToList()
+            .OrderBy(data => data.Id)
+            .Skip(skipCount ?? 0)
+            .Take(takeCount ?? 10);
     }
 
     public IQueryable<Session> GetAllProductSessions(Guid productId)

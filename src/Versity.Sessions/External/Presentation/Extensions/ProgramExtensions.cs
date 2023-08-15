@@ -17,21 +17,22 @@ namespace Presentation.Extensions;
 
 public static class ProgramExtensions
 {
-    public static WebApplicationBuilder ConfigureBuilder(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder ConfigureBuilder(
+        this WebApplicationBuilder builder,
+        IApplicationConfiguration applicationConfiguration)
     {
-        var applicationConfiguration = new ApplicationConfiguration(builder.Configuration);
         var kafkaConsumerConfiguration = new KafkaConsumerConfiguration(builder.Configuration);
+        var tokenGenerationConfiguration = new TokenGenerationConfiguration(builder.Configuration);
         
         builder.Services
             .AddSingleton<IApplicationConfiguration>(applicationConfiguration)
             .AddDbContext(applicationConfiguration)
-            .AddRepositories()
             .AddRedisCaching(applicationConfiguration)
             .AddApplication()
             .InjectSignalR()
             .AddHttpContextAccessor()
             .AddNotificationServices()
-            .AddJwtAuthentication(builder.Configuration)
+            .AddJwtAuthentication(tokenGenerationConfiguration)
             .AddSwagger()
             .AddCors(options => options.ConfigureApiGatewayCors())
             .AddHangfireService(applicationConfiguration)
@@ -84,12 +85,20 @@ public static class ProgramExtensions
         return app;
     }
 
-    public static async Task<WebApplication> RunApplicationAsync(this WebApplication webApplication)
+    public static async Task<WebApplication> RunApplicationAsync(
+        this WebApplication webApplication,
+        IApplicationConfiguration applicationConfiguration)
     {
         using var scope = webApplication.Services.CreateScope();
         var serviceProvider = scope.ServiceProvider;
         try
         {
+            if (applicationConfiguration.IsDevelopmentEnvironment)
+            {
+                var versityUsersDbContext = serviceProvider.GetRequiredService<VersitySessionsServiceSqlDbContext>();
+                await versityUsersDbContext.Database.EnsureCreatedAsync();
+            }
+            
             await webApplication.RunAsync();
         }
         catch (Exception ex)

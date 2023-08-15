@@ -15,7 +15,7 @@ public record UserSessionsViewModel(
         return new UserSessionsViewModel(
             session.Id,
             session.ProductId,
-            session.LogsId ?? new Guid(),
+            session.LogsId,
             session.Start,
             session.Expiry,
             session.Status);

@@ -38,19 +38,26 @@ public static class IdentityAuthenticationProgramExtension
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         }).AddJwtBearer(options =>
         {
-            options.TokenValidationParameters = new TokenValidationParameters()
-            {
-                ValidateActor = true,
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                RequireExpirationTime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = tokenGenerationConfiguration.Issuer,
-                ValidAudience = tokenGenerationConfiguration.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenGenerationConfiguration.Key))
-            };
+            options.SetValidationTokenOptions(tokenGenerationConfiguration);
         });
 
         return serviceCollection;
+    }
+
+    private static JwtBearerOptions SetValidationTokenOptions(this JwtBearerOptions options, ITokenGenerationConfiguration tokenGenerationConfiguration)
+    {
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateActor = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            RequireExpirationTime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = tokenGenerationConfiguration.Issuer,
+            ValidAudience = tokenGenerationConfiguration.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenGenerationConfiguration.Key))
+        };
+
+        return options;
     }
 }

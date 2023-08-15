@@ -18,7 +18,7 @@ public record SessionViewModel(
             session.Id,
             session.UserId,
             session.ProductId,
-            session.LogsId ?? new Guid(),
+            session.LogsId,
             session.Start,
             session.Expiry,
             session.Status);
