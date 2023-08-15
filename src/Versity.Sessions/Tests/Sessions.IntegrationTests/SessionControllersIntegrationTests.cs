@@ -24,7 +24,6 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
         _controllersAppFactory = controllersAppFactory;
         _httpClient = _controllersAppFactory.CreateClient();
         
-        var jwtTokenGeneratorService = new JwtTokenGeneratorService();
         _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + JwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
         
         using var scope = _controllersAppFactory.Services.CreateScope();
