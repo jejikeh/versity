@@ -1,5 +1,6 @@
 using Application.Abstractions;
 using Infrastructure.Configurations;
+using Infrastructure.Exceptions;
 using Infrastructure.Services;
 using StackExchange.Redis;
 
@@ -10,11 +11,14 @@ public class ApplicationConfiguration : IApplicationConfiguration
     public string DatabaseConnectionString { get; private set; } = string.Empty;
     public bool IsDevelopmentEnvironment { get; private set; }
     public string CacheServiceConnectionString { get; set; } = string.Empty;
+    public string GrpcIdentityHost { get; set; }
     public string DatabaseName { get; set; } = string.Empty;
 
     public ApplicationConfiguration(IConfiguration configuration)
     {
         IsDevelopmentEnvironment = IsDevelopment();
+        DatabaseName = configuration["GrpcIdentityHost"] ?? throw new UserSecretsInvalidException("GrpcIdentityHost");
+        
         _ = SetupDbConnectionString(configuration) || FallBackToDevelopmentEnvironment();
     }
 

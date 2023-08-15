@@ -1,5 +1,6 @@
 ﻿using Application.Abstractions;
 using Grpc.Net.Client;
+using Infrastructure.Configurations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -10,10 +11,10 @@ public class GrpcUsersDataService : IVersityUsersDataService
     private readonly GrpcChannel _channel;
     private readonly ILogger<GrpcUsersDataService> _logger;
 
-    public GrpcUsersDataService(IConfiguration configuration, ILogger<GrpcUsersDataService> logger)
+    public GrpcUsersDataService(IApplicationConfiguration configuration, ILogger<GrpcUsersDataService> logger)
     {
         _logger = logger;
-        _channel = GrpcChannel.ForAddress(configuration["GrpcUsers"]);
+        _channel = GrpcChannel.ForAddress(configuration.GrpcIdentityHost);
     }
 
     public async Task<IEnumerable<string>> GetUserRolesAsync(string userId)
