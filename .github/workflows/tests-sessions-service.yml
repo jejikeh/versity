@@ -30,6 +30,9 @@ jobs:
     - name: Unit Tests
       run: dotnet test ./src/Versity.Sessions/Tests/Sessions.Tests/Sessions.Tests.csproj --verbosity detailed
 
+    - name: Restore Integrations Tests
+      run: dotnet restore ./src/Versity.Sessions/Tests/Sessions.IntegrationTests/Sessions.IntegrationTests.csproj
+
     - name: Integration Tests
       run: dotnet test ./src/Versity.Sessions/Tests/Sessions.IntegrationTests/Sessions.IntegrationTests.csproj --verbosity detailed
 
