@@ -25,7 +25,10 @@ public class KafkaProductConsumerService : BackgroundService
         if (Environment.GetEnvironmentVariable("KAFKA_Host") != "no_set")
         {
             _consumer = new ConsumerBuilder<string, string>(_configuration.Config)
-                .SetErrorHandler((_, e) => _logger.LogError($"Kafka Exception: ErrorCode:[{e.Code}] Reason:[{e.Reason}] Message:[{e.ToString()}]"))
+                .SetErrorHandler((_, e) => _logger.LogError($"Kafka Exception: " +
+                                                            $"ErrorCode:[{e.Code}] " +
+                                                            $"Reason:[{e.Reason}] " +
+                                                            $"Message:[{e}]"))
                 .Build();
         }
     }
@@ -39,32 +42,32 @@ public class KafkaProductConsumerService : BackgroundService
 
     private async Task ConsumeMessages(CancellationToken stoppingToken)
     {
-        if (_consumer is null)
-            return;
-        
-        try
+        while (!stoppingToken.IsCancellationRequested)
         {
-            var consumeResult = _consumer.Consume(stoppingToken);
-
-            if (consumeResult?.Message == null || !consumeResult.Topic.Equals(_configuration.Topic))
+            try
             {
-                return;
+                var consumeResult = _consumer?.Consume();
+
+                if (consumeResult?.Message == null || !consumeResult.Topic.Equals(_configuration.Topic))
+                {
+                    continue;
+                }
+
+                _logger.LogInformation(
+                    $"[{consumeResult.Message.Key}] {consumeResult.Topic} - {consumeResult.Message.Value}");
+
+                using var scope = _serviceProvider.CreateScope();
+                var kafkaHandlersContainer = scope.ServiceProvider.GetRequiredService<IKafkaHandlersContainer>();
+
+                await kafkaHandlersContainer.ProcessMessage(
+                    consumeResult.Message.Key,
+                    consumeResult.Message.Value,
+                    stoppingToken);
             }
-
-            _logger.LogInformation(
-                $"[{consumeResult.Message.Key}] {consumeResult.Topic} - {consumeResult.Message.Value}");
-
-            using var scope = _serviceProvider.CreateScope();
-            var kafkaHandlersContainer = scope.ServiceProvider.GetRequiredService<IKafkaHandlersContainer>();
-
-            await kafkaHandlersContainer.ProcessMessage(
-                consumeResult.Message.Key,
-                consumeResult.Message.Value,
-                stoppingToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"--> Kafka Consume error: {ex.Message}");
+            catch (Exception ex)
+            {
+                _logger.LogError($"--> Kafka Consume error: {ex.Message}");
+            }
         }
     }
 
@@ -85,8 +88,10 @@ public class KafkaProductConsumerService : BackgroundService
         _logger.LogInformation("--> Kafka Consumer Service is stopping.");
 
         if (_consumer is null)
+        {
             return;
-        
+        }
+
         _consumer.Close();
 
         await base.StopAsync(cancellationToken);

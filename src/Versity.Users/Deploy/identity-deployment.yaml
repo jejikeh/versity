@@ -39,9 +39,9 @@ spec:
           volumeMounts:
             - mountPath: /app/appsettings.Production.json
               subPath: appsettings.Production.json
-              name: identity-secret-appsettings
+              name: versity-users-secret-appsettings
       restartPolicy: Always
       volumes:
-        - name: identity-secret-appsettings
+        - name: versity-users-secret-appsettings
           secret:
-            secretName: secret-identity-appsettings
+            secretName: versity-users-secret-appsettings

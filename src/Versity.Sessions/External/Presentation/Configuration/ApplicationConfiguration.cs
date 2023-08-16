@@ -17,8 +17,7 @@ public class ApplicationConfiguration : IApplicationConfiguration
     public ApplicationConfiguration(IConfiguration configuration)
     {
         IsDevelopmentEnvironment = IsDevelopment();
-        DatabaseName = configuration["GrpcIdentityHost"] ?? throw new UserSecretsInvalidException("GrpcIdentityHost");
-        
+        GrpcIdentityHost = configuration["GrpcIdentityHost"] ?? throw new UserSecretsInvalidException("GrpcIdentityHost");
         _ = SetupDbConnectionString(configuration) || FallBackToDevelopmentEnvironment();
     }
 

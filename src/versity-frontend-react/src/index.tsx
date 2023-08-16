@@ -24,9 +24,9 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  <Context.Provider value={{store}}>
+  <Context.Provider value={{ store }}>
     <React.StrictMode>
-      <NavBar/>
+      <NavBar />
       <App />
     </React.StrictMode>
   </Context.Provider>

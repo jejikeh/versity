@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sessions-db-service
+spec:
+  selector:
+    app: sessions-db
+    app.kubernetes.io/name: sessions-db
+  ports:
+    - protocol: TCP
+      port: 50980
+      targetPort: 27017
+  type: ClusterIP

@@ -14,7 +14,7 @@ public class Program
         
         builder
             .ConfigureBuilder(applicationConfiguration)
-            .AddLogging();
+            .AddLogging(applicationConfiguration);
 
         var application = builder
             .Build()

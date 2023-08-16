@@ -7,8 +7,8 @@ using Infrastructure.Configurations;
 using Infrastructure.Persistence;
 using Infrastructure.Services;
 using Infrastructure.Services.KafkaConsumer;
+using Infrastructure.Services.KafkaConsumer.Abstractions;
 using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Presentation.Configuration;
 using Presentation.Hubs;
@@ -25,7 +25,8 @@ public static class ProgramExtensions
         var tokenGenerationConfiguration = new TokenGenerationConfiguration(builder.Configuration);
         
         builder.Services
-            .AddSingleton<IApplicationConfiguration>(applicationConfiguration)
+            .AddSingleton((IApplicationConfiguration)applicationConfiguration)
+            .AddSingleton((IKafkaConsumerConfiguration)kafkaConsumerConfiguration)
             .AddDbContext(applicationConfiguration)
             .AddRedisCaching(applicationConfiguration)
             .AddApplication()
@@ -103,6 +104,8 @@ public static class ProgramExtensions
         }
         catch (Exception ex)
         {
+            Console.WriteLine("ERROR:" + ex.Message);
+            
             var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
             logger.LogError(ex, "Host terminated unexpectedly");
         }

@@ -32,8 +32,6 @@ public static class InfrastructureInjection
         return serviceCollection
             .AddSingleton<VersitySessionsServiceMongoDbContext>()
             .AddMongoRepositories();
-
-        return serviceCollection;
     }
     
     private static IServiceCollection AddSqliteDatabase<T>(

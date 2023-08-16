@@ -8,4 +8,5 @@ public interface IApplicationConfiguration
     public bool IsDevelopmentEnvironment { get; }
     public string CacheServiceConnectionString { get; set; }
     public void InjectCacheService(IServiceCollection serviceCollection);
+    public string DevelopmentSessionServiceHost { get; set;}
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors.Infrastructure;
+﻿using System.Net;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Versity.ApiGateway.Configuration;
@@ -20,8 +21,12 @@ public static class ProgramExtensions
             .AddJwtAuthentication(new TokenGenerationConfiguration(builder.Configuration))
             .AddCors(options => options.ConfigureFrontendCors())
             .AddOcelot(builder.Configuration);
+        
+        ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
 
-        builder.Services.AddSignalR();
+        builder.Services.AddSignalR(configure =>
+        {
+        });
         
         return builder;
     }

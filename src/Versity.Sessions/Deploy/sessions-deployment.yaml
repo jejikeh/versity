@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: products-deployment
+  name: sessions-deployment
   labels:
-    app: products-deployment
+    app: sessions-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: products
+      app: sessions
   template:
     metadata:
-      name: products
+      name: sessions
       labels:
-        app: products
-        app.kubernetes.io/name: products
+        app: sessions
+        app.kubernetes.io/name: sessions
     spec:
       containers:
-        - name: products-deployment
-          image: jejikeh/versity.products
+        - name: sessions-deployment
+          image: jejikeh/versity.sessions
           ports:
             - containerPort: 443
               name: https-web-api
@@ -39,9 +39,9 @@ spec:
           volumeMounts:
             - mountPath: /app/appsettings.Production.json
               subPath: appsettings.Production.json
-              name: versity-products-secret-appsettings
+              name: versity-sessions-secret-appsettings
       restartPolicy: Always
       volumes:
-        - name: versity-products-secret-appsettings
+        - name: versity-sessions-secret-appsettings
           secret:
-            secretName: versity-products-secret-appsettings
+            secretName: versity-sessions-secret-appsettings

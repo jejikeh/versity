@@ -5,6 +5,7 @@ using Infrastructure.Configurations;
 using Infrastructure.Persistence;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Presentation.Configuration;
 using Serilog;
@@ -20,6 +21,7 @@ public static class ProgramExtensions
         var kafkaProducerConfiguration = new KafkaProducerConfiguration(builder.Configuration);
         
         builder.Services
+            .AddSingleton((IApplicationConfiguration)applicationConfiguration)
             .AddDbContext(applicationConfiguration)
             .AddRepositories()
             .AddRedisCaching(applicationConfiguration)

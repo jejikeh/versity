@@ -1,5 +1,6 @@
 using Application.Abstractions;
 using Infrastructure.Configurations;
+using Infrastructure.Exceptions;
 using Infrastructure.Services;
 using StackExchange.Redis;
 
@@ -10,13 +11,20 @@ public class ApplicationConfiguration : IApplicationConfiguration
     public string DatabaseConnectionString { get; private set; } = string.Empty;
     public bool IsDevelopmentEnvironment { get; private set; }
     public string CacheServiceConnectionString { get; set; } = string.Empty;
-    
+    public string DevelopmentSessionServiceHost { get; set;} = string.Empty;
+
     public ApplicationConfiguration(IConfiguration configuration)
     {
         IsDevelopmentEnvironment = string.Equals(
             Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"), 
             "development", 
             StringComparison.InvariantCultureIgnoreCase);
+
+        if (IsDevelopmentEnvironment)
+        {
+            DevelopmentSessionServiceHost = configuration.GetConnectionString("SessionServiceHost") 
+                                            ?? throw new UserSecretsInvalidException("settings.json");
+        }
 
         _ = SetupDbConnectionString(configuration) || FallBackToDevelopmentEnvironment();
     }

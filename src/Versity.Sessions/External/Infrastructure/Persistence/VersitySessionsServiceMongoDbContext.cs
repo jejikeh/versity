@@ -19,6 +19,9 @@ public class VersitySessionsServiceMongoDbContext
 
     public VersitySessionsServiceMongoDbContext(IApplicationConfiguration applicationConfiguration)
     {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("MONGO_HOST: " + applicationConfiguration.DatabaseConnectionString);
+        
         Client = new MongoClient(applicationConfiguration.DatabaseConnectionString);
         Database = Client.GetDatabase(applicationConfiguration.DatabaseName);
 

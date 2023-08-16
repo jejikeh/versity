@@ -29,5 +29,15 @@ spec:
               value: PLAINTEXT://:9092
             - name: KAFKA_ADVERTISED_LISTENERS
               value: PLAINTEXT://products-kafka-service:9092
+            - name: CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR
+              value: "1"
+            - name: CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR
+              value: "1"
+            - name: CONNECT_STATUS_STORAGE_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_AUTO_CREATE_TOPICS_ENABLE
+              value: "true" 
           ports:
             - containerPort: 9092
