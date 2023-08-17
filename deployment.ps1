@@ -4,6 +4,7 @@ $USER_PATH = "./src/Versity.Users"
 $PRODUCTS_PATH = "./src/Versity.Products"
 $SESSIONS_PATH = "./src/Versity.Sessions"
 $APIGATEWAY_PATH = "./src/Versity.ApiGateway/Versity.ApiGateway"
+$FRONTEND_PATH = "./src/versity-frontend-react"
 
 function InitUserSecret {
     param (
@@ -65,6 +66,7 @@ function BuildAndDeployToDockerAll {
     BuildAndPushToDocker -PROJECT_PATH $PRODUCTS_PATH -IMAGE_NAME versity.products
     BuildAndPushToDocker -PROJECT_PATH $SESSIONS_PATH -IMAGE_NAME versity.sessions
     BuildAndPushToDocker -PROJECT_PATH $APIGATEWAY_PATH/../ -IMAGE_NAME versity.apigateway
+    BuildAndPushToDocker -PROJECT_PATH $FRONTEND_PATH -IMAGE_NAME versity.frontend
 }
 
 function KubernetesSetupSecret {

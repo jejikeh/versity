@@ -26,7 +26,7 @@ spec:
               name: http-web-api
           env:
             - name: ASPNETCORE_URLS
-              value: http://+80
+              value: http://+80;
           imagePullPolicy: Always
           livenessProbe:
             httpGet:

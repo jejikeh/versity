@@ -15,6 +15,7 @@ public class KafkaHandlersContainer : IKafkaHandlersContainer
     {
         foreach (var messageHandler in _messageHandlers)
         {
+            Console.WriteLine($"[{key}] {message}");
             await messageHandler.Handle(key, message, cancellationToken);
         }
     }

@@ -219,7 +219,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions-service.default.svc.cluster.local",
-          "Port": 8080
+          "Port": 9080
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/{page}",
@@ -235,7 +235,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions-service.default.svc.cluster.local",
-          "Port": 8080
+          "Port": 9080
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/products/{page}",
@@ -251,7 +251,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions-service.default.svc.cluster.local",
-          "Port": 8080
+          "Port": 9080
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/products/{id}/{page}",
@@ -267,7 +267,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions-service.default.svc.cluster.local",
-          "Port": 8080
+          "Port": 9080
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/",
@@ -283,7 +283,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions-service.default.svc.cluster.local",
-          "Port": 8080
+          "Port": 9080
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/{id}",
@@ -299,7 +299,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions-service.default.svc.cluster.local",
-          "Port": 8080
+          "Port": 9080
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/users/{id}",
@@ -315,7 +315,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions-service.default.svc.cluster.local",
-          "Port": 8080
+          "Port": 9080
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/{id}/close",
@@ -331,7 +331,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions-service.default.svc.cluster.local",
-          "Port": 8080
+          "Port": 9080
         }
       ],
       "DownstreamPathTemplate": "/api/logdata/{page}",
@@ -347,7 +347,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions-service.default.svc.cluster.local",
-          "Port": 8080
+          "Port": 9080
         }
       ],
       "DownstreamPathTemplate": "/api/logdata/",
@@ -363,7 +363,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions-service.default.svc.cluster.local",
-          "Port": 8080
+          "Port": 9080
         }
       ],
       "DownstreamPathTemplate": "/api/logdata/{id}",
@@ -379,7 +379,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions-service.default.svc.cluster.local",
-          "Port": 8080
+          "Port": 9080
         }
       ],
       "DownstreamPathTemplate": "/api/sessionlogs/{page}",
@@ -396,7 +396,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "sessions-service.default.svc.cluster.local",
-          "Port": 8080
+          "Port": 9080
         }
       ],
       "QoSOptions": {

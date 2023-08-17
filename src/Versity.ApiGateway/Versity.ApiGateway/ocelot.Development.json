@@ -206,8 +206,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "sessions.versity.dev",
-          "Port": 3001
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/{page}",
@@ -222,8 +222,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "sessions.versity.dev",
-          "Port": 3001
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/products/{page}",
@@ -238,8 +238,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "sessions.versity.dev",
-          "Port": 3001
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/products/{id}/{page}",
@@ -254,8 +254,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "sessions.versity.dev",
-          "Port": 3001
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/",
@@ -270,8 +270,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "sessions.versity.dev",
-          "Port": 3001
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/{id}",
@@ -286,8 +286,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "sessions.versity.dev",
-          "Port": 3001
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/users/{id}",
@@ -302,8 +302,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "sessions.versity.dev",
-          "Port": 3001
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "DownstreamPathTemplate": "/api/sessions/{id}/close",
@@ -318,8 +318,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "sessions.versity.dev",
-          "Port": 3001
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "DownstreamPathTemplate": "/api/logdata/{page}",
@@ -334,8 +334,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "sessions.versity.dev",
-          "Port": 3001
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "DownstreamPathTemplate": "/api/logdata/",
@@ -350,8 +350,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "sessions.versity.dev",
-          "Port": 3001
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "DownstreamPathTemplate": "/api/logdata/{id}",
@@ -366,8 +366,8 @@
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
-          "Host": "sessions.versity.dev",
-          "Port": 3001
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "DownstreamPathTemplate": "/api/sessionlogs/{page}",
@@ -383,8 +383,8 @@
       "DownstreamScheme": "wss",
       "DownstreamHostAndPorts": [
         {
-          "Host": "sessions.versity.dev",
-          "Port": 3001
+          "Host": "localhost",
+          "Port": 5001
         }
       ],
       "QoSOptions": {

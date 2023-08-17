@@ -35,7 +35,7 @@ public static class ProgramExtensions
             .AddNotificationServices()
             .AddJwtAuthentication(tokenGenerationConfiguration)
             .AddSwagger()
-            .AddCors(options => options.ConfigureApiGatewayCors())
+            .AddCors(options => options.ConfigureApiGatewayCors(builder.Configuration))
             .AddHangfireService(applicationConfiguration)
             .AddEndpointsApiExplorer()
             .AddControllers();
@@ -123,7 +123,7 @@ public static class ProgramExtensions
         return serviceCollection;
     }
     
-    private static CorsOptions ConfigureApiGatewayCors(this CorsOptions options)
+    private static CorsOptions ConfigureApiGatewayCors(this CorsOptions options, IConfiguration configuration)
     {
         options.AddPolicy("AllowAll", policy =>
         {
@@ -131,7 +131,7 @@ public static class ProgramExtensions
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials()
-                .WithOrigins("http://localhost:3000");
+                .WithOrigins(configuration["FrontendHost"] ?? throw new InvalidOperationException("Set the FrontendHost Variable"));
         });
         
         return options;

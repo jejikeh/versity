@@ -7,6 +7,6 @@ spec:
     app.kubernetes.io/name: sessions
   ports:
     - protocol: TCP
-      port: 8080
+      port: 9080
       targetPort: 80
-  type: ClusterIP
+  type: LoadBalancer

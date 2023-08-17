@@ -46,6 +46,7 @@ public class ProductMongoRepository : IProductsRepository
 
     public async Task<Product> CreateProductAsync(Product product, CancellationToken cancellationToken)
     {
+        Console.WriteLine($"CreateProductAsync: {product.Title}");
         await _context.Products.InsertOneAsync(product, cancellationToken: cancellationToken);
 
         return product;

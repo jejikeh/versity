@@ -4,7 +4,7 @@ export const API_URL = "http://localhost:7080/api"
 
 const $api = axios.create({
   withCredentials: true,
-  baseURL: API_URL
+  baseURL: API_URL,
 })
 
 $api.interceptors.request.use((config) => {

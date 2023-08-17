@@ -19,7 +19,7 @@ public static class ProgramExtensions
 
         builder.Services
             .AddJwtAuthentication(new TokenGenerationConfiguration(builder.Configuration))
-            .AddCors(options => options.ConfigureFrontendCors())
+            .AddCors(options => options.ConfigureFrontendCors(builder.Configuration))
             .AddOcelot(builder.Configuration);
         
         ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
@@ -67,7 +67,7 @@ public static class ProgramExtensions
         return application;
     }
     
-    private static CorsOptions ConfigureFrontendCors(this CorsOptions options)
+    private static CorsOptions ConfigureFrontendCors(this CorsOptions options, IConfiguration configuration)
     {
         options.AddPolicy("AllowAll", policy =>
         {
@@ -75,8 +75,7 @@ public static class ProgramExtensions
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials()
-                // i fix this after deploying frontend to kubernetes
-                .WithOrigins("http://localhost:3000");
+                .WithOrigins(configuration["FrontendHost"] ?? throw new InvalidOperationException("Set the FrontendHost Variable"));
         });
         
         return options;
