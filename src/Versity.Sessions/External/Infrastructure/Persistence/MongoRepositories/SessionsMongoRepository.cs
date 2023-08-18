@@ -77,13 +77,6 @@ public class SessionsMongoRepository : ISessionsRepository
             .Take(takeCount ?? 10);
     }
 
-    public IQueryable<Session> GetAllProductSessions(Guid productId)
-    {
-        var result = _context.Sessions.Find(x => x.ProductId == productId);
-
-        return result.ToList().AsQueryable();
-    }
-
     public async Task<Session> CreateSessionAsync(Session session, CancellationToken cancellationToken)
     {
         await _context.Sessions.InsertOneAsync(session, cancellationToken: cancellationToken);

@@ -49,6 +49,7 @@ public static class IdentityAuthenticationProgramExtension
         {
             OnMessageReceived = context =>
             {
+                Console.WriteLine("access_token");
                 var accessToken = context.Request.Query["access_token"];
                 var path = context.HttpContext.Request.Path;
                 
@@ -56,7 +57,7 @@ public static class IdentityAuthenticationProgramExtension
                 {
                     context.Token = accessToken;
                 }
-
+                Console.WriteLine("FOUND: " + context.Token);
                 return Task.CompletedTask;
             }
         };

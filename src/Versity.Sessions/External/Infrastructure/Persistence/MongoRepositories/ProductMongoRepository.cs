@@ -41,7 +41,7 @@ public class ProductMongoRepository : IProductsRepository
     {
         var result = await _context.Products.FindAsync(product => product.ExternalId == externalId, cancellationToken: cancellationToken);
 
-        return await result.SingleAsync(cancellationToken: cancellationToken);
+        return await result.FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
     public async Task<Product> CreateProductAsync(Product product, CancellationToken cancellationToken)

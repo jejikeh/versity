@@ -37,11 +37,6 @@ public class KafkaProductConsumerService : BackgroundService
     {
         _logger.LogInformation("--> Kafka Consumer Service is running.");
 
-        await ConsumeMessages(stoppingToken);
-    }
-
-    private async Task ConsumeMessages(CancellationToken stoppingToken)
-    {
         while (!stoppingToken.IsCancellationRequested)
         {
             try
@@ -66,7 +61,9 @@ public class KafkaProductConsumerService : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError($"--> Kafka Consume error: {ex.Message}");
+                _logger.LogError($"--> Kafka Consume error: {ex.Message}" +
+                                 $"\n STACK: {ex.StackTrace} " +
+                                 $"\n SOURCE: {ex.Source}");
             }
         }
     }
@@ -76,8 +73,10 @@ public class KafkaProductConsumerService : BackgroundService
         _logger.LogInformation("--> Kafka Consumer Service has started.");
 
         if (_consumer is null)
+        {
             return;
-        
+        }
+
         _consumer.Subscribe(new List<string>() { _configuration.Topic });
         
         await base.StartAsync(cancellationToken);
