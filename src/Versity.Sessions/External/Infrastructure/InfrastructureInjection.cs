@@ -3,6 +3,8 @@ using Application.Abstractions;
 using Application.Abstractions.Repositories;
 using Hangfire;
 using Hangfire.Mongo;
+using Hangfire.Mongo.Migration.Strategies;
+using Hangfire.Mongo.Migration.Strategies.Backup;
 using Infrastructure.Configuration;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.MongoRepositories;
@@ -134,8 +136,17 @@ public static class InfrastructureInjection
             }
             else
             {
-                configuration.UseMongoStorage(applicationConfiguration.DatabaseConnectionString);
-                // configuration.UseInMemoryStorage();
+                configuration.UseMongoStorage(
+                    applicationConfiguration.DatabaseConnectionString,
+                    new MongoStorageOptions { 
+                        MigrationOptions = new MongoMigrationOptions()
+                        {
+                            MigrationStrategy = new MigrateMongoMigrationStrategy(),
+                            BackupStrategy = new CollectionMongoBackupStrategy()
+                        },
+                        Prefix = "hangfire.mongo",
+                        CheckConnection = true
+                    });
             }
         });
 
