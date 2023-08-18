@@ -36,7 +36,7 @@ public class LogsDataMongoRepository : ILogsDataRepository
     {
         var result = await _context.LogsData.FindAsync(logData => logData.Id == id, cancellationToken: cancellationToken);
         
-        return await result.SingleAsync(cancellationToken: cancellationToken);
+        return await result.FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
     public async Task<LogData> CreateLogDataAsync(LogData logData, CancellationToken cancellationToken)

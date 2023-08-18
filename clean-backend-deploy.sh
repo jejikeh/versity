@@ -1,12 +1,9 @@
 #!/bin/bash
 
-DOCKER_REGISTRY=$1
-
 USER_PATH="./src/Versity.Users"
 PRODUCTS_PATH="./src/Versity.Products"
 SESSIONS_PATH="./src/Versity.Sessions"
 APIGATEWAY_PATH="./src/Versity.ApiGateway/Versity.ApiGateway"
-FRONTEND_PATH="./src/versity-frontend-react"
 
 function KubernetesSetupSecret {
     PROJECT_PATH=$1
@@ -34,9 +31,8 @@ function ApplyKubernetesServicesAll {
     ApplyKubernetesServices "$PRODUCTS_PATH/Deploy/"
     ApplyKubernetesServices "$SESSIONS_PATH/Deploy/"
     ApplyKubernetesServices "$APIGATEWAY_PATH/../Deploy/"
-    # ApplyKubernetesServices "$FRONTEND_PATH/Deploy/"    
 }
 
+chmod +x ./clean.sh && ./clean.sh
 KubernetesSetupSecretsAll
 ApplyKubernetesServicesAll
-

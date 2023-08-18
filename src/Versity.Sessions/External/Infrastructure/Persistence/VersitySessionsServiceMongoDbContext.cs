@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Domain.Models;
 using Domain.Models.SessionLogging;
-using Infrastructure.Configurations;
+using Infrastructure.Configuration;
 using MongoDB.Driver;
 
 namespace Infrastructure.Persistence;

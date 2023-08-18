@@ -4,7 +4,7 @@ export default class SessionConnectionService {
   static async connect(token: string): Promise<HubConnection | undefined> {
     try {
       const connection = new HubConnectionBuilder()
-        .withUrl("http://localhost:9080/sessions-hub", {
+        .withUrl("http://localhost:5000/sessions-hub", {
           skipNegotiation: true,
           transport: 1,
           accessTokenFactory: () => token

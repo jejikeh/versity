@@ -52,7 +52,7 @@ public class SessionsMongoRepository : ISessionsRepository
     {
         var result =  await _context.Sessions.FindAsync(x => x.Id == id, cancellationToken: cancellationToken);
 
-        return await result.SingleAsync(cancellationToken);
+        return await result.FirstOrDefaultAsync(cancellationToken);
     }
 
     public IEnumerable<Session> GetAllUserSessions(string userId, int? skipCount, int? takeCount)

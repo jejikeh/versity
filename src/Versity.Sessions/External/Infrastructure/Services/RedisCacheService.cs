@@ -27,7 +27,7 @@ public class RedisCacheService : ICacheService
         return value;
     }
 
-    public void SetRemoveMember<T>(string key, T member)
+    public void SetRemoveMember<T>(string key, T member) where T : IEquatable<T>
     {
         _database.SetRemove(key, JsonSerializer.Serialize(member));
     }

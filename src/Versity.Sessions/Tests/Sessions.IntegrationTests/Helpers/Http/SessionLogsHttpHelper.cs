@@ -1,4 +1,4 @@
-﻿namespace Sessions.Tests.Integrations.Helpers.Http;
+﻿namespace Sessions.IntegrationTests.Helpers.Http;
 
 public static class SessionLogsHttpHelper
 {

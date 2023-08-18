@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text.Json;
 using Application.Abstractions;
 using Microsoft.Extensions.Caching.Memory;
@@ -74,20 +75,24 @@ public class InMemoryCacheService : ICacheService
         }
     }
 
-    public void SetRemoveMember<T>(string key, T member)
+    public void SetRemoveMember<T>(string key, T member) where T : IEquatable<T>
     {
         var values = _memoryCache.Get<IEnumerable<T>>(key);
 
-        if (values is not null)
+        // This workaround is to fix a strange bug when comparing the last object from InMemoryCache
+        if (values?.Count() == 1)
         {
-            var valueArray = values as T[] ?? values.ToArray();
-            if (valueArray.Contains(member))
-            {
-                var t = valueArray.Where(value => !Equals(value, member));
-            }
-
-            _memoryCache.Set(key, valueArray);
+            _memoryCache.Set(key, new List<T>() { });
+            return;
         }
+        
+        if (values is null)
+        {
+            return;
+        }
+        
+        var valueArray = values as T[] ?? values.Where(value => value.Equals(member)).ToArray();
+        _memoryCache.Set(key, valueArray);
     }
 
     public async Task SetAddAsync<T>(string key, Func<Task<T?>> factory)
@@ -97,14 +102,20 @@ public class InMemoryCacheService : ICacheService
         if (values is not null)
         {
             var valueArray = values.ToList();
-            valueArray.Add(await factory.Invoke());
+            var insertValue = await factory.Invoke();
 
+            if (insertValue is not null)
+            {
+                valueArray.Add(insertValue);
+            }
+            
             _memoryCache.Set(key, valueArray);
         }
     }
 
     public Task SetAddAsync<T>(string key, T obj)
     {
+        Console.WriteLine(key);
         var values = _memoryCache.Get<IEnumerable<T>>(key);
 
         if (values is not null)
@@ -113,6 +124,10 @@ public class InMemoryCacheService : ICacheService
             valueArray.Add(obj);
 
             _memoryCache.Set(key, valueArray);
+        }
+        else
+        {
+            _memoryCache.Set(key, new List<T>() { obj });
         }
         
         return Task.CompletedTask;

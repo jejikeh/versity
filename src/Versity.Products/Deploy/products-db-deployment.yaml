@@ -29,9 +29,12 @@ spec:
               value: products-service
             - name: POSTGRES_USER
               value: products-service
+            - name: PGDATA
+              value: /var/lib/postgresql/data/versity/
           volumeMounts:
             - mountPath: "/var/lib/postgresql/data"
               name: products-volume
+              subPath: versity
       volumes:
         - name: products-volume
           persistentVolumeClaim:

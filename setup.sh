@@ -53,7 +53,7 @@ function BuildAndPushToDocker {
     echo "Start Build the $IMAGE_NAME Image"
     echo
 
-    docker build -t "$DOCKER_REGISTRY/$IMAGE_NAME" "$PROJECT_PATH"
+    docker buildx build --platform linux/amd64 -t "$DOCKER_REGISTRY/$IMAGE_NAME" "$PROJECT_PATH"
     docker push "$DOCKER_REGISTRY/$IMAGE_NAME"
 }
 

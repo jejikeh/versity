@@ -53,10 +53,11 @@ public static class IdentityAuthenticationProgramExtension
                 var accessToken = context.Request.Query["access_token"];
                 var path = context.HttpContext.Request.Path;
                 
-                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/sessions-hub/"))
+                if (!string.IsNullOrEmpty(accessToken) && path.Value.Contains("sessions-hub"))
                 {
                     context.Token = accessToken;
                 }
+                
                 Console.WriteLine("FOUND: " + context.Token);
                 return Task.CompletedTask;
             }

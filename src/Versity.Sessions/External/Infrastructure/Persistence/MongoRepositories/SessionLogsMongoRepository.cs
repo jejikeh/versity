@@ -34,7 +34,7 @@ public class SessionLogsMongoRepository : ISessionLogsRepository
     {
         var result = await _context.SessionLogs.FindAsync(x => x.Id == id, cancellationToken: cancellationToken);
 
-        return await result.SingleAsync(cancellationToken: cancellationToken);
+        return await result.FirstOrDefaultAsync(cancellationToken: cancellationToken);
     }
 
     public async Task<SessionLogs> CreateSessionLogsAsync(SessionLogs sessionLogs, CancellationToken cancellationToken)

@@ -29,9 +29,12 @@ spec:
               value: identity-service
             - name: POSTGRES_USER
               value: identity-service
+            - name: PGDATA
+              value: /var/lib/postgresql/data/identity/
           volumeMounts:
             - mountPath: "/var/lib/postgresql/data"
               name: identity-volume
+              subPath: identity
       volumes:
         - name: identity-volume
           persistentVolumeClaim:

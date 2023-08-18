@@ -2,7 +2,8 @@
 using Application.Abstractions;
 using Application.Abstractions.Repositories;
 using Hangfire;
-using Infrastructure.Configurations;
+using Hangfire.Mongo;
+using Infrastructure.Configuration;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.MongoRepositories;
 using Infrastructure.Persistence.SqlRepositories;
@@ -133,8 +134,8 @@ public static class InfrastructureInjection
             }
             else
             {
-                // configuration.UseMongoStorage(applicationConfiguration.DatabaseConnectionString);
-                configuration.UseInMemoryStorage();
+                configuration.UseMongoStorage(applicationConfiguration.DatabaseConnectionString);
+                // configuration.UseInMemoryStorage();
             }
         });
 

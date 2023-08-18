@@ -1,5 +1,4 @@
 ﻿using Application.Abstractions.Repositories;
-using Bogus;
 using Domain.Models;
 using Domain.Models.SessionLogging;
 
@@ -14,8 +13,6 @@ public static class SessionSeeder
         IProductsRepository productsRepository,
         int count = 0)
     {
-        var faker = new Faker();
-
         var (session, product, sessionLogs, logDatas) =
             FakeDataGenerator.GenerateFakeSessionAndReturnAllDependEntities(count == 0 ? Random.Shared.Next(1, 20) : count);
 
@@ -32,7 +29,7 @@ public static class SessionSeeder
         return (session, product, sessionLogs, logDatas);
     }
     
-    public static async Task<(Domain.Models.Session, Product, SessionLogs, List<LogData>)> SeedSessionDataAsync(
+    public static async Task<(Session, Product, SessionLogs, List<LogData>)> SeedSessionDataAsync(
         ISessionsRepository sessionsRepository,
         ISessionLogsRepository sessionLogsRepository,
         ILogsDataRepository logsDataRepository,
@@ -40,8 +37,6 @@ public static class SessionSeeder
         Guid userId,
         int count = 0)
     {
-        var faker = new Faker();
-
         var (session, product, sessionLogs, logDatas) =
             FakeDataGenerator.GenerateFakeSessionAndReturnAllDependEntitiesWithUser(userId, count == 0 ? Random.Shared.Next(1, 20) : count);
 
@@ -58,15 +53,13 @@ public static class SessionSeeder
         return (session, product, sessionLogs, logDatas);
     }
     
-    public static async Task<List<(Domain.Models.Session, Product, SessionLogs, List<LogData>)>> SeedSessionsDataAsync(
+    public static async Task<List<(Session, Product, SessionLogs, List<LogData>)>> SeedSessionsDataAsync(
         ISessionsRepository sessionsRepository,
         ISessionLogsRepository sessionLogsRepository,
         ILogsDataRepository logsDataRepository,
         IProductsRepository productsRepository,
         int count = 0)
     {
-        var faker = new Faker();
-
         var fakeData =
             FakeDataGenerator.GenerateFakeSessionsAndReturnAllDependEntities(Random.Shared.Next(1, 10), Random.Shared.Next(1, 10));
 

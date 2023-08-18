@@ -1,5 +1,5 @@
 using Application.Abstractions;
-using Infrastructure.Configurations;
+using Infrastructure.Configuration;
 using Infrastructure.Exceptions;
 using Infrastructure.Services;
 using StackExchange.Redis;

@@ -9,7 +9,7 @@ using Infrastructure.Services.KafkaConsumer;
 using Microsoft.Extensions.DependencyInjection;
 using Sessions.IntegrationTests.Fixture;
 using Sessions.IntegrationTests.Helpers;
-using Sessions.Tests.Integrations.Helpers.Http;
+using Sessions.IntegrationTests.Helpers.Http;
 using TestUtils = Sessions.IntegrationTests.Helpers.TestUtils;
 
 namespace Sessions.IntegrationTests;
@@ -266,7 +266,7 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
         
     }
 
-    private async Task<(Domain.Models.Session, Product, SessionLogs, List<LogData>)> SeedSessionEntities()
+    private async Task<(Session, Product, SessionLogs, List<LogData>)> SeedSessionEntities()
     {
         using var scope = _controllersAppFactory.Services.CreateScope();
         var sessionRepository = scope.ServiceProvider.GetService<ISessionsRepository>();
@@ -283,7 +283,7 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
         return (session, product, sessionLogs, logDatas);
     }
     
-    private async Task<(Domain.Models.Session, Product, SessionLogs, List<LogData>)> SeedSessionEntities(Guid userId)
+    private async Task<(Session, Product, SessionLogs, List<LogData>)> SeedSessionEntities(Guid userId)
     {
         using var scope = _controllersAppFactory.Services.CreateScope();
         var sessionRepository = scope.ServiceProvider.GetService<ISessionsRepository>();
@@ -301,7 +301,7 @@ public class SessionControllersIntegrationTests : IClassFixture<ControllersAppFa
         return (session, product, sessionLogs, logDatas);
     }
     
-    private async Task<List<(Domain.Models.Session, Product, SessionLogs, List<LogData>)>> SeedSessionsEntities()
+    private async Task<List<(Session, Product, SessionLogs, List<LogData>)>> SeedSessionsEntities()
     {
         using var scope = _controllersAppFactory.Services.CreateScope();
         var sessionRepository = scope.ServiceProvider.GetService<ISessionsRepository>();

@@ -5,7 +5,7 @@ using Application.RequestHandlers.Sessions.Commands.CloseSession;
 using Application.RequestHandlers.Sessions.Commands.CreateSession;
 using Application.RequestHandlers.Sessions.Commands.DeleteSession;
 using Application.RequestHandlers.Sessions.Queries.GetAllProductSessions;
-using Infrastructure.Configurations;
+using Infrastructure.Configuration;
 using Infrastructure.Services.KafkaConsumer.Abstractions;
 using Infrastructure.Services.KafkaConsumer.Handlers.CreateProduct;
 using Infrastructure.Services.KafkaConsumer.Handlers.DeleteProduct;

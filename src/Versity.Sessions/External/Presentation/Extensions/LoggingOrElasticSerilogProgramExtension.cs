@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using Infrastructure.Configurations;
+using Infrastructure.Configuration;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;

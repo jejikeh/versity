@@ -3,7 +3,7 @@ using Application.Abstractions;
 using Application.Abstractions.Hubs;
 using Hangfire;
 using Infrastructure;
-using Infrastructure.Configurations;
+using Infrastructure.Configuration;
 using Infrastructure.Persistence;
 using Infrastructure.Services;
 using Infrastructure.Services.KafkaConsumer;
@@ -25,7 +25,7 @@ public static class ProgramExtensions
         var tokenGenerationConfiguration = new TokenGenerationConfiguration(builder.Configuration);
         
         builder.Services
-            .AddSingleton((IApplicationConfiguration)applicationConfiguration)
+            .AddSingleton(applicationConfiguration)
             .AddSingleton((IKafkaConsumerConfiguration)kafkaConsumerConfiguration)
             .AddDbContext(applicationConfiguration)
             .AddRedisCaching(applicationConfiguration)

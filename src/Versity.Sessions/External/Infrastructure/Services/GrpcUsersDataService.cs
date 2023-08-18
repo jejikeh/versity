@@ -1,6 +1,6 @@
 ﻿using Application.Abstractions;
 using Grpc.Net.Client;
-using Infrastructure.Configurations;
+using Infrastructure.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Infrastructure.Configurations;
+namespace Infrastructure.Configuration;
 
 public interface IApplicationConfiguration
 {
