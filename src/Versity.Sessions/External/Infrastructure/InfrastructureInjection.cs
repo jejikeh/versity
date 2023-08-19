@@ -130,7 +130,7 @@ public static class InfrastructureInjection
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings();
             
-            if (applicationConfiguration.IsDevelopmentEnvironment)
+            if (applicationConfiguration.IsDevelopmentEnvironment || applicationConfiguration.IsTestingEnvironment)
             {
                 configuration.UseInMemoryStorage();
             }

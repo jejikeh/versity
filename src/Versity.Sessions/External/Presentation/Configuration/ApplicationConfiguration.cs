@@ -10,6 +10,7 @@ public class ApplicationConfiguration : IApplicationConfiguration
 {
     public string DatabaseConnectionString { get; private set; } = string.Empty;
     public bool IsDevelopmentEnvironment { get; private set; }
+    public bool IsTestingEnvironment { get; set; }
     public string CacheServiceConnectionString { get; set; } = string.Empty;
     public string GrpcIdentityHost { get; set; }
     public string DatabaseName { get; set; } = string.Empty;
@@ -48,6 +49,7 @@ public class ApplicationConfiguration : IApplicationConfiguration
         // but im getting connection string to database in runtime at startup of integration tests
         if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TEST_ConnectionString")))
         {
+            IsTestingEnvironment = true;
             cacheConnectionString = Environment.GetEnvironmentVariable("TEST_CacheHost");
             databaseName = Environment.GetEnvironmentVariable("TEST_DatabaseName");
             dbConnectionString = Environment.GetEnvironmentVariable("TEST_ConnectionString") + databaseName + "?authSource=admin";
