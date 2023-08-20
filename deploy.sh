@@ -36,3 +36,8 @@ function ApplyKubernetesServicesAll {
 chmod +x ./clean.sh && ./clean.sh
 KubernetesSetupSecretsAll
 ApplyKubernetesServicesAll
+
+go run .
+docker build -t jejikeh/versity.frontend ./src/versity-frontend-react/
+docker push jejikeh/versity.frontend
+kubectl apply -f src/versity-frontend-react/Deploy

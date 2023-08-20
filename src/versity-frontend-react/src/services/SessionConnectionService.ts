@@ -1,10 +1,12 @@
 import signalR, { HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr"
 
+export const SESSIONS_URL = "http://:9080/sessions-hub"
+
 export default class SessionConnectionService {
   static async connect(token: string): Promise<HubConnection | undefined> {
     try {
       const connection = new HubConnectionBuilder()
-        .withUrl("http://localhost:9080/sessions-hub", {
+        .withUrl(SESSIONS_URL, {
           skipNegotiation: true,
           transport: 1,
           accessTokenFactory: () => token
