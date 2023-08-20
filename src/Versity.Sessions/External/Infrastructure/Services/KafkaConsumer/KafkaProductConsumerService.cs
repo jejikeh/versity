@@ -41,10 +41,9 @@ public class KafkaProductConsumerService : BackgroundService
         {
             try
             {
-                var consumeResult = _consumer?.Consume();
-
-                if (consumeResult?.Message == null || !consumeResult.Topic.Equals(_configuration.Topic))
+                if (ConsumeFromTopic(out var consumeResult) || consumeResult is null)
                 {
+                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
                     continue;
                 }
 
@@ -66,6 +65,22 @@ public class KafkaProductConsumerService : BackgroundService
                                  $"\n SOURCE: {ex.Source}");
             }
         }
+    }
+
+    private bool ConsumeFromTopic(out ConsumeResult<string, string>? consumeResult)
+    {
+        if (_consumer != null && !_consumer.Assignment.Exists(topicPartition =>
+                string.Equals(topicPartition.Topic, _configuration.Topic)))
+        {
+            _logger.LogInformation($"The topic {_configuration.Topic} is not available");
+            consumeResult = null;
+            
+            return true;
+        }
+
+        consumeResult = _consumer?.Consume();
+
+        return consumeResult?.Message == null || !consumeResult.Topic.Equals(_configuration.Topic);
     }
 
     public override async Task StartAsync(CancellationToken cancellationToken)

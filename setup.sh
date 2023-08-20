@@ -1,7 +1,5 @@
 #!/bin/bash
 
-DOCKER_REGISTRY=$1
-
 USER_PATH="./src/Versity.Users"
 PRODUCTS_PATH="./src/Versity.Products"
 SESSIONS_PATH="./src/Versity.Sessions"
