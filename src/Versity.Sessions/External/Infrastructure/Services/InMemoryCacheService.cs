@@ -1,4 +1,3 @@
-using System.Numerics;
 using System.Text.Json;
 using Application.Abstractions;
 using Microsoft.Extensions.Caching.Memory;
@@ -21,8 +20,10 @@ public class InMemoryCacheService : ICacheService
             entry =>
             {
                 entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(2));
+                
                 return factory.Invoke();
-            });    }
+            });    
+    }
 
     public Task<T?> GetOrCreateAsync<T>(string key, Func<Task<T?>> factory)
     {
@@ -83,6 +84,7 @@ public class InMemoryCacheService : ICacheService
         if (values?.Count() == 1)
         {
             _memoryCache.Set(key, new List<T>() { });
+            
             return;
         }
         
@@ -115,14 +117,12 @@ public class InMemoryCacheService : ICacheService
 
     public Task SetAddAsync<T>(string key, T obj)
     {
-        Console.WriteLine(key);
         var values = _memoryCache.Get<IEnumerable<T>>(key);
 
         if (values is not null)
         {
             var valueArray = values.ToList();
             valueArray.Add(obj);
-
             _memoryCache.Set(key, valueArray);
         }
         else
