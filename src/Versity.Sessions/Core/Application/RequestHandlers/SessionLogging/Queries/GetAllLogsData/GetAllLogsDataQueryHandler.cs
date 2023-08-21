@@ -16,12 +16,10 @@ public class GetAllLogsDataQueryHandler : IRequestHandler<GetAllLogsDataQuery, I
 
     public async Task<IEnumerable<LogData>> Handle(GetAllLogsDataQuery request, CancellationToken cancellationToken)
     {
-        var logsData = _logsDataRepository
-            .GetAllLogsData()
-            .OrderBy(x => x.Id)
-            .Skip(PageFetchSettings.ItemsOnPage * (request.Page - 1))
-            .Take(PageFetchSettings.ItemsOnPage);
+        var logsData = _logsDataRepository.GetLogsData(
+            PageFetchSettings.ItemsOnPage * (request.Page - 1), 
+            PageFetchSettings.ItemsOnPage);
 
-        return await _logsDataRepository.ToListAsync(logsData);
+        return logsData;
     }
 }

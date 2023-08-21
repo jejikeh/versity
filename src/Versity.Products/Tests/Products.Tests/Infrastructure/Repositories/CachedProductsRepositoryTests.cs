@@ -25,10 +25,10 @@ public class CachedProductsRepositoryTests
     public void GetAllProducts_ShouldInvokeRepository_WhenValueIsNotInCache()
     {
         // Act
-        _cachedProductsRepository.GetAllProducts();
+        _cachedProductsRepository.GetProductsAsync(It.IsAny<int?>(), It.IsAny<int?>(), It.IsAny<CancellationToken>());
 
         // Assert
-        _productsRepository.Verify(x => x.GetAllProducts(), Times.Once);
+        _productsRepository.Verify(x => x.GetProductsAsync(It.IsAny<int?>(), It.IsAny<int?>(), It.IsAny<CancellationToken>()), Times.Once);
     }
     
     [Fact]

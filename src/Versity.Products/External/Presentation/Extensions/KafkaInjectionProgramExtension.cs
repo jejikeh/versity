@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Infrastructure.Configurations;
 using KafkaFlow;
 using KafkaFlow.Configuration;
 using KafkaFlow.Serializer;
@@ -7,12 +8,10 @@ namespace Presentation.Extensions;
 
 public static class KafkaInjectionProgramExtension
 {
-    public static IServiceCollection AddKafkaFlow(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddKafkaFlow(
+        this IServiceCollection serviceCollection,
+        IKafkaProducerConfiguration kafkaProducerConfiguration)
     {
-        var kafkaServer = Environment.GetEnvironmentVariable("KAFKA_Host");
-        var kafkaTopic = Environment.GetEnvironmentVariable("KAFKA_Topic");
-        var kafkaProducerName = Environment.GetEnvironmentVariable("KAFKA_ProducerName");
-
         serviceCollection.AddKafka(kafka => 
         {
             kafka
@@ -20,14 +19,14 @@ public static class KafkaInjectionProgramExtension
                 .AddCluster(cluster =>  
                 {
                     cluster
-                        .WithBrokers(new[] { kafkaServer })
-                        .CreateTopicIfNotExists(kafkaTopic, 1, 1)
+                        .WithBrokers(new[] { kafkaProducerConfiguration.Host })
+                        .CreateTopicIfNotExists(kafkaProducerConfiguration.DeleteProductTopic, 1, 1)
                         .AddProducer(
-                            kafkaProducerName,
+                            kafkaProducerConfiguration.ProducerName,
                             producer =>
                             {
                                 producer
-                                    .DefaultTopic(kafkaTopic)
+                                    .DefaultTopic(kafkaProducerConfiguration.Topic)
                                     .AddMiddlewares(middlewares =>
                                         middlewares.AddSerializer<JsonCoreSerializer>());
                             }

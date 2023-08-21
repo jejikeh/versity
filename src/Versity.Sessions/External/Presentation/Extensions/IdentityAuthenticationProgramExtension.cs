@@ -8,37 +8,38 @@ namespace Presentation.Extensions;
 
 public static class IdentityAuthenticationProgramExtension
 {
-    public static IServiceCollection AddJwtAuthentication(this IServiceCollection serviceCollection, IConfiguration configuration)
+    public static IServiceCollection AddJwtAuthentication(
+        this IServiceCollection serviceCollection,
+        TokenGenerationConfiguration tokenGenerationConfiguration)
     {
         serviceCollection.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(options =>
-        {
-            options.SetTokenValidationParameters();
-            options.SetSignalRAuthorization();
-        });
-
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options => options
+                .SetValidationTokenOptions(tokenGenerationConfiguration)
+                .SetSignalRAuthorization());
+        
         serviceCollection.AddSingleton<IUserIdProvider, SubBasedUserIdProvider>();
         
         return serviceCollection;
     }
 
-    private static JwtBearerOptions SetTokenValidationParameters(this JwtBearerOptions options)
+    private static JwtBearerOptions SetValidationTokenOptions(this JwtBearerOptions options, TokenGenerationConfiguration tokenGenerationConfiguration)
     {
         options.TokenValidationParameters = new TokenValidationParameters()
         {
             ValidateActor = true,
             ValidateIssuer = true,
-            ValidateAudience = false,
+            ValidateAudience = true,
             RequireExpirationTime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = Environment.GetEnvironmentVariable("JWT__Issuer"),
-            ValidAudience = Environment.GetEnvironmentVariable("JWT__Audience"),
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT__Key")))
+            ValidIssuer = tokenGenerationConfiguration.Issuer,
+            ValidAudience = tokenGenerationConfiguration.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenGenerationConfiguration.Key))
         };
-        
+
         return options;
     }
 
@@ -51,11 +52,11 @@ public static class IdentityAuthenticationProgramExtension
                 var accessToken = context.Request.Query["access_token"];
                 var path = context.HttpContext.Request.Path;
                 
-                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/sessions-hub/"))
+                if (!string.IsNullOrEmpty(accessToken) && path.Value.Contains("sessions-hub"))
                 {
                     context.Token = accessToken;
                 }
-
+                
                 return Task.CompletedTask;
             }
         };

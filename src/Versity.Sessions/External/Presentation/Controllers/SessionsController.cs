@@ -72,9 +72,9 @@ public class SessionsController : ApiController
     
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<IActionResult> CreateSession([FromBody] CreateSessionCommand command, CancellationToken cancellationToken)
+    public async Task<IActionResult> CreateSession([FromBody] CreateSessionCommand d, CancellationToken cancellationToken)
     {
-        var result = await Sender.Send(command, cancellationToken);
+        var result = await Sender.Send(d, cancellationToken);
         
         return CreatedAtAction(nameof(GetSessionById), new { id = result.Id }, result);;
     }

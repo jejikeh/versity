@@ -12,11 +12,15 @@ public class KafkaConsumerConfiguration : IKafkaConsumerConfiguration
     public string CreateProductTopic { get; } = "CreateProduct";
     public string DeleteProductTopic { get; } = "DeleteProduct";
 
-    public KafkaConsumerConfiguration()
+    public KafkaConsumerConfiguration(IConfiguration configuration)
     {
         GroupId = "versity.sessions";
-        Host = Environment.GetEnvironmentVariable("KAFKA_Host") ?? "no_set";
-        Topic = Environment.GetEnvironmentVariable("KAFKA_Topic") ?? "no_set";
+        Host = configuration["Kafka:Host"]
+               ?? Environment.GetEnvironmentVariable("KAFKA_Host")
+               ?? "NO_SET";
+        Topic = configuration["Kafka:Topic"]
+                ?? Environment.GetEnvironmentVariable("KAFKA_Topic") 
+                ?? "NO_SET";
         
         Config = new ConsumerConfig()
         {

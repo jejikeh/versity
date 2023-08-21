@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity-db-deployment
+  labels:
+    app: identity-db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: identity-db
+  template:
+    metadata:
+      name: identity-db
+      labels:
+        app: identity-db
+        app.kubernetes.io/name: identity-db
+    spec:
+      containers:
+        - name: identity-db
+          image: postgres:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DATABASE
+              value: identity-db
+            - name: POSTGRES_PASSWORD
+              value: identity-service
+            - name: POSTGRES_USER
+              value: identity-service
+            - name: PGDATA
+              value: /var/lib/postgresql/data/identity/
+          volumeMounts:
+            - mountPath: "/var/lib/postgresql/data"
+              name: identity-volume
+              subPath: identity
+      volumes:
+        - name: identity-volume
+          persistentVolumeClaim:
+            claimName: identity-volume-claim
+      restartPolicy: Always

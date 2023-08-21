@@ -1,29 +1,25 @@
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Presentation.Configuration;
 using Presentation.Extensions;
 
-var builder = WebApplication
-    .CreateBuilder(args)
-    .ConfigureBuilder()
-    .AddLogging();
+namespace Presentation;
 
-var app = builder
-    .Build()
-    .ConfigureApplication();
-
-using var scope = app.Services.CreateScope();
-var serviceProvider = scope.ServiceProvider;
-try
+public class Program
 {
-    var versitySessionsServiceDbContext = serviceProvider.GetRequiredService<VersitySessionsServiceDbContext>();
-    versitySessionsServiceDbContext.Database.EnsureCreated();
-    await versitySessionsServiceDbContext.Database.MigrateAsync();
-    await app.RunAsync();
-}
-catch (Exception ex)
-{
-    var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "Host terminated unexpectedly");
-}
+    public static async Task Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
+        var applicationConfiguration = new ApplicationConfiguration(builder.Configuration);
+        
+        builder
+            .ConfigureBuilder(applicationConfiguration)
+            .AddLogging(applicationConfiguration);
 
-public partial class Program { }
+        var application = builder
+            .Build()
+            .ConfigureApplication();
+
+        await application.RunApplicationAsync(applicationConfiguration);
+    }
+}

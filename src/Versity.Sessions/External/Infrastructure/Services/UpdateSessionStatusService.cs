@@ -26,11 +26,7 @@ public class UpdateSessionStatusService
     {
         _logger.LogInformation("--> Start updating statuses of sessions...");
 
-        var expiredSessions = _sessionsRepository
-            .GetAllSessions()
-            .Where(x => x.Expiry < DateTime.UtcNow)
-            .Where(x => x.Status != SessionStatus.Closed && x.Status != SessionStatus.Expired)
-            .ToList();
+        var expiredSessions = _sessionsRepository.GetExpiredSessions();
     
         foreach (var session in expiredSessions)
         {
@@ -47,13 +43,9 @@ public class UpdateSessionStatusService
     {
         _logger.LogInformation("--> Start activating sessions...");
 
-        var expiredSessions = _sessionsRepository
-            .GetAllSessions()
-            .Where(x => x.Start <= DateTime.UtcNow && x.Expiry > DateTime.UtcNow)
-            .Where(x => x.Status == SessionStatus.Inactive)
-            .ToList();
+        var inactiveSessions = _sessionsRepository.GetInactiveSessions();
     
-        foreach (var session in expiredSessions)
+        foreach (var session in inactiveSessions)
         {
             session.Status = SessionStatus.Open;
             _sessionsRepository.UpdateSession(session);

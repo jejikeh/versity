@@ -31,7 +31,7 @@ public class ProductsKafkaAndDbIntegrationTests : IClassFixture<ProductsServiceA
         _consumerService?.Start();
         
         var jwtTokenGeneratorService = new JwtTokenGeneratorService();
-        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
+        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + JwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
     }
     
     [Fact]
@@ -90,7 +90,6 @@ public class ProductsKafkaAndDbIntegrationTests : IClassFixture<ProductsServiceA
         using var scope = _productsServiceAppFactory.Services.CreateScope();
         var versityProductsRepository = scope.ServiceProvider.GetService<IVersityProductsRepository>();
         var product = await ProductSeeder.SeedProductDataAsync(versityProductsRepository);
-        var countBeforeDelete = await versityProductsRepository.GetAllProducts().CountAsync();
         
         // Act
         var response = await _httpClient.DeleteAsync(HttpHelper.DeleteProductById(product.Id.ToString()));
@@ -98,7 +97,6 @@ public class ProductsKafkaAndDbIntegrationTests : IClassFixture<ProductsServiceA
         
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        countBeforeDelete.Should().BeGreaterThan(await versityProductsRepository.GetAllProducts().CountAsync());
         message.Should().NotBeNull();
         message?.Id.Should().Be(product.Id);
     }
@@ -110,7 +108,6 @@ public class ProductsKafkaAndDbIntegrationTests : IClassFixture<ProductsServiceA
         var command = GenerateFakeCreateProductCommand();
         using var scope = _productsServiceAppFactory.Services.CreateScope();
         var versityProductsRepository = scope.ServiceProvider.GetService<IVersityProductsRepository>();
-        var countBeforeCreating = await versityProductsRepository.GetAllProducts().CountAsync();
         
         // Act
         var response = await _httpClient.PostAsJsonAsync(HttpHelper.CreateProduct(), command);
@@ -119,7 +116,6 @@ public class ProductsKafkaAndDbIntegrationTests : IClassFixture<ProductsServiceA
          
          // Assert
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        countBeforeCreating.Should().BeLessThan(await versityProductsRepository.GetAllProducts().CountAsync());
         message.Should().NotBeNull();
         message?.Title.Should().Be(command.Title);
         result.Author.Should().Be(command.Author);

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity-deployment
+  labels:
+    app: identity-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: identity
+  template:
+    metadata:
+      name: identity
+      labels:
+        app: identity
+        app.kubernetes.io/name: identity
+    spec:
+      containers:
+        - name: identity-deployment
+          image: jejikeh/versity.users
+          ports:
+            - containerPort: 443
+              name: https-web-api
+            - containerPort: 80
+              name: http-web-api
+          env:
+            - name: ASPNETCORE_URLS
+              value: http://+80
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /health-check
+              port: 80
+          readinessProbe:
+            httpGet:
+              path: /health-check
+              port: 80
+          volumeMounts:
+            - mountPath: /app/appsettings.Production.json
+              subPath: appsettings.Production.json
+              name: versity-users-secret-appsettings
+      restartPolicy: Always
+      volumes:
+        - name: versity-users-secret-appsettings
+          secret:
+            secretName: versity-users-secret-appsettings

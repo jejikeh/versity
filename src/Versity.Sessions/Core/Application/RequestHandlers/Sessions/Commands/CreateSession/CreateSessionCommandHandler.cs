@@ -10,20 +10,20 @@ namespace Application.RequestHandlers.Sessions.Commands.CreateSession;
 
 public class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand, SessionViewModel>
 {
-    private readonly ISessionsRepository _sessions;
+    private readonly ISessionsRepository _sessionsRepository;
     private readonly IVersityUsersDataService _users;
     private readonly IProductsRepository _productsRepository;
     private readonly ISessionLogsRepository _sessionLogsRepository;
     private readonly INotificationSender _notificationSender;
 
     public CreateSessionCommandHandler(
-        ISessionsRepository sessionsRepository, 
+        ISessionsRepository sessionsRepositoryRepository, 
         IVersityUsersDataService users, 
         IProductsRepository productsRepository, 
         ISessionLogsRepository sessionLogsRepository, 
         INotificationSender notificationSender)
     {
-        _sessions = sessionsRepository;
+        _sessionsRepository = sessionsRepositoryRepository;
         _users = users;
         _productsRepository = productsRepository;
         _sessionLogsRepository = sessionLogsRepository;
@@ -53,20 +53,20 @@ public class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand,
         {
             Id = Guid.NewGuid(),
             UserId = request.UserId,
-            Product = product,
+            ProductId = product.Id,
             Start = request.Start,
             Expiry = request.Expiry,
             Status = SessionStatus.Inactive,
-            Logs = sessionLogs
+            LogsId = sessionLogs.Id
         };
         
-        var result = await _sessions.CreateSessionAsync(session, cancellationToken);
+        var result = await _sessionsRepository.CreateSessionAsync(session, cancellationToken);
         
         sessionLogs.SessionId = result.Id;
         await _sessionLogsRepository.CreateSessionLogsAsync(sessionLogs, cancellationToken);
         
         await _sessionLogsRepository.SaveChangesAsync(cancellationToken);
-        await _sessions.SaveChangesAsync(cancellationToken);
+        await _sessionsRepository.SaveChangesAsync(cancellationToken);
 
         var sessionViewModel = SessionViewModel.MapWithModel(result);
         _notificationSender.PushCreatedNewSession(result.UserId, UserSessionsViewModel.MapWithModel(session));

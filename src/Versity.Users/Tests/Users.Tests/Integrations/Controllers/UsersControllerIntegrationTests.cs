@@ -2,6 +2,9 @@
 using System.Net.Http.Json;
 using Application.Abstractions.Repositories;
 using Application.Dtos;
+using Application.RequestHandlers.Auth.Commands.LoginVersityUser;
+using Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
+using Application.RequestHandlers.Auth.Commands.ResendEmailVerificationToken;
 using Bogus;
 using Domain.Models;
 using DotNet.Testcontainers.Builders;
@@ -9,7 +12,9 @@ using FluentAssertions;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services.TokenServices;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using Presentation.Configuration;
 using Users.Tests.Integrations.Fixtures;
 using Users.Tests.Integrations.Helpers;
@@ -18,7 +23,7 @@ using Utils = Application.Common.Utils;
 
 namespace Users.Tests.Integrations.Controllers;
 
-[TestCaseOrderer(PriorityOrderer.Name, PriorityOrderer.Assembly)]
+[Collection("Integration Tests")]
 public class UsersControllerIntegrationTests : IClassFixture<ControllersAppFactoryFixture>
 {
     private readonly HttpClient _httpClient;
@@ -28,8 +33,14 @@ public class UsersControllerIntegrationTests : IClassFixture<ControllersAppFacto
     {
         _controllersAppFactory = factoryUsersController;
         _httpClient = factoryUsersController.CreateClient();
-        var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration());
-        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
+
+        using var scope = _controllersAppFactory.Services.CreateScope();
+        var configuration = scope.ServiceProvider.GetService<IConfiguration>();
+        var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration(configuration));
+        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(
+            TestUtils.AdminId, 
+            TestUtils.AdminEmail, 
+            new List<string> { "Admin" }));
     }
     
     [Fact]
@@ -42,7 +53,7 @@ public class UsersControllerIntegrationTests : IClassFixture<ControllersAppFacto
         response.EnsureSuccessStatusCode();
     }
 
-    [Fact, Priority(-10)]
+    [Fact]
     public async Task GetUserById_ShouldReturnUser_WhenUserExists()
     {
         // Act
@@ -53,14 +64,14 @@ public class UsersControllerIntegrationTests : IClassFixture<ControllersAppFacto
         response.EnsureSuccessStatusCode();
         result.Should().NotBeNull();
         result.Role.Should().Contain("Admin");
-        result.Email.Should().Be("admin@mail.com");
+        result.Email.Should().Be(TestUtils.AdminEmail);
     }
 
     [Fact]
     public async Task ChangeUserPassword_ShouldReturnValidationError_WhenPasswordTooShort()
     {
         // Arrange
-        var command = new ChangeUserPasswordDto("admin", "new_admin");
+        var command = new ChangeUserPasswordDto("versity.Adm1n.dev-31_13%versity", "new_admin");
         
         // Act
         var response = await _httpClient.PutAsJsonAsync(HttpHelper.ChangeUserPassword("4e274126-1d8a-4dfd-a025-806987095809"), command);
@@ -73,10 +84,16 @@ public class UsersControllerIntegrationTests : IClassFixture<ControllersAppFacto
     public async Task ChangeUserPassword_ShouldChangePassword_WhenPasswordIsStrong()
     {
         // Arrange
-        var command = new ChangeUserPasswordDto("admin", "neW_admin!123");
+        using var scope = _controllersAppFactory.Services.CreateScope();
+        var repository = scope.ServiceProvider.GetService<IVersityUsersRepository>();
+        var (user, password) = await VersityUserSeeder.SeedUserDataAsync(repository);
+        var faker = new Faker();
+        var command = new ChangeUserPasswordDto(
+            password,
+            faker.Internet.Password(5) + $"!{Utils.GenerateRandomString(2)}!p1A2");
         
         // Act
-        var response = await _httpClient.PutAsJsonAsync(HttpHelper.ChangeUserPassword("4e274126-1d8a-4dfd-a025-806987095809"), command);
+        var response = await _httpClient.PutAsJsonAsync(HttpHelper.ChangeUserPassword(user.Id), command);
         
         // Act
         response.EnsureSuccessStatusCode();

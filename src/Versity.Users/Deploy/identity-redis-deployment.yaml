@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity-redis-deployment
+  labels:
+    app: identity-redis-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: identity-redis
+  template:
+    metadata:
+      name: identity-redis
+      labels:
+        app: identity-redis
+        app.kubernetes.io/name: identity-redis
+    spec:
+      containers:
+        - name: identity-redis
+          image: redis/redis-stack:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6379
+          env:
+            - name: REDIS_ARGS
+              value: --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+          volumeMounts:
+            - mountPath: "/var/lib/postgresql/data"
+              name: identity-volume-cache
+      volumes:
+        - name: identity-volume-cache
+          persistentVolumeClaim:
+            claimName: identity-volume-claim-cache
+      restartPolicy: Always

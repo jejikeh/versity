@@ -22,17 +22,16 @@ public class GetAllProductsTests
         // Arrange
         var products = GenerateFakeProductsList();
         _productsRepository.Setup(productsRepository => 
-                productsRepository.GetAllProducts())
-            .Returns(products.AsQueryable);
+                productsRepository.GetProductsAsync(It.IsAny<int?>(), It.IsAny<int?>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromResult(products));
         
         var handler = new GetAllProductsQueryHandler(_productsRepository.Object);
         
         // Act
-        await handler.Handle(new GetAllProductsQuery(1), CancellationToken.None);
+        var result = await handler.Handle(new GetAllProductsQuery(1), CancellationToken.None);
 
         // Assert
-        _productsRepository.Verify(productsRepository =>
-            productsRepository.ToListAsync(It.Is<IQueryable<Product>>(q => q.Count() == 10)), Times.Once);
+        result.Count().Should().Be(products.Count());
     }
     
     [Fact]

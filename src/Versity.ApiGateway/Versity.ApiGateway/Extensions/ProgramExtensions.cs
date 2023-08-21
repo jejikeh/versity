@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Cors.Infrastructure;
+﻿using System.Net;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using Versity.ApiGateway.Configuration;
 
 namespace Versity.ApiGateway.Extensions;
 
@@ -10,22 +12,34 @@ public static class ProgramExtensions
     {
         builder.Configuration
             .SetBasePath(builder.Environment.ContentRootPath)
-            .AddJsonFile("ocelot.json", optional: false, reloadOnChange: true)
+            .AddJsonFile("appsettings.json", true, true)
+            .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", true, true)
+            .AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json")
             .AddEnvironmentVariables();
 
         builder.Services
-            .AddJwtAuthentication(builder.Configuration)
-            .AddCors(options => options.ConfigureFrontendCors())
+            .AddJwtAuthentication(new TokenGenerationConfiguration(builder.Configuration))
+            .AddCors(options => options.ConfigureFrontendCors(builder.Configuration))
             .AddOcelot(builder.Configuration);
+        
+        ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, sslPolicyErrors) => true;
 
-        builder.Services.AddSignalR();
+        builder.Services.AddSignalR(configure =>
+        {
+        });
         
         return builder;
     }
     
     public static async Task<WebApplication> ConfigureApplication(this WebApplication app)
     {
-        app.UseHttpsRedirection();
+        // if deploying in kubernetes, then https and ssl certificates
+        // will be managing by kubernetes ingress
+        if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "false")
+        {
+            app.UseHttpsRedirection();
+        }
+        
         app.UseAuthorization();
         app.UseAuthentication();
         app.UseCors("AllowAll");
@@ -34,8 +48,26 @@ public static class ProgramExtensions
 
         return app;
     }
+
+    public static async Task<WebApplication> RunApplicationAsync(this WebApplication application)
+    {
+        using var scope = application.Services.CreateScope();
+        var serviceProvider = scope.ServiceProvider;
+        
+        try
+        {
+            await application.RunAsync();
+        }
+        catch (Exception ex)
+        {
+            var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "Host terminated unexpectedly");
+        }
+        
+        return application;
+    }
     
-    private static CorsOptions ConfigureFrontendCors(this CorsOptions options)
+    private static CorsOptions ConfigureFrontendCors(this CorsOptions options, IConfiguration configuration)
     {
         options.AddPolicy("AllowAll", policy =>
         {
@@ -43,7 +75,7 @@ public static class ProgramExtensions
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials()
-                .WithOrigins("http://localhost:3000");
+                .WithOrigins(configuration["FrontendHost"] ?? throw new InvalidOperationException("Set the FrontendHost Variable"));
         });
         
         return options;

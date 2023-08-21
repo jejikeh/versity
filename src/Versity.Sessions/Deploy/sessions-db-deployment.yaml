@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sessions-db-deployment
+  labels:
+    app: sessions-db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sessions-db
+  template:
+    metadata:
+      name: sessions-db
+      labels:
+        app: sessions-db
+        app.kubernetes.io/name: sessions-db
+    spec:
+      containers:
+        - name: sessions-db
+          image: mongo:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 27017
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: sessions-service
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: sessions-service
+            - name: MONGO_INITDB_DATABASE
+              value: versity_sessions
+          volumeMounts:
+            - mountPath: "/data/db"
+              name: sessions-volume
+      volumes:
+        - name: sessions-volume
+          persistentVolumeClaim:
+            claimName: sessions-volume-claim
+      restartPolicy: Always

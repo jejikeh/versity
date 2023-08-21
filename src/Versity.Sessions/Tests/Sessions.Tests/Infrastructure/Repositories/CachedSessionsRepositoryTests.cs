@@ -2,7 +2,7 @@
 using Application.Abstractions.Repositories;
 using Domain.Models;
 using FluentAssertions;
-using Infrastructure.Persistence.Repositories;
+using Infrastructure.Persistence.MongoRepositories;
 using Moq;
 using Sessions.Tests.Application;
 
@@ -25,14 +25,15 @@ public class CachedSessionsRepositoryTests
     public void GetAllSessions_ShouldReturnSessionsFromRepository_WhenValueNotCached()
     {
         // Arrange
-        _sessionsRepository.Setup(repository => repository.GetAllSessions())
+        _sessionsRepository.Setup(repository => repository.GetSessions(
+                It.IsAny<int?>(), It.IsAny<int?>()))
             .Returns(FakeDataGenerator.GenerateFakeSessions(10, 10).AsQueryable());
         
         // Act
-        _cachedSessions.GetAllSessions();
+        _cachedSessions.GetSessions(1, 2);
         
         // Assert
-        _sessionsRepository.Verify(repository => repository.GetAllSessions(), Times.Once());
+        _sessionsRepository.Verify(repository => repository.GetSessions(1, 2), Times.Once());
     }
     
     [Fact]
@@ -56,28 +57,34 @@ public class CachedSessionsRepositoryTests
     public void GetAllUserSessions_ShouldReturnSessionsFromRepository_WhenValueNotCached()
     {
         // Arrange
-        _sessionsRepository.Setup(repository => repository.GetAllUserSessions(It.IsAny<string>()))
+        _sessionsRepository.Setup(repository => repository.GetAllUserSessions(
+                It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<int?>()))
             .Returns(FakeDataGenerator.GenerateFakeSessions(10, 10).AsQueryable());
         
         // Act
-        _cachedSessions.GetAllUserSessions(Guid.NewGuid().ToString());
+        _cachedSessions.GetAllUserSessions(Guid.NewGuid().ToString(), 1, 1);
         
         // Assert
-        _sessionsRepository.Verify(repository => repository.GetAllUserSessions(It.IsAny<string>()), Times.Once());
+        _sessionsRepository.Verify(repository => repository.GetAllUserSessions(
+            It.IsAny<string>(), It.IsAny<int?>(), It.IsAny<int?>()), 
+            Times.Once());
     }
     
     [Fact]
     public void GetAllProductSessions_ShouldReturnSessionsFromRepository_WhenValueNotCached()
     {
         // Arrange
-        _sessionsRepository.Setup(repository => repository.GetAllProductSessions(It.IsAny<Guid>()))
+        _sessionsRepository.Setup(repository => repository.GetAllProductSessions(
+                It.IsAny<Guid>(), It.IsAny<int?>(), It.IsAny<int?>()))
             .Returns(FakeDataGenerator.GenerateFakeSessions(10, 10).AsQueryable());
         
         // Act
-        _cachedSessions.GetAllProductSessions(Guid.NewGuid());
+        _cachedSessions.GetAllProductSessions(Guid.NewGuid(), Random.Shared.Next(1,100), Random.Shared.Next(1,100));
         
         // Assert
-        _sessionsRepository.Verify(repository => repository.GetAllProductSessions(It.IsAny<Guid>()), Times.Once());
+        _sessionsRepository.Verify(repository => repository.GetAllProductSessions(
+            It.IsAny<Guid>(), It.IsAny<int?>(), It.IsAny<int?>()), 
+            Times.Once());
     }
     
     [Fact]
@@ -123,21 +130,6 @@ public class CachedSessionsRepositoryTests
         
         // Assert
         _sessionsRepository.Verify(repository => repository.UpdateSession(It.IsAny<Session>()), Times.Once());
-    }
-    
-    [Fact]
-    public void ToListAsync_ShouldUseMethodFromRepository_WhenValueNotCached()
-    {
-        // Arrange
-        var session = FakeDataGenerator.GenerateFakeSessions(10, 10);
-        _sessionsRepository.Setup(repository => repository.ToListAsync(It.IsAny<IQueryable<Session>>()))
-            .Returns(Task.Run(() => session));
-        
-        // Act
-        _cachedSessions.ToListAsync(session.AsQueryable());
-        
-        // Assert
-        _sessionsRepository.Verify(repository => repository.ToListAsync(It.IsAny<IQueryable<Session>>()), Times.Once());
     }
     
     [Fact]

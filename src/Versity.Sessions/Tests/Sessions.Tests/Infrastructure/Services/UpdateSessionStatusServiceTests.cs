@@ -32,9 +32,11 @@ public class UpdateSessionStatusServiceTests
         var sessions = GenerateFakeExpiredOrNotExpiredSessions(count, new Random().Next(1, 10));
         var expectedCount = sessions
             .Where(session => session.Expiry < DateTime.UtcNow)
-            .Count(session => session.Status != SessionStatus.Closed && session.Status != SessionStatus.Expired);
+            .Where(session => session.Status != SessionStatus.Closed && session.Status != SessionStatus.Expired)
+            .ToList();
         
-        _sessionsRepository.Setup(repository => repository.GetAllSessions()).Returns(sessions.AsQueryable());
+        _sessionsRepository.Setup(repository => repository.GetExpiredSessions())
+            .Returns(expectedCount);
         
         // Act
         _updateSessionStatusService.ExpireExpiredSessions();
@@ -42,7 +44,7 @@ public class UpdateSessionStatusServiceTests
         // Assert
         _sessionsRepository.Verify(
             repository => repository.UpdateSession(It.IsAny<Session>()), 
-            Times.Exactly(expectedCount));
+            Times.Exactly(expectedCount.Count()));
     }
     
     [Fact]
@@ -53,9 +55,11 @@ public class UpdateSessionStatusServiceTests
         var sessions = GenerateFakeExpiredOrNotExpiredSessions(count, new Random().Next(1, 10));
         var expectedCount = sessions
             .Where(session => session.Expiry < DateTime.UtcNow)
-            .Count(session => session.Status != SessionStatus.Closed && session.Status != SessionStatus.Expired);
+            .Where(session => session.Status != SessionStatus.Closed && session.Status != SessionStatus.Expired)
+            .ToList();
         
-        _sessionsRepository.Setup(repository => repository.GetAllSessions()).Returns(sessions.AsQueryable());
+        _sessionsRepository.Setup(repository => repository.GetExpiredSessions())
+            .Returns(expectedCount);
         
         // Act
         _updateSessionStatusService.ExpireExpiredSessions();
@@ -65,7 +69,7 @@ public class UpdateSessionStatusServiceTests
             repository => repository.PushClosedSession(
                 It.IsAny<string>(), 
                 It.IsAny<UserSessionsViewModel>()), 
-            Times.Exactly(expectedCount));
+            Times.Exactly(expectedCount.Count()));
     }
     
     [Fact]
@@ -76,9 +80,11 @@ public class UpdateSessionStatusServiceTests
         var sessions = GenerateFakeInactiveOrNotInactiveSessions(count, new Random().Next(1, 10));
         var expectedCount = sessions
             .Where(session => session.Start <= DateTime.Now && session.Expiry > DateTime.UtcNow)
-            .Count(session => session.Status == SessionStatus.Inactive);
+            .Where(session => session.Status == SessionStatus.Inactive)
+            .ToList();
         
-        _sessionsRepository.Setup(repository => repository.GetAllSessions()).Returns(sessions.AsQueryable());
+        _sessionsRepository.Setup(repository => repository.GetInactiveSessions())
+            .Returns(expectedCount);
         
         // Act
         _updateSessionStatusService.OpenInactiveSessions();
@@ -86,7 +92,7 @@ public class UpdateSessionStatusServiceTests
         // Assert
         _sessionsRepository.Verify(repository => 
                 repository.UpdateSession(It.IsAny<Session>()), 
-            Times.Exactly(expectedCount));
+            Times.Exactly(expectedCount.Count()));
     }
     
     [Fact]
@@ -97,9 +103,12 @@ public class UpdateSessionStatusServiceTests
         var sessions = GenerateFakeInactiveOrNotInactiveSessions(count, new Random().Next(1, 10));
         var expectedCount = sessions
             .Where(session => session.Start <= DateTime.Now && session.Expiry > DateTime.UtcNow)
-            .Count(session => session.Status == SessionStatus.Inactive);
+            .Where(session => session.Status == SessionStatus.Inactive)
+            .ToList();
         
-        _sessionsRepository.Setup(repository => repository.GetAllSessions()).Returns(sessions.AsQueryable());
+        _sessionsRepository.Setup(repository => repository
+            .GetInactiveSessions())
+            .Returns(expectedCount);
         
         // Act
         _updateSessionStatusService.OpenInactiveSessions();
@@ -109,7 +118,7 @@ public class UpdateSessionStatusServiceTests
                 repository.PushCreatedNewSession(
                     It.IsAny<string>(), 
                     It.IsAny<UserSessionsViewModel>()), 
-            Times.Exactly(expectedCount));
+            Times.Exactly(expectedCount.Count()));
     }
     
     private static List<Session> GenerateFakeExpiredOrNotExpiredSessions(int count, int logCount)
@@ -120,8 +129,8 @@ public class UpdateSessionStatusServiceTests
             Id = Guid.NewGuid(),
             UserId = Guid.NewGuid().ToString(),
             Status = (SessionStatus)random.Next(5),
-            Product = FakeDataGenerator.GenerateFakeProduct(),
-            Logs = FakeDataGenerator.GenerateFakeSessionLogs(logCount),
+            ProductId = FakeDataGenerator.GenerateFakeProduct().Id,
+            LogsId = FakeDataGenerator.GenerateFakeSessionLogs(logCount).Id,
             Expiry = random.Next(1, 10) == 9 ? faker.Date.Future() : faker.Date.Past(),
             Start = faker.Date.Past()
         }).Generate(count);
@@ -135,8 +144,8 @@ public class UpdateSessionStatusServiceTests
             Id = Guid.NewGuid(),
             UserId = Guid.NewGuid().ToString(),
             Status = (SessionStatus)random.Next(5),
-            Product = FakeDataGenerator.GenerateFakeProduct(),
-            Logs = FakeDataGenerator.GenerateFakeSessionLogs(logCount),
+            ProductId = FakeDataGenerator.GenerateFakeProduct().Id,
+            LogsId = FakeDataGenerator.GenerateFakeSessionLogs(logCount).Id,
             Expiry = faker.Date.Between(DateTime.UtcNow.AddYears(-5), DateTime.UtcNow.AddYears(5)),
             Start = faker.Date.Between(DateTime.UtcNow.AddYears(-10), DateTime.UtcNow.AddYears(-5))
         }).Generate(count);

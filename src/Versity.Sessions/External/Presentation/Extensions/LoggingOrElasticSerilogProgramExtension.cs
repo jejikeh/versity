@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Infrastructure.Configuration;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;
@@ -17,11 +18,13 @@ public static class LoggingOrElasticSerilogProgramExtension
         return application;
     }
     
-    public static WebApplicationBuilder AddLogging(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder AddLogging(
+        this WebApplicationBuilder builder,
+        IApplicationConfiguration applicationConfiguration)
     {
         if (Environment.GetEnvironmentVariable("ElasticConfiguration:Uri") != "no_set")
         {
-            return builder.AddElasticAndSerilog();
+            return builder.AddElasticAndSerilog(applicationConfiguration);
         }
         
         builder.Logging.ClearProviders();
@@ -29,12 +32,16 @@ public static class LoggingOrElasticSerilogProgramExtension
         
         return builder;
     }
-    
-    public static WebApplicationBuilder AddElasticAndSerilog(this WebApplicationBuilder builder)
+
+    private static WebApplicationBuilder AddElasticAndSerilog(
+        this WebApplicationBuilder builder,
+        IApplicationConfiguration applicationConfiguration)
     {
         builder.Host.UseSerilog((context, configuration) =>
         {
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var environment = applicationConfiguration.IsDevelopmentEnvironment 
+                ? "Development" 
+                : "Production";
             if (string.IsNullOrEmpty(environment))
             {
                 throw new NullReferenceException("ASPNETCORE_ENVIRONMENT variable is empty!");

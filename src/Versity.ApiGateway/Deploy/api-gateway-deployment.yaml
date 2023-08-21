@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway-deployment
+  labels:
+    app: api-gateway-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      name: api-gateway
+      labels:
+        app: api-gateway
+        app.kubernetes.io/name: api-gateway
+    spec:
+      containers:
+        - name: api-gateway-deployment
+          image: jejikeh/versity.apigateway
+          ports:
+            - containerPort: 443
+              name: https-web-api
+            - containerPort: 80
+              name: http-web-api
+          env:
+            - name: ASPNETCORE_URLS
+              value: http://+80
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: /app/appsettings.Production.json
+              subPath: appsettings.Production.json
+              name: versity-apigateway-secret-appsettings
+      restartPolicy: Always
+      volumes:
+        - name: versity-apigateway-secret-appsettings
+          secret:
+            secretName: versity-apigateway-secret-appsettings

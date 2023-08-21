@@ -12,7 +12,6 @@ public class KafkaProductConsumerService
     private readonly IKafkaConsumerConfiguration _configuration;
 
     public KafkaProductConsumerService(
-        ILogger<KafkaProductConsumerService> logger, 
         IKafkaConsumerConfiguration configuration)
     {
         _configuration = configuration;

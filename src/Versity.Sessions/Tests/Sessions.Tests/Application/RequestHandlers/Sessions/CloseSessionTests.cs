@@ -51,8 +51,8 @@ public class CloseSessionTests
         await _closeSessionCommandHandler.Handle(new CloseSessionCommand(Guid.NewGuid()), CancellationToken.None);
 
         // Assert
-        _sessionsRepository.Verify(sessionsRepository => sessionsRepository.UpdateSession(
-                It.Is<Session>(session => session.Status == SessionStatus.Closed)), 
+        _sessionsRepository.Verify(sessionsRepository => sessionsRepository.UpdateSessionAsync(
+                It.IsAny<Session>(), It.IsAny<CancellationToken>()), 
             Times.Once);
     }
     

@@ -46,10 +46,8 @@ public class BackgroundWorkersCacheService
                 LogLevel = log.LogLevel,
                 Data = log.Data,
                 SessionLogsId = log.SessionLogsId,
-                SessionLogs = sessionLogs
             };
             
-            sessionLogs.Logs.Add(logData);
             _logsDataRepository.CreateLogDataAsync(logData, default);
             _cacheService.SetRemoveMember(CachingKeys.SessionLogs, log);
         }

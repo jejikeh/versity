@@ -1,8 +1,7 @@
 ﻿using System.Text;
-using Application.Abstractions;
 using Domain.Models;
 using Infrastructure.Persistence;
-using Infrastructure.Services;
+using Infrastructure.Services.TokenServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -29,7 +28,9 @@ public static class IdentityAuthenticationProgramExtension
         return serviceCollection;
     }
 
-    public static IServiceCollection AddJwtAuthentication(this IServiceCollection serviceCollection, IConfiguration configuration)
+    public static IServiceCollection AddJwtAuthentication(
+        this IServiceCollection serviceCollection, 
+        ITokenGenerationConfiguration tokenGenerationConfiguration)
     {
         serviceCollection.AddAuthentication(options =>
         {
@@ -37,19 +38,26 @@ public static class IdentityAuthenticationProgramExtension
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         }).AddJwtBearer(options =>
         {
-            options.TokenValidationParameters = new TokenValidationParameters()
-            {
-                ValidateActor = true,
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                RequireExpirationTime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = Environment.GetEnvironmentVariable("JWT__Issuer") ?? configuration.GetSection("Jwt:Issuer").Value,
-                ValidAudience = Environment.GetEnvironmentVariable("JWT__Audience") ?? configuration.GetSection("Jwt:Audience").Value,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT__Key") ?? configuration.GetSection("Jwt:Key").Value))
-            };
+            options.SetValidationTokenOptions(tokenGenerationConfiguration);
         });
 
         return serviceCollection;
+    }
+
+    private static JwtBearerOptions SetValidationTokenOptions(this JwtBearerOptions options, ITokenGenerationConfiguration tokenGenerationConfiguration)
+    {
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateActor = true,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            RequireExpirationTime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = tokenGenerationConfiguration.Issuer,
+            ValidAudience = tokenGenerationConfiguration.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenGenerationConfiguration.Key))
+        };
+
+        return options;
     }
 }

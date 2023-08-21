@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Local Debug Deploy" type="CompoundRunConfigurationType">
+    <toRun name="Apigateway" type="LaunchSettings" />
+    <toRun name="Products" type="LaunchSettings" />
+    <toRun name="Sessions" type="LaunchSettings" />
+    <toRun name="Users" type="LaunchSettings" />
+    <method v="2" />
+  </configuration>
+</component>

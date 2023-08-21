@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: products-zookeeper-deployment
+  labels:
+    app: products-zookeeper-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: products-zookeeper
+  template:
+    metadata:
+      name: products-zookeeper
+      labels:
+        app: products-zookeeper
+        app.kubernetes.io/name: products-zookeeper
+    spec:
+      containers:
+        - image: wurstmeister/zookeeper
+          name: products-zookeeper
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 2181

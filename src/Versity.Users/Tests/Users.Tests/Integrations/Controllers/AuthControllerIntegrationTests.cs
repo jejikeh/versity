@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using Application.Abstractions.Repositories;
-using Application.RequestHandlers.Auth.Commands.ConfirmEmail;
 using Application.RequestHandlers.Auth.Commands.LoginVersityUser;
 using Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
 using Application.RequestHandlers.Auth.Commands.ResendEmailVerificationToken;
@@ -9,6 +8,7 @@ using Bogus;
 using Domain.Models;
 using FluentAssertions;
 using Infrastructure.Services.TokenServices;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Presentation.Configuration;
 using Users.Tests.Integrations.Fixtures;
@@ -17,6 +17,7 @@ using Utils = Application.Common.Utils;
 
 namespace Users.Tests.Integrations.Controllers;
 
+[Collection("Integration Tests")]
 public class AuthControllerIntegrationTests : IClassFixture<ControllersAppFactoryFixture>
 {
     private readonly HttpClient _httpClient;
@@ -27,8 +28,13 @@ public class AuthControllerIntegrationTests : IClassFixture<ControllersAppFactor
         _controllersAppControllersAppFactory = controllersAppFactoryFixture;
         _httpClient = controllersAppFactoryFixture.CreateClient();
         
-        var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration());
-        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(TestUtils.AdminId, "admin@mail.com", new List<string> { "Admin" }));
+        using var scope = _controllersAppControllersAppFactory.Services.CreateScope();
+        var configuration = scope.ServiceProvider.GetService<IConfiguration>();
+        var jwtTokenGeneratorService = new JwtTokenGeneratorService(new TokenGenerationConfiguration(configuration));
+        _httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + jwtTokenGeneratorService.GenerateToken(
+            TestUtils.AdminId, 
+            TestUtils.AdminEmail, 
+            new List<string> { "Admin" }));
     }
 
     [Fact]
@@ -82,6 +88,11 @@ public class AuthControllerIntegrationTests : IClassFixture<ControllersAppFactor
         
         // Act
         var response = await _httpClient.PostAsJsonAsync(HttpHelper.Register(), command);
+        if (response.StatusCode != HttpStatusCode.OK)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            throw new Exception(content);
+        }
         
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -138,6 +149,11 @@ public class AuthControllerIntegrationTests : IClassFixture<ControllersAppFactor
         
         // Act
         var response = await _httpClient.PostAsJsonAsync(HttpHelper.RefreshJwtToken(user.Id, token), user.Id);
+        if (response.StatusCode == HttpStatusCode.InternalServerError)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            throw new Exception(content);
+        }
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

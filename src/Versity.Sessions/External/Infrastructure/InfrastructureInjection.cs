@@ -2,59 +2,114 @@
 using Application.Abstractions;
 using Application.Abstractions.Repositories;
 using Hangfire;
-using Hangfire.PostgreSql;
+using Hangfire.Mongo;
+using Hangfire.Mongo.Migration.Strategies;
+using Hangfire.Mongo.Migration.Strategies.Backup;
+using Infrastructure.Configuration;
 using Infrastructure.Persistence;
-using Infrastructure.Persistence.Repositories;
+using Infrastructure.Persistence.MongoRepositories;
+using Infrastructure.Persistence.SqlRepositories;
 using Infrastructure.Services;
 using Infrastructure.Services.KafkaConsumer;
 using Infrastructure.Services.KafkaConsumer.Abstractions;
 using Infrastructure.Services.KafkaConsumer.Handlers.CreateProduct;
 using Infrastructure.Services.KafkaConsumer.Handlers.DeleteProduct;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using StackExchange.Redis;
 
 namespace Infrastructure;
 
 public static class InfrastructureInjection
 {
-    public static IServiceCollection AddDbContext(this IServiceCollection serviceCollection, IConfiguration configuration)
+    public static IServiceCollection AddDbContext(
+        this IServiceCollection serviceCollection, 
+        IApplicationConfiguration configuration)
     {
-        var connectionString = Environment.GetEnvironmentVariable("ConnectionString");
-        serviceCollection.AddDbContext<VersitySessionsServiceDbContext>(options =>
+        return configuration.IsDevelopmentEnvironment 
+            ? serviceCollection.AddSqliteDatabase<VersitySessionsServiceSqlDbContext>(configuration.DatabaseConnectionString) 
+            : serviceCollection.AddMongoDb();
+    }
+
+    private static IServiceCollection AddMongoDb(this IServiceCollection serviceCollection)
+    {
+        return serviceCollection
+            .AddSingleton<VersitySessionsServiceMongoDbContext>()
+            .AddMongoRepositories();
+    }
+    
+    private static IServiceCollection AddSqliteDatabase<T>(
+        this IServiceCollection serviceCollection, 
+        string? connectionString) where T : DbContext
+    {
+        serviceCollection.AddDbContext<T>(options =>
         {
             options.EnableDetailedErrors();
+            options.UseSqlite(
+                connectionString,
+                builder =>
+                {
+                    builder.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
+                });
+        });
+
+        serviceCollection.AddSqlRepositories();
+
+        return serviceCollection;
+    }
+
+    private static IServiceCollection AddPostgresDatabase<T>(
+        this IServiceCollection serviceCollection, 
+        string? connectionString) where T : DbContext
+    {
+        serviceCollection.AddDbContext<T>(options =>
+        {
+            options.EnableDetailedErrors();
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             options.UseNpgsql(
                 connectionString,
-                builder => builder.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName));
-            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+                builder =>
+                {
+                    builder.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
+                    builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+                });
         });
 
         return serviceCollection;
     }
     
-    public static IServiceCollection AddRepositories(this IServiceCollection serviceCollection)
+    private static IServiceCollection AddMongoRepositories(this IServiceCollection serviceCollection)
     {
-        serviceCollection.AddScoped<ISessionsRepository, SessionsRepository>();
-        serviceCollection.AddScoped<IProductsRepository, ProductRepository>();
-        serviceCollection.AddScoped<ISessionLogsRepository, SessionLogsRepository>();
-        serviceCollection.AddScoped<ILogsDataRepository, LogsDataRepository>();
+        serviceCollection.AddScoped<ISessionsRepository, SessionsMongoRepository>();
+        serviceCollection.AddScoped<IProductsRepository, ProductMongoRepository>();
+        serviceCollection.AddScoped<ISessionLogsRepository, SessionLogsMongoRepository>();
+        serviceCollection.AddScoped<ILogsDataRepository, LogsDataMongoRepository>();
+        
+        return serviceCollection;
+    }
+    
+    private static IServiceCollection AddSqlRepositories(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddScoped<ISessionsRepository, SessionsSqlRepository>();
+        serviceCollection.AddScoped<IProductsRepository, ProductSqlRepository>();
+        serviceCollection.AddScoped<ISessionLogsRepository, SessionLogsSqlRepository>();
+        serviceCollection.AddScoped<ILogsDataRepository, LogsDataSqlRepository>();
         
         return serviceCollection;
     }
 
-    public static IServiceCollection AddRedisCaching(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddRedisCaching(
+        this IServiceCollection serviceCollection,
+        IApplicationConfiguration configuration)
     {
         serviceCollection.Decorate<ISessionsRepository, CachedSessionsRepository>();
-        serviceCollection.AddSingleton(ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS_Host")));
-        serviceCollection.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(provider => provider.GetService<ConnectionMultiplexer>());
-        serviceCollection.AddSingleton<ICacheService, RedisCacheService>();
+        configuration.InjectCacheService(serviceCollection);
         
         return serviceCollection;
     }
 
-    public static IServiceCollection AddKafka(this IServiceCollection serviceCollection, IKafkaConsumerConfiguration configuration)
+    public static IServiceCollection AddKafka(
+        this IServiceCollection serviceCollection, 
+        IKafkaConsumerConfiguration configuration)
     {
         serviceCollection
             .AddKafkaHandler<CreateProductMessageHandler>()
@@ -64,13 +119,37 @@ public static class InfrastructureInjection
         return serviceCollection;
     }
     
-    public static IServiceCollection AddHangfireService(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddHangfireService(
+        this IServiceCollection serviceCollection,
+        IApplicationConfiguration applicationConfiguration)
     {
         serviceCollection.AddHangfireServer();
-        serviceCollection.AddHangfire(configuration => configuration
-            .UseSimpleAssemblyNameTypeSerializer()
-            .UseRecommendedSerializerSettings()
-            .UsePostgreSqlStorage(Environment.GetEnvironmentVariable("ConnectionString")));
+        serviceCollection.AddHangfire(configuration =>
+        {
+            configuration
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings();
+            
+            if (applicationConfiguration.IsDevelopmentEnvironment || applicationConfiguration.IsTestingEnvironment)
+            {
+                configuration.UseInMemoryStorage();
+            }
+            else
+            {
+                configuration.UseMongoStorage(
+                    applicationConfiguration.DatabaseConnectionString,
+                    new MongoStorageOptions { 
+                        MigrationOptions = new MongoMigrationOptions()
+                        {
+                            MigrationStrategy = new MigrateMongoMigrationStrategy(),
+                            BackupStrategy = new CollectionMongoBackupStrategy()
+                        },
+                        Prefix = "hangfire.mongo",
+                        CheckConnection = true,
+                        CheckQueuedJobsStrategy = CheckQueuedJobsStrategy.TailNotificationsCollection
+                    });
+            }
+        });
 
         serviceCollection.AddTransient<UpdateSessionStatusService>();
         serviceCollection.AddTransient<BackgroundWorkersCacheService>();

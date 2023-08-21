@@ -1,0 +1,414 @@
+﻿{
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/health-check",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identity-service.default.svc.cluster.local",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/health-check"
+    },
+    {
+      "UpstreamPathTemplate": "/api/auth/register",
+      "UpstreamHttpMethod": ["Post"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identity-service.default.svc.cluster.local",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/auth/register"
+    },
+    {
+      "UpstreamPathTemplate": "/api/auth/refreshtoken/{userId}/{refreshToken}",
+      "UpstreamHttpMethod": ["Post"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identity-service.default.svc.cluster.local",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/auth/refreshtoken/{userId}/{refreshToken}"
+    },
+    {
+      "UpstreamPathTemplate": "/api/auth/GetAllRefreshTokens",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identity-service.default.svc.cluster.local",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/auth/getallrefreshtokens",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/auth/login",
+      "UpstreamHttpMethod": ["Post"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identity-service.default.svc.cluster.local",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/auth/login"
+    },
+    {
+      "UpstreamPathTemplate": "/api/auth/resendemailverificationtoken",
+      "UpstreamHttpMethod": ["Post"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identity-service.default.svc.cluster.local",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/auth/resendemailverificationtoken"
+    },
+    {
+      "UpstreamPathTemplate": "/api/auth/confirmemail/{userId}/{code}",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identity-service.default.svc.cluster.local",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/auth/confirmemail/{userId}/{code}"
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/{userId}/set-admin",
+      "UpstreamHttpMethod": ["Post"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identity-service.default.svc.cluster.local",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users/{userId}/set-admin",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/{userId}",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identity-service.default.svc.cluster.local",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users/{userId}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/page/{page}",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identity-service.default.svc.cluster.local",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users/page/{page}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/users/{userId}/password/",
+      "UpstreamHttpMethod": ["Put"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "identity-service.default.svc.cluster.local",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/users/{userId}/password/",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/products/",
+      "UpstreamHttpMethod": ["Post"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "products-service.default.svc.cluster.local",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/products/",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/products/{page}",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "products-service.default.svc.cluster.local",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/products/{page}"
+    },
+    {
+      "UpstreamPathTemplate": "/api/products/{productId}",
+      "UpstreamHttpMethod": ["Put"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "products-service.default.svc.cluster.local", 
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/products/{productId}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/products/{productId}",
+      "UpstreamHttpMethod": ["Delete"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "products-service.default.svc.cluster.local",
+          "Port": 8080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/products/{productId}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/sessions/{page}",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "sessions-service.default.svc.cluster.local",
+          "Port": 9080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/sessions/{page}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/sessions/products/{page}",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "sessions-service.default.svc.cluster.local",
+          "Port": 9080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/sessions/products/{page}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/sessions/products/{id}/{page}",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "sessions-service.default.svc.cluster.local",
+          "Port": 9080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/sessions/products/{id}/{page}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/sessions/",
+      "UpstreamHttpMethod": ["Post"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "sessions-service.default.svc.cluster.local",
+          "Port": 9080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/sessions/",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/sessions/{id}",
+      "UpstreamHttpMethod": ["Delete"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "sessions-service.default.svc.cluster.local",
+          "Port": 9080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/sessions/{id}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/sessions/users/{id}",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "sessions-service.default.svc.cluster.local",
+          "Port": 9080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/sessions/users/{id}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/sessions/{id}/close",
+      "UpstreamHttpMethod": ["Put"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "sessions-service.default.svc.cluster.local",
+          "Port": 9080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/sessions/{id}/close",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/logdata/{page}",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "sessions-service.default.svc.cluster.local",
+          "Port": 9080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/logdata/{page}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/logdata/",
+      "UpstreamHttpMethod": ["Post"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "sessions-service.default.svc.cluster.local",
+          "Port": 9080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/logdata/",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/logdata/{id}",
+      "UpstreamHttpMethod": ["Post"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "sessions-service.default.svc.cluster.local",
+          "Port": 9080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/logdata/{id}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/api/sessionlogs/{page}",
+      "UpstreamHttpMethod": ["Get"],
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "sessions-service.default.svc.cluster.local",
+          "Port": 9080
+        }
+      ],
+      "DownstreamPathTemplate": "/api/sessionlogs/{page}",
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/sessions-hub/",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "DownstreamPathTemplate": "/sessions-hub/",
+      "DownstreamScheme": "wss",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "sessions-service.default.svc.cluster.local",
+          "Port": 9080
+        }
+      ],
+      "QoSOptions": {
+        "TimeoutValue": 320000
+      },
+      "DangerousAcceptAnyServerCertificateValidator": true
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:8080",
+    "HttpHandlerOptions": {
+      "SslProtocols": "Tls12"
+    }
+  }
+}

@@ -27,7 +27,7 @@ public class CreateProductMessageHandler : IKafkaMessageHandler
         
         var request = JsonSerializer.Deserialize<CreateProductMessage>(message);
         
-        if (await _productsRepository.GetProductByExternalIdAsync(request.Id, cancellationToken) is not null)
+        if (await _productsRepository.GetProductByExternalIdAsync(request.Id, CancellationToken.None) is not null)
         {
             throw new ExceptionWithStatusCode(StatusCodes.Status409Conflict, "Product with specified Id external already exist!");
         }

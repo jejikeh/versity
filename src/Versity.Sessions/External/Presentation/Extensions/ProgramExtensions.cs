@@ -3,34 +3,51 @@ using Application.Abstractions;
 using Application.Abstractions.Hubs;
 using Hangfire;
 using Infrastructure;
+using Infrastructure.Configuration;
+using Infrastructure.Persistence;
 using Infrastructure.Services;
+using Infrastructure.Services.KafkaConsumer;
+using Infrastructure.Services.KafkaConsumer.Abstractions;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.OpenApi.Models;
 using Presentation.Configuration;
 using Presentation.Hubs;
-using Serilog;
 
 namespace Presentation.Extensions;
 
 public static class ProgramExtensions
 {
-    public static WebApplicationBuilder ConfigureBuilder(this WebApplicationBuilder builder)
+    public static WebApplicationBuilder ConfigureBuilder(
+        this WebApplicationBuilder builder,
+        IApplicationConfiguration applicationConfiguration)
     {
+        var kafkaConsumerConfiguration = new KafkaConsumerConfiguration(builder.Configuration);
+        var tokenGenerationConfiguration = new TokenGenerationConfiguration(builder.Configuration);
+        
         builder.Services
-            .AddDbContext(builder.Configuration)
-            .AddRepositories()
-            .AddRedisCaching()
+            .AddSingleton(applicationConfiguration)
+            .AddSingleton((IKafkaConsumerConfiguration)kafkaConsumerConfiguration)
+            .AddDbContext(applicationConfiguration)
+            .AddRedisCaching(applicationConfiguration)
             .AddApplication()
             .InjectSignalR()
             .AddHttpContextAccessor()
             .AddNotificationServices()
-            .AddJwtAuthentication(builder.Configuration)
+            .AddJwtAuthentication(tokenGenerationConfiguration)
             .AddSwagger()
-            .AddCors(options => options.ConfigureApiGatewayCors())
-            .AddKafka(new KafkaConsumerConfiguration())
-            .AddHangfireService()
+            .AddCors(options => options.ConfigureApiGatewayCors(builder.Configuration))
+            .AddHangfireService(applicationConfiguration)
             .AddEndpointsApiExplorer()
             .AddControllers();
+
+        if (!string.Equals(kafkaConsumerConfiguration.Host, "NO_SET"))
+        {
+            builder.Services.AddKafka(kafkaConsumerConfiguration);
+        }
+        else
+        {
+            builder.Services.AddFallbackKafkaServices(kafkaConsumerConfiguration);
+        }
         
         builder.Services.AddScoped<IVersityUsersDataService, GrpcUsersDataService>();
         
@@ -49,9 +66,15 @@ public static class ProgramExtensions
         {
             app.UseExceptionHandler("/error");
         }
+        
+        // if we will be deploying in kubernetes, then https and ssl certificates
+        // will be managing by kubernetes it self
+        if (Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "false")
+        {
+            app.UseHttpsRedirection();
+        }
 
         app.UseLoggingDependOnEnvironment();
-        app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseCors("AllowAll");
@@ -62,8 +85,45 @@ public static class ProgramExtensions
         
         return app;
     }
+
+    public static async Task<WebApplication> RunApplicationAsync(
+        this WebApplication webApplication,
+        IApplicationConfiguration applicationConfiguration)
+    {
+        using var scope = webApplication.Services.CreateScope();
+        var serviceProvider = scope.ServiceProvider;
+        try
+        {
+            if (applicationConfiguration.IsDevelopmentEnvironment)
+            {
+                var versityUsersDbContext = serviceProvider.GetRequiredService<VersitySessionsServiceSqlDbContext>();
+                await versityUsersDbContext.Database.EnsureCreatedAsync();
+            }
+            
+            await webApplication.RunAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("ERROR:" + ex.Message);
+            
+            var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "Host terminated unexpectedly");
+        }
+
+        return webApplication;
+    }
     
-    private static CorsOptions ConfigureApiGatewayCors(this CorsOptions options)
+    public static IServiceCollection AddFallbackKafkaServices(
+        this IServiceCollection serviceCollection, 
+        KafkaConsumerConfiguration configuration)
+    {
+        serviceCollection.AddSingleton(configuration);
+        serviceCollection.AddHostedService<FallbackKafkaProductConsumerService>();
+
+        return serviceCollection;
+    }
+    
+    private static CorsOptions ConfigureApiGatewayCors(this CorsOptions options, IConfiguration configuration)
     {
         options.AddPolicy("AllowAll", policy =>
         {
@@ -71,7 +131,7 @@ public static class ProgramExtensions
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials()
-                .WithOrigins("http://localhost:3000");
+                .WithOrigins(configuration["FrontendHost"] ?? throw new InvalidOperationException("Set the FrontendHost Variable"));
         });
         
         return options;

@@ -6,24 +6,54 @@ using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using StackExchange.Redis;
 
 namespace Infrastructure;
 
 public static class InfrastructureInjection
 {
-    public static IServiceCollection AddDbContext(this IServiceCollection serviceCollection, IConfiguration configuration)
+    public static IServiceCollection AddDbContext(
+        this IServiceCollection serviceCollection, 
+        IApplicationConfiguration configuration)
     {
-        var connectionString = Environment.GetEnvironmentVariable("ConnectionString");
+        return configuration.IsDevelopmentEnvironment
+            ? serviceCollection.AddSqliteDatabase(configuration.DatabaseConnectionString)
+            : serviceCollection.AddPostgresDatabase(configuration.DatabaseConnectionString);
+    }
+    
+    private static IServiceCollection AddSqliteDatabase(
+        this IServiceCollection serviceCollection, 
+        string? connectionString)
+    {
         serviceCollection.AddDbContext<VersityProductsDbContext>(options =>
         {
             options.EnableDetailedErrors();
+            options.UseSqlite(
+                connectionString,
+                builder =>
+                {
+                    builder.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
+                });
+        });
+
+        return serviceCollection;
+    }
+
+    private static IServiceCollection AddPostgresDatabase(
+        this IServiceCollection serviceCollection, 
+        string? connectionString)
+    {
+        serviceCollection.AddDbContext<VersityProductsDbContext>(options =>
+        {
+            options.EnableDetailedErrors();
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
             options.UseNpgsql(
                 connectionString,
-                builder => builder.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName));
-            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+                builder =>
+                {
+                    builder.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
+                    builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+                });
         });
 
         return serviceCollection;
@@ -44,12 +74,12 @@ public static class InfrastructureInjection
         return serviceCollection;
     }
     
-    public static IServiceCollection AddRedisCaching(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddRedisCaching(
+        this IServiceCollection serviceCollection,
+        IApplicationConfiguration configuration)
     {
         serviceCollection.Decorate<IVersityProductsRepository, CachedProductsRepository>();
-        serviceCollection.AddSingleton(ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS_Host")));
-        serviceCollection.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(provider => provider.GetService<ConnectionMultiplexer>());
-        serviceCollection.AddSingleton<ICacheService, RedisCacheService>();
+        configuration.InjectCacheService(serviceCollection);
         
         return serviceCollection;
     }

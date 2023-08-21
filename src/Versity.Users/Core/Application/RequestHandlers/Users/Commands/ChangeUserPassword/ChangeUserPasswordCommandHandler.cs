@@ -27,8 +27,9 @@ public class ChangeUserPasswordCommandHandler : IRequestHandler<ChangeUserPasswo
             throw new InvalidOperationException("User claims was empty!");
         }
 
-        var versityUser = await _versityUsersRepository.GetUserByIdAsync(claimId);
-        if (versityUser is null) 
+        var versityUser = await _versityUsersRepository.GetUserByIdAsync(userId);
+        var claimUser = await _versityUsersRepository.GetUserByIdAsync(claimId);
+        if (versityUser is null || claimId is null) 
         {
             throw new NotFoundExceptionWithStatusCode("There is no user with this Id");
         }
@@ -39,7 +40,7 @@ public class ChangeUserPasswordCommandHandler : IRequestHandler<ChangeUserPasswo
         
         if (userId != claimId)
         {
-            var userRoles = await _versityUsersRepository.GetUserRolesAsync(versityUser);
+            var userRoles = await _versityUsersRepository.GetUserRolesAsync(claimUser);
             if (!userRoles.Contains("Admin"))
             {
                 throw new ExceptionWithStatusCode(StatusCodes.Status403Forbidden, "Not enough rights");

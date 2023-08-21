@@ -15,16 +15,13 @@ public class GetAllProductSessionsQueryHandler : IRequestHandler<GetAllProductSe
         _sessionsRepository = sessionsRepository;
     }
 
-    public async Task<IEnumerable<SessionViewModel>> Handle(GetAllProductSessionsQuery request, CancellationToken cancellationToken)
+    public Task<IEnumerable<SessionViewModel>> Handle(GetAllProductSessionsQuery request, CancellationToken cancellationToken)
     {
-        var sessions = _sessionsRepository
-            .GetAllProductSessions(request.ProductId)
-            .OrderBy(x => x.Status)
-            .Skip(PageFetchSettings.ItemsOnPage * (request.Page - 1))
-            .Take(PageFetchSettings.ItemsOnPage);
+        var sessions = _sessionsRepository.GetAllProductSessions(
+            request.ProductId,
+            PageFetchSettings.ItemsOnPage * (request.Page - 1),
+            PageFetchSettings.ItemsOnPage);
         
-        var viewModels = SessionViewModel.MapWithModels(await _sessionsRepository.ToListAsync(sessions));
-
-        return viewModels;
+        return Task.FromResult(SessionViewModel.MapWithModels(sessions));
     }
 }
