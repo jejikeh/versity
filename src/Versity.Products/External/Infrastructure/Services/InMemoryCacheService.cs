@@ -19,6 +19,7 @@ public class InMemoryCacheService : ICacheService
             entry =>
             {
                 entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(2));
+                
                 return factory.Invoke();
             });
     }
