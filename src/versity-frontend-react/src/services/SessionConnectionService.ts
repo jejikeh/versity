@@ -1,6 +1,6 @@
 import signalR, { HubConnection, HubConnectionBuilder, LogLevel } from "@microsoft/signalr"
 
-export const SESSIONS_URL = "http://:9080/sessions-hub"
+export const SESSIONS_URL = "http://localhost:9080/sessions-hub"
 
 export default class SessionConnectionService {
   static async connect(token: string): Promise<HubConnection | undefined> {

@@ -41,7 +41,7 @@ public class KafkaProductConsumerService : BackgroundService
         {
             try
             {
-                if (ConsumeFromTopic(out var consumeResult) || consumeResult is null)
+                if (ConsumeFromTopic(out var consumeResult))
                 {
                     await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
                     continue;
