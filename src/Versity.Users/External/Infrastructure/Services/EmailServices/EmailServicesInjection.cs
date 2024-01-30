@@ -1,4 +1,5 @@
 ﻿using Application.Abstractions;
+using Application.Abstractions.Repositories;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,7 +12,7 @@ public static class EmailServicesInjection
         serviceCollection.AddSingleton(configuration);
         serviceCollection.AddTransient<IEmailConfirmMessageService, SendConfirmMessageEmailService>();
         serviceCollection.AddTransient<IEmailSenderService, EmailSenderService>();
-        serviceCollection.AddTransient<ISmtpClient, SmptClientService>();
+        serviceCollection.AddTransient<ISmtpClientService, SmptClientService>();
         
         return serviceCollection;
     }

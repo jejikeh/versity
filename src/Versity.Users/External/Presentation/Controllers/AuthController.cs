@@ -5,8 +5,6 @@ using Application.RequestHandlers.Auth.Commands.LoginVersityUser;
 using Application.RequestHandlers.Auth.Commands.RefreshJwtToken;
 using Application.RequestHandlers.Auth.Commands.RegisterVersityUser;
 using Application.RequestHandlers.Auth.Commands.ResendEmailVerificationToken;
-using Application.RequestHandlers.Auth.Queries;
-using Application.RequestHandlers.Users.Commands.GiveAdminRoleToUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -42,7 +40,7 @@ public sealed class AuthController : ApiController
     public async Task<IActionResult> ConfirmEmail(string userId, string code, CancellationToken cancellationToken)
     {
         var command = new ConfirmEmailCommand(userId, Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code)));
-        var token  = await Sender.Send(command, cancellationToken);
+        var token = await Sender.Send(command, cancellationToken);
         
         return Ok(token.Succeeded ? "Thank you for confirming your mail." : "Your Email is not confirmed");
     }

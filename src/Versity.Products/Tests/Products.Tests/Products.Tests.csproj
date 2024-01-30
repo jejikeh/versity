@@ -14,6 +14,11 @@
         <PackageReference Include="FluentAssertions" Version="6.11.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
         <PackageReference Include="Moq" Version="4.18.4" />
+        <PackageReference Include="Testcontainers" Version="3.3.0" />
+        <PackageReference Include="Testcontainers.Elasticsearch" Version="3.3.0" />
+        <PackageReference Include="Testcontainers.Kafka" Version="3.3.0" />
+        <PackageReference Include="Testcontainers.PostgreSql" Version="3.3.0" />
+        <PackageReference Include="Testcontainers.Redis" Version="3.3.0" />
         <PackageReference Include="xunit" Version="2.4.2" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -31,4 +36,25 @@
       <ProjectReference Include="..\..\External\Presentation\Presentation.csproj" />
     </ItemGroup>
 
+
+    <ItemGroup>
+      <Reference Include="Microsoft.AspNetCore.Mvc.Testing">
+        <HintPath>..\..\..\..\..\..\..\.nuget\packages\microsoft.aspnetcore.mvc.testing\7.0.9\lib\net7.0\Microsoft.AspNetCore.Mvc.Testing.dll</HintPath>
+      </Reference>
+      <Reference Include="Microsoft.AspNetCore.TestHost">
+        <HintPath>..\..\..\..\..\..\..\.nuget\packages\microsoft.aspnetcore.testhost\7.0.9\lib\net7.0\Microsoft.AspNetCore.TestHost.dll</HintPath>
+      </Reference>
+      <Reference Include="Testcontainers">
+        <HintPath>..\..\..\..\..\..\..\.nuget\packages\testcontainers\3.3.0\lib\netstandard2.1\Testcontainers.dll</HintPath>
+      </Reference>
+      <Reference Include="Testcontainers.Elasticsearch">
+        <HintPath>..\..\..\..\..\..\..\.nuget\packages\testcontainers.elasticsearch\3.3.0\lib\netstandard2.1\Testcontainers.Elasticsearch.dll</HintPath>
+      </Reference>
+      <Reference Include="Testcontainers.PostgreSql">
+        <HintPath>..\..\..\..\..\..\..\.nuget\packages\testcontainers.postgresql\3.3.0\lib\netstandard2.1\Testcontainers.PostgreSql.dll</HintPath>
+      </Reference>
+      <Reference Include="Testcontainers.Redis">
+        <HintPath>..\..\..\..\..\..\..\.nuget\packages\testcontainers.redis\3.3.0\lib\netstandard2.1\Testcontainers.Redis.dll</HintPath>
+      </Reference>
+    </ItemGroup>
 </Project>

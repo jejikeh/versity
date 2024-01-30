@@ -21,12 +21,12 @@ namespace Users.Tests.Presentation.Controllers;
 public class UsersControllerTests
 {
     private readonly Mock<ISender> _sender;
-    private UsersController service;
+    private readonly UsersController _usersController;
 
     public UsersControllerTests()
     {
         _sender = new Mock<ISender>();
-        service = new UsersController(_sender.Object);
+        _usersController = new UsersController(_sender.Object);
     }
     
     [Fact]
@@ -38,7 +38,7 @@ public class UsersControllerTests
             .ReturnsAsync(GenerateFakeUser());
         
         // Act
-        var response = await service.GetUserById(Guid.NewGuid(), CancellationToken.None);
+        var response = await _usersController.GetUserById(Guid.NewGuid(), CancellationToken.None);
         
         // Assert
         response.Should().BeOfType<OkObjectResult>();
@@ -53,7 +53,7 @@ public class UsersControllerTests
             .ReturnsAsync(GenerateFakeUserList());
         
         // Act
-        var response = await service.GetAllUsers(1, CancellationToken.None);
+        var response = await _usersController.GetAllUsers(1, CancellationToken.None);
         
         // Assert
         response.Should().BeOfType<OkObjectResult>();
@@ -69,7 +69,7 @@ public class UsersControllerTests
         var request = new ChangeUserPasswordDto(Utils.GenerateRandomString(10), Utils.GenerateRandomString(10));
         
         // Act
-        var response = await service.ChangeUserPassword(Guid.NewGuid(), request, CancellationToken.None);
+        var response = await _usersController.ChangeUserPassword(Guid.NewGuid(), request, CancellationToken.None);
         
         // Assert
         response.Should().BeOfType<OkObjectResult>();
@@ -84,7 +84,7 @@ public class UsersControllerTests
             .ReturnsAsync(Guid.NewGuid().ToString());
         
         // Act
-        var response = await service.SetAdmin(Guid.NewGuid(),CancellationToken.None);
+        var response = await _usersController.SetAdmin(Guid.NewGuid(),CancellationToken.None);
         
         // Assert
         response.Should().BeOfType<OkObjectResult>();
