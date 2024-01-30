@@ -1,12 +1,14 @@
 ﻿using System.Reflection;
 using Application.Abstractions;
 using Application.Abstractions.Repositories;
+using Infrastructure.Configurations;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
 using Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace Infrastructure;
 
@@ -34,10 +36,21 @@ public static class InfrastructureInjection
         return serviceCollection;
     }
 
-    public static IServiceCollection AddKafkaServices(this IServiceCollection serviceCollection)
+    public static IServiceCollection AddKafkaServices(this IServiceCollection serviceCollection, IKafkaProducerConfiguration configuration)
     {
+        serviceCollection.AddSingleton(configuration);
         serviceCollection.AddTransient<IProductProducerService, KafkaProductProducerService>();
 
+        return serviceCollection;
+    }
+    
+    public static IServiceCollection AddRedisCaching(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.Decorate<IVersityProductsRepository, CachedProductsRepository>();
+        serviceCollection.AddSingleton(ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS_Host")));
+        serviceCollection.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(provider => provider.GetService<ConnectionMultiplexer>());
+        serviceCollection.AddSingleton<ICacheService, RedisCacheService>();
+        
         return serviceCollection;
     }
 }

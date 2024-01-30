@@ -1,11 +1,12 @@
 ﻿using Application.Abstractions.Repositories;
+using Application.Dtos;
 using Application.Exceptions;
 using Domain.Models;
 using MediatR;
 
 namespace Application.RequestHandlers.Sessions.Queries.GetSessionById;
 
-public class GetSessionByIdQueryHandler : IRequestHandler<GetSessionByIdQuery, Session>
+public class GetSessionByIdQueryHandler : IRequestHandler<GetSessionByIdQuery, GetSessionByIdViewModel>
 {
     private readonly ISessionsRepository _sessions;
 
@@ -14,7 +15,7 @@ public class GetSessionByIdQueryHandler : IRequestHandler<GetSessionByIdQuery, S
         _sessions = sessions;
     }
 
-    public async Task<Session> Handle(GetSessionByIdQuery request, CancellationToken cancellationToken)
+    public async Task<GetSessionByIdViewModel> Handle(GetSessionByIdQuery request, CancellationToken cancellationToken)
     {
         var session = await _sessions.GetSessionByIdAsync(request.Id, cancellationToken);
         if (session is null)
@@ -22,6 +23,6 @@ public class GetSessionByIdQueryHandler : IRequestHandler<GetSessionByIdQuery, S
             throw new NotFoundExceptionWithStatusCode("There is no session with this Id");
         }
 
-        return session;
+        return GetSessionByIdViewModel.MapWithModel(session);
     }
 }

@@ -8,15 +8,17 @@ namespace Infrastructure.Services.KafkaConsumer.Handlers.DeleteProduct;
 public class DeleteProductMessageHandler : IKafkaMessageHandler
 {
     private readonly IProductsRepository _productsRepository;
+    private readonly IKafkaConsumerConfiguration _configuration;
 
-    public DeleteProductMessageHandler(IProductsRepository productsRepository)
+    public DeleteProductMessageHandler(IProductsRepository productsRepository, IKafkaConsumerConfiguration configuration)
     {
         _productsRepository = productsRepository;
+        _configuration = configuration;
     }
 
     public async Task Handle(string key, string message, CancellationToken cancellationToken)
     {
-        if (key != "DeleteProduct")
+        if (key != _configuration.DeleteProductTopic)
         {
             return;
         }

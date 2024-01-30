@@ -38,13 +38,13 @@ public sealed class UsersController : ApiController
     }
     
     [Authorize(Roles = "Admin,Member")]
-    [HttpPut("{id}/password")]
-    public async Task<IActionResult> ChangeUserPassword(string id, ChangeUserPasswordDto changeUserPasswordDto,CancellationToken cancellationToken)
+    [HttpPut("{id:guid}/password")]
+    public async Task<IActionResult> ChangeUserPassword(Guid id, ChangeUserPasswordDto changeUserPasswordDto, CancellationToken cancellationToken)
     {
         var command = new ChangeUserPasswordCommand(
             changeUserPasswordDto.OldPassword, 
             changeUserPasswordDto.NewPassword,
-            id);
+            id.ToString());
         var result = await Sender.Send(command, cancellationToken);
         
         return Ok(result);

@@ -1,7 +1,11 @@
 ﻿using System.Reflection;
+using Application.Abstractions;
 using Application.Abstractions.Repositories;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Infrastructure.Persistence;
 using Infrastructure.Persistence.Repositories;
+using Infrastructure.Services;
 using Infrastructure.Services.KafkaConsumer;
 using Infrastructure.Services.KafkaConsumer.Abstractions;
 using Infrastructure.Services.KafkaConsumer.Handlers.CreateProduct;
@@ -9,6 +13,7 @@ using Infrastructure.Services.KafkaConsumer.Handlers.DeleteProduct;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 
 namespace Infrastructure;
 
@@ -33,6 +38,18 @@ public static class InfrastructureInjection
     {
         serviceCollection.AddScoped<ISessionsRepository, SessionsRepository>();
         serviceCollection.AddScoped<IProductsRepository, ProductRepository>();
+        serviceCollection.AddScoped<ISessionLogsRepository, SessionLogsRepository>();
+        serviceCollection.AddScoped<ILogsDataRepository, LogsDataRepository>();
+        
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddRedisCaching(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.Decorate<ISessionsRepository, CachedSessionsRepository>();
+        serviceCollection.AddSingleton(ConnectionMultiplexer.Connect(Environment.GetEnvironmentVariable("REDIS_Host")));
+        serviceCollection.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(provider => provider.GetService<ConnectionMultiplexer>());
+        serviceCollection.AddSingleton<ICacheService, RedisCacheService>();
         
         return serviceCollection;
     }
@@ -45,5 +62,44 @@ public static class InfrastructureInjection
             .UseKafkaConsumer(configuration);
         
         return serviceCollection;
+    }
+    
+    public static IServiceCollection AddHangfireService(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddHangfireServer();
+        serviceCollection.AddHangfire(configuration => configuration
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UsePostgreSqlStorage(Environment.GetEnvironmentVariable("ConnectionString")));
+
+        serviceCollection.AddTransient<UpdateSessionStatusService>();
+        serviceCollection.AddTransient<BackgroundWorkersCacheService>();
+        
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddNotificationServices(this IServiceCollection servicesCollection)
+    {
+        servicesCollection.AddScoped<INotificationSender, SessionNotificationsSenderService>();
+
+        return servicesCollection;
+    }
+
+    public static void AddHangfireProcesses()
+    {
+        RecurringJob.AddOrUpdate<UpdateSessionStatusService>(
+            "ExpireExpiredSessions",
+            x => x.ExpireExpiredSessions(), 
+            Cron.Minutely);
+        
+        RecurringJob.AddOrUpdate<UpdateSessionStatusService>(
+            "OpenInactiveSessions",
+            x => x.OpenInactiveSessions(), 
+            Cron.Minutely);
+        
+        RecurringJob.AddOrUpdate<BackgroundWorkersCacheService>(
+            "PushSessionsLogs",
+            x => x.PushSessionLogs(), 
+            Cron.Minutely);
     }
 }

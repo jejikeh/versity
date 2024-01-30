@@ -15,30 +15,35 @@ public static class ProgramExtensions
 
         builder.Services
             .AddJwtAuthentication(builder.Configuration)
-            .AddCors(options => options.ConfigureAllowAllCors())
+            .AddCors(options => options.ConfigureFrontendCors())
             .AddOcelot(builder.Configuration);
 
+        builder.Services.AddSignalR();
+        
         return builder;
     }
     
     public static async Task<WebApplication> ConfigureApplication(this WebApplication app)
     {
-        await app.UseOcelot();
         app.UseHttpsRedirection();
         app.UseAuthorization();
         app.UseAuthentication();
         app.UseCors("AllowAll");
+        app.UseWebSockets();
+        await app.UseOcelot();
 
         return app;
     }
     
-    private static CorsOptions ConfigureAllowAllCors(this CorsOptions options)
+    private static CorsOptions ConfigureFrontendCors(this CorsOptions options)
     {
         options.AddPolicy("AllowAll", policy =>
         {
-            policy.AllowAnyHeader();
-            policy.AllowAnyMethod();
-            policy.AllowAnyOrigin();
+            policy
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
+                .WithOrigins("http://localhost:3000");
         });
         
         return options;

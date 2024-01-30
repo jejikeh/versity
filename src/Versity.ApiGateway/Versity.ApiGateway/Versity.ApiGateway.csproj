@@ -10,6 +10,7 @@
 
     <ItemGroup>
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.5" />
+      <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.9" />
       <PackageReference Include="Ocelot" Version="19.0.2" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.15.1" />
     </ItemGroup>

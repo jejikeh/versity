@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.OpenApi.Models;
+using Presentation.Configuration;
 using Presentation.Services;
 using Serilog;
 
@@ -17,8 +18,12 @@ public static class ProgramExtensions
         builder.Services
             .AddDbContext(builder.Configuration)
             .AddRepositories()
+            .AddRedisCaching()
             .AddApplication()
             .AddVersityIdentity()
+            .AddServices(
+                new EmailServicesConfiguration(), 
+                new TokenGenerationConfiguration())
             .AddJwtAuthentication(builder.Configuration)
             .AddSwagger()
             .AddCors(options => options.ConfigureAllowAllCors())
@@ -43,7 +48,7 @@ public static class ProgramExtensions
             app.UseExceptionHandler("/error");
         }
 
-        app.UseSerilogRequestLogging();
+        app.UseLoggingDependOnEnvironment();
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();

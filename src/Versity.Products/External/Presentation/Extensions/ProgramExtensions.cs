@@ -1,10 +1,8 @@
 ﻿using Application;
 using Infrastructure;
 using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel;
 using Microsoft.OpenApi.Models;
+using Presentation.Configuration;
 using Serilog;
 
 namespace Presentation.Extensions;
@@ -16,9 +14,10 @@ public static class ProgramExtensions
         builder.Services
             .AddDbContext(builder.Configuration)
             .AddRepositories()
+            .AddRedisCaching()
             .AddApplication()
             .AddKafkaFlow()
-            .AddKafkaServices()
+            .AddKafkaServices(new KafkaProducerConfiguration())
             .AddJwtAuthentication(builder.Configuration)
             .AddSwagger()
             .AddCors(options => options.ConfigureAllowAllCors())
@@ -41,7 +40,7 @@ public static class ProgramExtensions
             app.UseExceptionHandler("/error");
         }
 
-        app.UseSerilogRequestLogging();
+        app.UseLoggingDependOnEnvironment();
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
